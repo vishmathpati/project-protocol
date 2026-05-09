@@ -25,9 +25,10 @@ STAGE=$(mktemp -d)
 trap "rm -rf $STAGE" EXIT
 
 # Copy plugin structure into staging
-mkdir -p "$STAGE/.claude-plugin" "$STAGE/hooks" "$STAGE/templates"
+mkdir -p "$STAGE/.claude-plugin" "$STAGE/.codex-plugin" "$STAGE/hooks" "$STAGE/templates"
 
 cp .claude-plugin/plugin.json "$STAGE/.claude-plugin/"
+cp .codex-plugin/plugin.json "$STAGE/.codex-plugin/"
 cp -r skills/ "$STAGE/skills/"
 cp hooks/hooks.json "$STAGE/hooks/"
 cp hooks/session-start-context.md "$STAGE/hooks/"

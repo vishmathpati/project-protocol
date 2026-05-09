@@ -5,6 +5,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
 
+## [3.3.2] — 2026-05-09
+
+### Fixed
+- Add `.codex-plugin/plugin.json` to plugin archive (Codex was missing metadata, requiring manual post-install patching)
+- hooks.json SessionStart: try `CODEX_PLUGIN_ROOT` before `CLAUDE_PLUGIN_ROOT` so Codex gets full `session-start-context.md` instead of fallback mini-message
+- build.sh: now includes `.codex-plugin/` in staged zip
+
 ## [3.3.1] — 2026-05-09
 
 ### Fixed

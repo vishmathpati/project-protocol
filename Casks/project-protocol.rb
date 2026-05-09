@@ -1,6 +1,6 @@
 cask "project-protocol" do
-  version "3.3.1"
-  sha256 "b61710d94845d345f0447c4331a1fdd54019d1133ebae4760c477347f658d3f1"
+  version "3.3.2"
+  sha256 "20f3c4b2827d64212d917c1d21e7669600a9df7e6c113d1d9e6ffb824257ddbc"
 
   url "https://github.com/vishmathpati/project-protocol/releases/download/v#{version}/project-protocol-v#{version}.plugin"
   name "project-protocol"
