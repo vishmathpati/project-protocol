@@ -19,9 +19,10 @@ Downloads the latest release and installs it directly into Claude Code.
 ### Homebrew
 
 ```bash
-brew tap vishmathpati/project-protocol
-brew install project-protocol
+brew install --cask vishmathpati/project-protocol/project-protocol
 ```
+
+Installs and activates the plugin in Claude Code automatically.
 
 ### Manual
 
