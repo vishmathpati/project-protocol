@@ -7,21 +7,32 @@ cask "project-protocol" do
   desc "Session protocol plugin for Claude Code and Codex"
   homepage "https://github.com/vishmathpati/project-protocol"
 
-  # No .app bundle — install via claude plugin install
+  # Copy plugin to a permanent location so it survives staging cleanup
+  artifact "project-protocol-v#{version}.plugin",
+    target: "#{Dir.home}/Library/Application Support/project-protocol/project-protocol.plugin"
+
   postflight do
-    system_command "/bin/bash",
-      args: [
-        "-c",
-        "if command -v claude &>/dev/null; then " \
-          "claude plugin install '#{staged_path}/project-protocol-v#{version}.plugin' && " \
-          "echo '✅ project-protocol installed. Open any project and say: init project'; " \
-        "else " \
-          "echo '⚠️  Claude Code not found. Install from https://claude.ai/code then run:'; " \
-          "echo '    brew reinstall --cask vishmathpati/project-protocol/project-protocol'; " \
-        "fi"
-      ],
-      print_stdout: true
+    plugin_path = "#{Dir.home}/Library/Application Support/project-protocol/project-protocol.plugin"
+
+    # Search common Claude Code install locations — brew PATH is restricted
+    claude = %w[
+      claude
+      /usr/local/bin/claude
+      /opt/homebrew/bin/claude
+    ].find { |p| system("/usr/bin/env", "test", "-x", p) || system("command", "-v", p) }
+
+    if claude
+      system_command "/bin/bash",
+        args: ["-c", "#{claude} plugin install '#{plugin_path}' && echo '✅ project-protocol installed.'"],
+        print_stdout: true
+    else
+      puts ""
+      puts "⚠️  Claude Code not found in PATH during install."
+      puts "Run this once to activate the plugin:"
+      puts "  claude plugin install '#{plugin_path}'"
+      puts ""
+    end
   end
 
-  zap trash: []
+  zap trash: ["#{Dir.home}/Library/Application Support/project-protocol"]
 end
