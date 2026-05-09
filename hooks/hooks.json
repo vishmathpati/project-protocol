@@ -1,0 +1,37 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILE=\"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-context.md\"; if [ -n \"$CLAUDE_PLUGIN_ROOT\" ] && [ -f \"$FILE\" ]; then cat \"$FILE\"; else printf \"# Project Protocol — Session Start\\n\\nRead CLAUDE.md + STATUS.md before touching any code.\\nRun save-session before closing.\\nAppend to WORKLOG.md after every change.\\n\"; fi'"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f WORKLOG.md ] && [ -s WORKLOG.md ] && ! grep -q \"^# Worklog\" WORKLOG.md; then BACKUP=\"WORKLOG.backup-$(date +%Y%m%d-%H%M%S).md\"; cp WORKLOG.md \"$BACKUP\"; echo \"[project-protocol] PreCompact: WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- WORKLOG.md CONTENTS ---\"; cat WORKLOG.md; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: WORKLOG.md empty or cleared — no backup needed\"; fi'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f WORKLOG.md ] && [ -s WORKLOG.md ] && ! grep -q \"^# Worklog\" WORKLOG.md; then LINE_COUNT=$(wc -l < WORKLOG.md | tr -d \" \"); echo \"[project-protocol] WORKLOG.md has $LINE_COUNT lines of unsaved work. Run save-session before closing.\"; fi'"
+          }
+        ]
+      }
+    ]
+  }
+}
