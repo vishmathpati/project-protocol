@@ -1,7 +1,7 @@
 {
   "name": "project-protocol",
-  "version": "1.0.0",
-  "description": "Universal project protocol for any coding project. Standard file set (CLAUDE.md, STATUS.md, ROADMAP.md, WORKLOG.md, CHANGELOG.md, docs/INDEX.md), session discipline via hooks, project bootstrap via init-project, and extended context via add-context.",
+  "version": "1.0.1",
+  "description": "Project session discipline plugin: three-folder layout (cowork/agents/human) + root CLAUDE.md/README.md. 10 skills, 8 hooks. agentskills.io-conformant — Claude Code + Codex.",
   "author": {
     "name": "Vish Mathpati"
   },

@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-05-11
+
+### Changed
+- Updated plugin.json descriptions in both manifests to describe the three-folder layout (cowork/agents/human) + 10 skills + 8 hooks, replacing the stale legacy flat-layout file list.
+
 ## [1.0.0] — 2026-05-11
 
 Initial public release. Clean v1.0.0 baseline.
