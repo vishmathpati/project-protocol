@@ -1,0 +1,7 @@
+interface:
+  display_name: "Audit Before Close"
+  short_description: "Spec-vs-implementation check before marking work done"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

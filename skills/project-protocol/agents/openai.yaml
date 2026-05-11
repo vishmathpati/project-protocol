@@ -1,0 +1,7 @@
+interface:
+  display_name: "Project Protocol"
+  short_description: "Standard project session discipline"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

@@ -1,170 +1,195 @@
 ---
 name: save-session
 description: >
-  Save and close a Claude Code or Codex project session. Use whenever the session is ending —
-  triggered by "save", "save session", "close session", "end session", "done for today",
-  or "lock session". Reads WORKLOG.md, appends to CHANGELOG.md, updates STATUS.md,
-  signs BRIEF.md if decisions were made, and clears WORKLOG.md.
-  Works for any project following the standard project protocol.
+  Save and close a Claude Code, Codex, or Cowork project session. Use whenever the
+  session is ending — triggered by "save", "save session", "close session",
+  "end session", "done for today", or "lock session". Reads the active WORKLOG
+  for the current tier (cowork/ or agents/), appends to that tier's CHANGELOG,
+  updates the matching STATUS, signs the matching BRIEF if decisions were made,
+  and clears the WORKLOG. Works for any project using the three-folder protocol.
 allowed-tools: Read, Write, Edit, Glob, Bash(ls:*,date:*,wc:*)
 ---
 
 # Save Session — Project Protocol
 
-Closes out the current coding session cleanly. Works for any project that follows
-the standard protocol (CLAUDE.md, STATUS.md, WORKLOG.md, CHANGELOG.md, BRIEF.md).
+Closes the current session cleanly. Works for any project that follows the three-folder protocol layout (`cowork/`, `agents/`, `human/`).
 
 ---
 
-## Step 1 — Read WORKLOG.md
+## Step 1 — Detect tier
 
-Read `WORKLOG.md` from the project root. This is your real-time log of what happened.
-If WORKLOG.md is empty or missing, reconstruct from memory of this session.
+Identify which tier the current session belongs to:
+
+- **Cowork session** — agent is Cowork; touches `cowork/` files primarily. Operates on `cowork/WORKLOG.md`, `cowork/STATUS.md`, `cowork/BRIEF.md`, `cowork/CHANGELOG.md`.
+- **Agent session** — agent is Claude Code or Codex; touches `agents/` files primarily. Operates on `agents/WORKLOG.md`, `agents/STATUS.md`, `agents/BRIEF.md`, `agents/CHANGELOG.md`.
+
+Determine tier from:
+1. Which agent is running (Cowork vs. Claude Code/Codex — check available context).
+2. If ambiguous, ask: "Which tier is this session — cowork/ or agents/?"
+
+All steps below operate on the tier's matching files.
 
 ---
 
-## Step 2 — Update CHANGELOG.md
+## Step 2 — Read WORKLOG
 
-Read WORKLOG.md entries and categorize them into Keep a Changelog format.
-If `CHANGELOG.md` does not exist, create it with the header below first.
+Read `<tier>/WORKLOG.md` (where `<tier>` is `cowork` or `agents`). This is your real-time log of what happened.
 
-**Mapping WORKLOG entries to changelog categories:**
+If WORKLOG is empty or in cleared state (`# Worklog — cleared after each session.`), reconstruct from session memory.
+
+---
+
+## Step 3 — Update `<tier>/CHANGELOG.md`
+
+Read WORKLOG entries, categorize into Keep a Changelog format. If CHANGELOG doesn't exist, create with header first.
+
+**Mapping WORKLOG → CHANGELOG categories:**
 - `fixed:` entries → `### Fixed`
 - `decided:` entries about new capabilities → `### Added`
 - `decided:` entries about changes to existing features → `### Changed`
-- `tried_failed:` entries → **excluded** (internal working notes, not shipped)
-- `found_bug:` entries → **excluded** unless fixed this session (then → `### Fixed`)
+- `tried_failed:` entries → **excluded** (internal working notes)
+- `found_bug:` entries → **excluded** unless fixed this session
 
-**Only include entries for things that actually shipped.**
+**Only include things that actually shipped.**
 
-Append a new dated section to `CHANGELOG.md` at the top (below the header):
+Append a new dated section at the top (below header):
 
 ```markdown
-## [YYYY-MM-DD] · Claude Code
+## [YYYY-MM-DD] · [agent label]
 
 ### Added
-- [new feature or capability shipped this session]
+- [new feature or capability shipped]
 
 ### Changed
 - [modification to existing feature]
 
 ### Fixed
-- [bug that was resolved]
+- [bug resolved]
 
 ### Removed
 - [anything deliberately deleted]
 ```
 
-Include agent label (`· Claude Code` or `· Codex`) in the section header.
-Omit any section that has no entries. If nothing shipped this session, write:
+Agent labels: `· Cowork`, `· Claude Code`, `· Codex`.
+
+If nothing shipped: `- No changes shipped this session.`
+
+CHANGELOG header (created once, never overwritten):
+
 ```markdown
-## [YYYY-MM-DD] · Claude Code
-- No changes shipped this session.
+# Changelog — [tier]
+
+All notable changes to this tier are documented here.
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+
+## [Unreleased]
 ```
 
-**CHANGELOG.md header (create once, never overwrite):**
-```markdown
-# Changelog
-
-All notable changes to this project are documented here.
-Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-
----
-```
-
-**CHANGELOG.md is never cleared.** It accumulates for the entire life of the project.
+**CHANGELOG.md is never cleared.**
 
 ---
 
-## Step 3 — Check docs/INDEX.md was updated
+## Step 4 — Check `agents/docs/INDEX.md` was updated
 
-If any feature was added, any page changed, or any shared function was modified this session:
-- Verify docs/INDEX.md was updated inline during the session
-- If it was NOT updated: add a reminder in STATUS.md Next Actions:
-  `[ ] Update docs/INDEX.md — [what changed that needs reflecting]`
+If any feature was added, page changed, or shared function modified this session:
+- Verify `agents/docs/INDEX.md` was updated inline during the session.
+- If not, add a reminder to `agents/STATUS.md` Next Actions: `[ ] Update agents/docs/INDEX.md — [what changed]`.
 
 Do not update INDEX.md yourself during save-session — that should have happened inline.
 
----
-
-## Step 4 — Update STATUS.md
-
-Read `STATUS.md`. Apply:
-1. Update "Last updated" line to: `> Last updated: YYYY-MM-DD · Claude Code` (or `· Codex`)
-2. Add this session's one-line summary to Recent Sessions (rolling — keep last 5, drop oldest)
-3. Update Health: add new bugs as 🔴, remove resolved bugs from 🔴
-4. Update "Needs CEO Input" section: add any open decisions that need Cowork; clear resolved items
-5. Update Next Actions to reflect what's actually next
-
-Rule: STATUS.md must never exceed 60 lines.
+(Only applies to agent-tier sessions. Cowork sessions skip this step.)
 
 ---
 
-## Step 5 — Sign BRIEF.md if decisions were made
+## Step 5 — Update `<tier>/STATUS.md`
+
+Read `<tier>/STATUS.md`. Apply:
+1. Update "Last updated" line: `> Last updated: YYYY-MM-DD · [agent label]`.
+2. Add this session's one-line summary to Recent Sessions (rolling — keep last 5, drop oldest).
+3. Update Health: add new bugs as 🔴, remove resolved ones.
+4. Update "Pending human input" / "Needs CEO input": add open decisions, clear resolved ones.
+5. Update "Next actions" to reflect what's actually next.
+
+STATUS.md must never exceed 60 lines.
+
+---
+
+## Step 6 — Sign `<tier>/BRIEF.md` if decisions were made
 
 If any architecture, tech stack, or significant scope decisions were made this session:
 
-Append a new version block to `BRIEF.md`:
+Append a new version block to `<tier>/BRIEF.md`:
 
 ```markdown
 ---
 
-## v1.X — YYYY-MM-DD HH:MM · Claude Code
+## v1.X — YYYY-MM-DD HH:MM · [agent label]
 
 [describe only the delta — what changed or was decided this session]
 [rejected options if any]
 ```
 
-**Rules:**
-- Increment the version number from the last block in BRIEF.md
-- Include the exact time (not just date) — run `date +%Y-%m-%d\ %H:%M` if needed
-- Only append; never edit existing blocks
-- If nothing significant was decided, skip this step entirely
-- **500-line limit check:** If BRIEF.md is approaching 500 lines, create `BRIEF-2.md` first, add a pointer at the top of BRIEF.md (`> Continued in BRIEF-2.md`), and append the new block to BRIEF-2.md instead
+Rules:
+- Increment version from last block.
+- Include exact time (`date +%Y-%m-%d\ %H:%M`).
+- Append only; never edit existing blocks.
+- If no significant decisions: skip this step.
+- **500-line limit:** if BRIEF.md approaches 500 lines, create `BRIEF-2.md` in the same tier, add pointer `> Continued in BRIEF-2.md` at the top of BRIEF.md, append the new block to BRIEF-2.md instead.
 
 ---
 
-## Step 6 — Update DISCOVERIES.md if needed
+## Step 7 — Update `agents/DISCOVERIES.md` if needed
+
+(Only applies to agent-tier sessions.)
 
 If any UI patterns, component integrations, or design decisions proved out this session, append:
 
 ```
-[YYYY-MM-DD] · Claude Code · [component or pattern name] — what worked and why
+[YYYY-MM-DD] · [agent label] · [component/pattern] — what worked and why
 ```
 
-Examples of what belongs here:
-- A shadcn component that integrated cleanly with the existing token system
-- A layout pattern that solved a specific spacing problem
-- An animation timing that felt right for this product's personality
-- A CSS variable combination that produced a specific visual effect
+Belongs here: shadcn component that integrated cleanly, layout pattern that solved a specific spacing problem, animation timing that felt right, CSS variable combination producing a specific effect.
 
-Examples of what does NOT belong here:
-- Bug fixes (those go in CHANGELOG.md)
-- Architecture decisions (those go in BRIEF.md)
-- Session events (those go in WORKLOG.md before it's cleared)
+Does NOT belong here: bug fixes (go to CHANGELOG), architecture decisions (go to BRIEF), session events (were in WORKLOG before clearing).
 
-Never clear or reorganize DISCOVERIES.md. Append only.
+Never clear or reorganize. Append only.
 
 ---
 
-## Step 7 — Clear WORKLOG.md
+## Step 8 — Update `human/agenda.md` if relevant
+
+(Only applies when the session shipped a chapter or changed roadmap order.)
+
+If a chapter completed: move it to ✓ Done in `human/agenda.md`, promote next chapter to Up Next.
+
+If `agents/ROADMAP.md` or `agents/BRIEF.md` shape changed: re-derive `human/agenda.md` from current canon.
+
+Otherwise: skip.
+
+---
+
+## Step 9 — Clear `<tier>/WORKLOG.md`
 
 Replace contents with:
 
 ```
-# Worklog — cleared after each session.
+# Worklog — [tier]
+> Cleared after each session.
 ```
 
 ---
 
-## Step 8 — Confirm
+## Step 10 — Confirm
 
 ```
-✅ CHANGELOG.md updated — [N Added, N Changed, N Fixed]
-✅ STATUS.md updated · [agent label]
-✅ BRIEF.md signed (v1.X) — [Y/N, or "no decisions this session"]
-✅ WORKLOG.md cleared.
-[X completed, Y bugs, Z decisions]
+✅ <tier>/CHANGELOG.md updated — [N Added, N Changed, N Fixed]
+✅ <tier>/STATUS.md updated · [agent label]
+✅ <tier>/BRIEF.md signed (v1.X) — [Y/N, or "no decisions this session"]
+✅ <tier>/WORKLOG.md cleared
+✅ agents/DISCOVERIES.md appended — [Y/N]
+✅ human/agenda.md updated — [Y/N]
+
+Session closed.
 ```
 
 ---
@@ -172,8 +197,6 @@ Replace contents with:
 ## Rules
 
 - Never make up content that wasn't in the session. Only log what actually happened.
-- If this session had no changes, still run through the steps — update STATUS.md at minimum.
-- CHANGELOG.md is never cleared — only appended to.
-- DISCOVERIES.md is never cleared — only appended to.
-- BRIEF.md is never overwritten — only appended to.
-- Goal: a new session reading STATUS.md + BRIEF.md has 100% context to continue without asking Vish anything.
+- If nothing changed this session, still run through the steps — update STATUS.md at minimum.
+- CHANGELOG.md, DISCOVERIES.md, BRIEF.md are never overwritten — only appended to.
+- Goal: a new session reading `<tier>/STATUS.md` + `<tier>/BRIEF.md` has 100% context to continue without asking the user anything.

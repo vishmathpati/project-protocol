@@ -1,0 +1,7 @@
+interface:
+  display_name: "Discipline"
+  short_description: "Pre-action gate: pause, declare, cascade, verify, confirm"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

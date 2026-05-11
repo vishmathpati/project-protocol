@@ -1,0 +1,7 @@
+interface:
+  display_name: "Init Project"
+  short_description: "Bootstrap or audit a project with the standard protocol"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

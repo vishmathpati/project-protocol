@@ -1,18 +1,20 @@
 cask "project-protocol" do
-  version "3.3.2"
-  sha256 "20f3c4b2827d64212d917c1d21e7669600a9df7e6c113d1d9e6ffb824257ddbc"
+  version "1.0.0"
+  # TODO: regenerate sha256 after building and uploading v1.0.0 release.
+  # Compute with: shasum -a 256 dist/project-protocol-v1.0.0.zip
+  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
 
-  url "https://github.com/vishmathpati/project-protocol/releases/download/v#{version}/project-protocol-v#{version}.plugin"
+  url "https://github.com/vishmathpati/project-protocol/releases/download/v#{version}/project-protocol-v#{version}.zip"
   name "project-protocol"
   desc "Session protocol plugin for Claude Code and Codex"
   homepage "https://github.com/vishmathpati/project-protocol"
 
   # Copy plugin to a permanent location so it survives staging cleanup
-  artifact "project-protocol-v#{version}.plugin",
-    target: "#{Dir.home}/Library/Application Support/project-protocol/project-protocol.plugin"
+  artifact "project-protocol-v#{version}.zip",
+    target: "#{Dir.home}/Library/Application Support/project-protocol/project-protocol.zip"
 
   postflight do
-    plugin_path = "#{Dir.home}/Library/Application Support/project-protocol/project-protocol.plugin"
+    plugin_path = "#{Dir.home}/Library/Application Support/project-protocol/project-protocol.zip"
 
     # Search common Claude Code install locations — brew PATH is restricted
     claude = %w[

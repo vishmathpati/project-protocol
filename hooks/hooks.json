@@ -11,6 +11,28 @@
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'printf \"[project-protocol] For any non-trivial change: classify as NEW / ADDITION / UI CHANGE / BUG FIX. Append to WORKLOG.md after each action.\\n\"'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f WORKLOG.md ] && grep -q \"^# Worklog — cleared\" WORKLOG.md; then printf \"[project-protocol] WORKLOG.md is in cleared state — remember to append an entry for this change.\\n\" >&2; fi'"
+          }
+        ]
+      }
+    ],
     "PreCompact": [
       {
         "matcher": "",
@@ -18,6 +40,39 @@
           {
             "type": "command",
             "command": "bash -c 'if [ -f WORKLOG.md ] && [ -s WORKLOG.md ] && ! grep -q \"^# Worklog\" WORKLOG.md; then BACKUP=\"WORKLOG.backup-$(date +%Y%m%d-%H%M%S).md\"; cp WORKLOG.md \"$BACKUP\"; echo \"[project-protocol] PreCompact: WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- WORKLOG.md CONTENTS ---\"; cat WORKLOG.md; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: WORKLOG.md empty or cleared — no backup needed\"; fi'"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'PLUGIN_ROOT=\"${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}\"; FILE=\"$PLUGIN_ROOT/hooks/post-compact-context.md\"; if [ -n \"$PLUGIN_ROOT\" ] && [ -f \"$FILE\" ]; then cat \"$FILE\"; else printf \"# After Compaction — Re-orient\\n\\nContext was just compacted. Re-read CLAUDE.md and STATUS.md to confirm current state before continuing.\\n\"; fi'"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f WORKLOG.md ] && ! grep -q \"^# Worklog — cleared\" WORKLOG.md; then printf \"[%s] subagent_start\\n\" \"$(date +%H:%M)\" >> WORKLOG.md; fi'"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if [ -f WORKLOG.md ] && ! grep -q \"^# Worklog — cleared\" WORKLOG.md; then printf \"[%s] subagent_stop\\n\" \"$(date +%H:%M)\" >> WORKLOG.md; fi'"
           }
         ]
       }

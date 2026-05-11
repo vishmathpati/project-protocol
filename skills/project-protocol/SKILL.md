@@ -1,18 +1,17 @@
 ---
 name: project-protocol
 description: >
-  Standard protocol for every coding project in ~/Arel OS/Projects/active/.
-  Defines the file set, session discipline, worklog rules, and agent signatures
-  that all agents (Claude Code, Codex) must follow. Read this at the start of
-  every session inside any project in ~/Arel OS/Projects/active/.
+  Standard protocol for any coding project that uses this plugin. Defines the
+  file set, session discipline, worklog rules, and agent signatures that all
+  agents (Claude Code, Codex) must follow. Read at the start of every session.
   Triggers: "project start", "init project", "project protocol", "session start",
-  "read protocol", or when starting any session inside ~/Arel OS/Projects/active/.
+  "read protocol".
 allowed-tools: Read, Glob, Grep
 ---
 
 # Project Protocol
 
-Every coding project in `~/Arel OS/Projects/active/` follows this protocol. No exceptions.
+Every coding project that uses this plugin follows this protocol. No exceptions.
 
 ---
 

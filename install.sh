@@ -25,8 +25,8 @@ fi
 echo "  Latest version: v${LATEST}"
 
 # Download the plugin
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/v${LATEST}/${PLUGIN_NAME}-v${LATEST}.plugin"
-PLUGIN_PATH="${TMP_DIR}/${PLUGIN_NAME}-v${LATEST}.plugin"
+DOWNLOAD_URL="https://github.com/${REPO}/releases/download/v${LATEST}/${PLUGIN_NAME}-v${LATEST}.zip"
+PLUGIN_PATH="${TMP_DIR}/${PLUGIN_NAME}-v${LATEST}.zip"
 
 echo "  Downloading..."
 curl -fsSL -o "$PLUGIN_PATH" "$DOWNLOAD_URL"
@@ -39,7 +39,7 @@ if command -v claude &> /dev/null; then
   echo "  To use: open any project in Claude Code and say \"init project\""
 else
   # Claude Code not found — save to Downloads as fallback
-  DEST="$HOME/Downloads/${PLUGIN_NAME}-v${LATEST}.plugin"
+  DEST="$HOME/Downloads/${PLUGIN_NAME}-v${LATEST}.zip"
   cp "$PLUGIN_PATH" "$DEST"
   echo "  ⚠️  Claude Code not found in PATH."
   echo "  Plugin saved to: $DEST"

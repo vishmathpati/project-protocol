@@ -1,0 +1,7 @@
+interface:
+  display_name: "Audit"
+  short_description: "Cross-file consistency check across canon"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

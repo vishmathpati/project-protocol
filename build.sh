@@ -1,14 +1,14 @@
 #!/bin/bash
 # Build script for project-protocol plugin
 # Usage: ./build.sh
-# Output: dist/project-protocol-vX.Y.Z.plugin
+# Output: dist/project-protocol-vX.Y.Z.zip
 
 set -e
 
 PLUGIN_NAME="project-protocol"
 VERSION=$(python3 -c "import sys,json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
 OUTPUT_DIR="$(pwd)/dist"
-OUTPUT="$OUTPUT_DIR/${PLUGIN_NAME}-v${VERSION}.plugin"
+OUTPUT="$OUTPUT_DIR/${PLUGIN_NAME}-v${VERSION}.zip"
 
 echo "→ Building ${PLUGIN_NAME} v${VERSION}..."
 
@@ -31,7 +31,7 @@ cp .claude-plugin/plugin.json "$STAGE/.claude-plugin/"
 cp .codex-plugin/plugin.json "$STAGE/.codex-plugin/"
 cp -r skills/ "$STAGE/skills/"
 cp hooks/hooks.json "$STAGE/hooks/"
-cp hooks/session-start-context.md "$STAGE/hooks/"
+cp hooks/*.md "$STAGE/hooks/"
 cp templates/FUNDAMENTALS.md "$STAGE/templates/"
 
 # Zip it
@@ -41,5 +41,5 @@ zip -r "$OUTPUT" . -x "*.DS_Store" > /dev/null
 echo "  ✅ Done: $OUTPUT"
 echo ""
 echo "  Install:"
-echo "    Cowork:      Drag the .plugin file into the Cowork chat"
+echo "    Cowork:      Drag the .zip file into the Cowork chat"
 echo "    Claude Code: claude plugin install \"$OUTPUT\""

@@ -1,6 +1,6 @@
 # project-protocol
 
-A plugin for Claude Code and Codex that gives every project a consistent session discipline — so your AI agent always knows where things stand, logs its work in real time, and hands off cleanly when a session ends.
+A plugin for Claude Code and Codex (and any tool that supports the [agentskills.io](https://agentskills.io) standard) that gives every project a consistent session discipline — so your AI agent always knows where things stand, logs its work in real time, audits before closing, and hands off cleanly when a session ends.
 
 Install once. Every project gets a shared system that works the same way no matter which agent you're using.
 
@@ -22,94 +22,102 @@ Downloads the latest release and installs it directly into Claude Code.
 brew install --cask vishmathpati/project-protocol/project-protocol
 ```
 
-Installs and activates the plugin in Claude Code automatically.
-
 ### Manual
 
-Download the latest `.plugin` file from [Releases](https://github.com/vishmathpati/project-protocol/releases), then:
+Download the latest `.zip` file from [Releases](https://github.com/vishmathpati/project-protocol/releases), then:
 
 ```bash
 # Claude Code
-claude plugin install ~/Downloads/project-protocol-vX.Y.Z.plugin
+claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 # Cowork (Claude desktop)
-# Drag the .plugin file into the Cowork chat window
+# Drag the .zip file into the Cowork chat window
 ```
 
 ---
 
-## What it does
+## What you get
 
-Once installed, every coding session on any project gets three things automatically:
+10 skills + 8 hooks that turn every AI coding session into a disciplined operation.
 
-1. **Session start** — the agent is reminded to read `CLAUDE.md` and `STATUS.md` before touching any code
-2. **Live work log** — every change, decision, and failed attempt gets appended to `WORKLOG.md` in real time
-3. **Clean session close** — `save-session` writes the handoff: updates `STATUS.md`, appends to `CHANGELOG.md`, clears the worklog
+### Session lifecycle (the core 5)
 
-The agent never loses context between sessions. You never have to re-explain what's happening.
+- **`init-project`** — Bootstrap or audit a project. Creates the standard three-folder layout (`cowork/`, `agents/`, `human/`).
+- **`save-session`** — Close cleanly: WORKLOG → CHANGELOG, update STATUS, clear WORKLOG. Tier-aware.
+- **`session-recap`** — Mid-session snapshot: what's been done, what's still open.
+- **`add-context`** — Add extended context files (data contracts, domain reference, integrations).
+- **`project-protocol`** — Reference document defining the file set + session discipline.
+
+### Discipline skills
+
+Auto-fire on description match, also invokable via slash command.
+
+- **`discipline`** — Pre-action gate: pause, declare files-to-change, cascade-effects, verify canon, confirm, then act.
+- **`verify-by-reading`** — Open the file before answering questions about it. Catches memory drift.
+- **`audit-before-close`** — Spec-vs-implementation check before any chapter or task is marked done.
+- **`discussion-mode`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
+- **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix.
+
+### Hooks (8 total)
+
+| Hook | What it does |
+|---|---|
+| `SessionStart` | Inject required reading context |
+| `UserPromptSubmit` | Pre-task classification reminder |
+| `PreToolUse` (Edit\|Write) | Warn if WORKLOG is in cleared state |
+| `PreCompact` | Back up WORKLOG before context compaction |
+| `PostCompact` | Re-orient context after compaction |
+| `SubagentStart` / `SubagentStop` | Log sub-agent invocations to WORKLOG |
+| `Stop` | Warn if WORKLOG has unsaved lines |
 
 ---
 
-## Skills
+## Project layout
 
-### `init-project`
-Bootstrap any project — new or existing. Scans all markdown files, asks what to do with each, and creates a unified set of protocol files. Also generates `docs/INDEX.md` from live codebase analysis.
-
-**Say:** *"init project"* or *"set up protocol files"*
-
-Creates these files in your project:
+When `init-project` runs, it creates this structure in your project:
 
 ```
-your-project/
-├── CLAUDE.md          ← project identity, stack, guardrails, coding rules
-├── STATUS.md          ← current health, blockers, next actions
-├── ROADMAP.md         ← direction and phases
-├── WORKLOG.md         ← real-time session log (cleared by save-session)
-├── CHANGELOG.md       ← version history (Keep a Changelog format)
-├── BRIEF.md           ← versioned decision log from planning sessions
-├── BRAND.md           ← product identity (auto-detected from codebase)
-├── FUNDAMENTALS.md    ← design principles reference
-├── DESIGN.md          ← project design system (google/design.md spec)
-└── docs/
-    ├── INDEX.md       ← human map + agent dependency index
-    └── detail/        ← deep-dive docs for complex features
+project-root/
+├── CLAUDE.md              ← rules + folder map (always loaded)
+├── README.md              ← file-and-dependency map
+├── cowork/                ← orchestration tier
+│   └── CLAUDE.md, STATUS.md, BRIEF.md, WORKLOG.md, CHANGELOG.md
+├── agents/                ← project canon tier (Codex / Claude Code read here)
+│   ├── STATUS.md, BRIEF.md, ROADMAP.md, BRAND.md, FUNDAMENTALS.md,
+│   │   DESIGN.md, DISCOVERIES.md, WORKLOG.md, CHANGELOG.md
+│   └── docs/
+│       ├── INDEX.md
+│       └── detail/
+└── human/
+    └── agenda.md          ← daily steering file
 ```
 
-### `save-session`
-Close a session properly. Reads the worklog, appends to `CHANGELOG.md`, updates `STATUS.md`, signs `BRIEF.md` if decisions were made, and clears the worklog.
-
-**Say:** *"save session"*, *"close session"*, *"done for today"*
-
-### `session-recap`
-Mid-session orientation. Checks your current directory and git state (including worktree detection), reads `WORKLOG.md` and `STATUS.md`, and prints a crisp snapshot of what's been done and what's still open.
-
-**Say:** *"recap"*, *"where are we"*, *"catch me up"*
-
-### `add-context`
-Add a deep-reference document to an already-initialized project — data contracts, domain knowledge, architecture docs, integration specs. Auto cross-references in `CLAUDE.md` and `docs/INDEX.md`.
-
-**Say:** *"add context"*, *"add a data contracts file"*, *"add domain reference"*
+Each tier serves one audience. The root `CLAUDE.md` is the brain — non-negotiable rules + a map of where everything lives. The root `README.md` is the file-and-dependency map you consult before any non-trivial edit.
 
 ---
 
 ## Why it works
 
-Most AI agent sessions start cold — the agent has no memory of what was decided, what broke, or what was tried last time. This plugin solves that by keeping the context in plain markdown files the agent reads at the start of every session.
+AI agents forget everything between sessions. This plugin fixes that by keeping all context in plain markdown files the agent reads at session start.
 
-`WORKLOG.md` is the key: every response that changes something appends one line. By the time a session ends, there's a full real-time audit trail. `save-session` distills that into `CHANGELOG.md` and `STATUS.md` for the next session to start from.
+`WORKLOG.md` is the discipline engine: every response that changes something appends one line. By session end, you have a full real-time audit trail. `save-session` distills it into `CHANGELOG.md` and `STATUS.md` so the next session starts from solid ground.
+
+The **discipline skills** add a second layer: gates that fire automatically when their description matches the conversation. They force the agent to verify before acting, read before answering, and audit before closing — the patterns that fail in untrained agent sessions.
 
 ---
 
 ## Compatibility
 
-Works with Claude Code and Codex. Designed to be agent-agnostic:
+Works with Claude Code, Codex CLI, and any tool that supports the [agentskills.io](https://agentskills.io) skill standard.
 
-- No hardcoded model names
-- `FUNDAMENTALS.md` content is embedded inline — no plugin path dependencies
-- SessionStart hook degrades gracefully if the host agent doesn't support `${CLAUDE_PLUGIN_ROOT}`
-- `session-recap` detects both Codex worktrees (`.codex/worktrees/`) and Claude Code worktrees (`.claude/worktrees/`) and warns when running in a detached context
+- No hardcoded model names.
+- Every skill ships with both a Claude Code `SKILL.md` and a Codex `agents/openai.yaml` sidecar.
+- Dual manifest: `.claude-plugin/plugin.json` + `.codex-plugin/plugin.json`.
+- Worktree detection in `session-recap` for both Codex (`.codex/worktrees/`) and Claude Code (`.claude/worktrees/`).
+- SessionStart hook degrades gracefully if the host doesn't expose `${CLAUDE_PLUGIN_ROOT}` or `${CODEX_PLUGIN_ROOT}`.
 
-**Codex one-time setup:** Add this to `~/.codex/config.toml` to make Codex read `CLAUDE.md` automatically:
+**Codex one-time setup:** add this to `~/.codex/config.toml` so Codex reads `CLAUDE.md` automatically:
+
 ```toml
 project_doc_fallback_filenames = ["CLAUDE.md"]
 ```
@@ -124,9 +132,9 @@ cd project-protocol
 ./build.sh
 ```
 
-Outputs `project-protocol-vX.Y.Z.plugin` in the `dist/` folder.
+Outputs `project-protocol-vX.Y.Z.zip` in the `dist/` folder.
 
-To release a new version: bump `version` in `.claude-plugin/plugin.json`, then run `./build.sh`.
+To release: bump `version` in `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`, then run `./build.sh`.
 
 ---
 

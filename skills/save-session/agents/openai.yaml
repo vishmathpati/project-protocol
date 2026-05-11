@@ -1,0 +1,7 @@
+interface:
+  display_name: "Save Session"
+  short_description: "Close a session: WORKLOG to CHANGELOG, update STATUS, clear WORKLOG"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Discussion Mode"
+  short_description: "Read-only conversation mode when the user signals thinking"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Add Context"
+  short_description: "Add extended context files (data contracts, domain reference, integrations)"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

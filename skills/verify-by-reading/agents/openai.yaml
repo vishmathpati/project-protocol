@@ -1,0 +1,7 @@
+interface:
+  display_name: "Verify by Reading"
+  short_description: "Force opening the file before answering questions about it"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

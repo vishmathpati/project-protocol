@@ -3,41 +3,44 @@ name: add-context
 description: >
   Add extended context files to an already-initialized project. Use when a project
   needs deep-reference documentation beyond the standard protocol — data contracts,
-  domain reference, architecture supplements, or external integration docs. After
-  writing each file, automatically cross-references it in CLAUDE.md and docs/INDEX.md
-  so the system knows it exists.
+  domain reference, architecture supplements, or external integration docs. Files
+  are written into `agents/docs/` and automatically cross-referenced in root
+  CLAUDE.md and `agents/docs/INDEX.md`.
   Triggers: "add context", "add context file", "I need a data contracts file",
-  "add domain reference", "create an integration doc", or any request to add
-  a deep-reference markdown file to a project.
+  "add domain reference", "create an integration doc", or any request to add a
+  deep-reference markdown file to a project.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir:*,ls:*,cat:*)
 ---
 
 # Add Context
 
-Add one or more extended context files to an already-initialized project. Each file
-is written into `docs/` and immediately cross-referenced in CLAUDE.md and docs/INDEX.md
-so no file is orphaned.
+Add one or more extended context files to an already-initialized project. Each file is written into `agents/docs/` and immediately cross-referenced in root `CLAUDE.md` and `agents/docs/INDEX.md` so no file is orphaned.
 
 ---
 
 ## Pre-flight — Read existing protocol
 
 Before adding anything, silently read:
-1. `CLAUDE.md` — check if `## Extended Context` section already exists; note its current contents
-2. `docs/INDEX.md` — locate the Key Files table; note its current entries
+1. **Root `CLAUDE.md`** — check if `## Extended Context` section exists; note current contents.
+2. **`agents/docs/INDEX.md`** — locate the Key Files table; note current entries.
 
 If either file is missing, stop and tell the user:
-"This project doesn't appear to have a protocol set up yet — run init-project first."
+
+> "This project doesn't appear to have the three-folder protocol set up yet — run init-project first."
+
+If the project has the legacy flat layout (no `agents/` folder), also stop and tell the user:
+
+> "This project is on the legacy flat layout. Run init-project to migrate to the three-folder layout first, or place context files manually if you want to stay on legacy."
 
 ---
 
-## The Loop
+## The loop
 
 Repeat until the user says done.
 
 ### Step 1 — File type
 
-Ask via AskUserQuestion:
+Use `AskUserQuestion`:
 
 ```
 What type of extended context file do you need?
@@ -52,19 +55,17 @@ Or describe in plain English — I'll categorize it.
 
 ### Step 2 — Filename
 
-Ask via AskUserQuestion:
-
 ```
 What should this file be called?
-(examples: data-contracts.md, tcld-domain.md, stripe-integration.md)
+(examples: data-contracts.md, domain.md, stripe-integration.md)
 
-It will live in docs/.
+It will live in `agents/docs/`.
 ```
 
-Check whether `docs/[filename]` already exists. If it does, ask:
+Check whether `agents/docs/[filename]` already exists. If yes, ask:
 
 ```
-docs/[filename] already exists. What would you like to do?
+agents/docs/[filename] already exists. What would you like to do?
 
 A — Append new content to the existing file
 B — Replace it entirely
@@ -73,27 +74,24 @@ C — Cancel — pick a different name
 
 ### Step 3 — Context collection
 
-Tell the user:
-
 ```
 Paste the context for [filename] now.
 This can be multiple pages — paste everything at once.
 Type DONE on a new line when finished.
 ```
 
-Wait for the paste. Accumulate all lines until "DONE" appears on its own line.
-Strip the "DONE" line from the content before processing.
+Accumulate all lines until "DONE" appears on its own line. Strip the "DONE" line.
 
 ### Step 4 — Summarize and write
 
-Based on file type, structure the raw paste into a clean document:
+Structure the raw paste based on file type:
 
 **Data contracts** → organize into sections:
 - Request shapes: `name → fields (types) — purpose`
 - Response shapes: `name → fields (types) — purpose`
 - Error types: `code — meaning — when it occurs`
 - DB schema: `table_name: field (type) — purpose`
-- Type definitions: any shared TypeScript/Python types
+- Type definitions: shared TypeScript/Python types
 
 **Domain reference** → organize into:
 - Glossary: `term: definition`
@@ -117,6 +115,7 @@ Based on file type, structure the raw paste into a clean document:
 - Env vars required
 
 Add a header to every file:
+
 ```markdown
 # [filename stem] — [type]
 > Last updated: YYYY-MM-DD
@@ -125,45 +124,44 @@ Add a header to every file:
 ---
 ```
 
-Show a preview: "Here's what I'll write to docs/[filename] — does this look right?"
-Apply any corrections, then write the file.
+Show preview: "Here's what I'll write to `agents/docs/[filename]` — does this look right?"
 
-Create `docs/` if it doesn't exist: `mkdir -p docs`
+Apply corrections, then write the file.
+
+Create `agents/docs/` if it doesn't exist: `mkdir -p agents/docs`
 
 ### Step 5 — Cross-reference immediately
 
-After writing the file, update two places without asking:
+Without asking, update two places:
 
-**docs/INDEX.md** — find the Key Files table and add:
+**`agents/docs/INDEX.md`** — find the Key Files table and add:
 ```
-| docs/[filename] | [type]: [what it contains] — read before [trigger condition] |
+| agents/docs/[filename] | [type]: [what it contains] — read before [trigger condition] |
 ```
 If no Key Files table exists, create a `## Key Files` section.
 
-**CLAUDE.md** — find `## Extended Context` and append:
+**Root `CLAUDE.md`** — find `## Extended Context` section and append:
 ```
-- docs/[filename] — [type]: [one-line description]. Read before [trigger condition].
+- `agents/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
 ```
-If `## Extended Context` doesn't exist, create it at the bottom of CLAUDE.md:
+If `## Extended Context` doesn't exist, create it at the bottom:
 ```markdown
 ## Extended Context
 > These files go beyond the standard protocol. Read when their trigger applies.
 
-- docs/[filename] — [type]: [one-line description]. Read before [trigger condition].
+- `agents/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
 ```
 
-If the file is architecture- or decisions-related (type C or any file that captures "why" decisions were made), also update **BRIEF.md**:
+If the file is architecture- or decisions-related (type C, or any file capturing "why" decisions were made), also update **`agents/BRIEF.md`**:
 - Find or create a `## Reference files` section
-- Append: `- docs/[filename] — [description]`
+- Append: `- agents/docs/[filename] — [description]`
 
-Confirm to the user: "Written ✅ — referenced in CLAUDE.md and docs/INDEX.md."
+Confirm: "Written ✅ — referenced in root CLAUDE.md and agents/docs/INDEX.md."
 
 ### Step 6 — Loop
 
-Ask via AskUserQuestion:
-
 ```
-Done. Do you need another extended context file?
+Done. Another extended context file?
 
 Y — Yes, add another
 N — No, all done
@@ -179,9 +177,9 @@ Output a tidy summary:
 
 ```
 Extended context files added:
-  ✅ docs/[filename-1] — [type] — referenced in CLAUDE.md + INDEX.md
-  ✅ docs/[filename-2] — [type] — referenced in CLAUDE.md + INDEX.md
+  ✅ agents/docs/[filename-1] — [type] — referenced in root CLAUDE.md + agents/docs/INDEX.md
+  ✅ agents/docs/[filename-2] — [type] — referenced in root CLAUDE.md + agents/docs/INDEX.md
 
-CLAUDE.md §Extended Context now lists [N] files.
-Next session, Claude Code will read these when their trigger condition applies.
+Root CLAUDE.md §Extended Context now lists [N] files.
+Next session, the relevant agent will read these when their trigger condition applies.
 ```
