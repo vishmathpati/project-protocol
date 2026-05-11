@@ -1,10 +1,6 @@
 ---
 name: audit-before-close
-description: >
-  End-of-work verification gate. Use before marking any chapter, task, feature,
-  or work unit as complete. Forces an independent re-read of the original
-  contract or spec, comparison against the actual implementation, and surfacing
-  of any drift, missing items, or scope creep before closure.
+description: End-of-work verification gate. Before marking any chapter, task, or feature complete, re-read the contract, compare against implementation, and surface drift or scope creep.
 allowed-tools: Read, Glob, Grep
 ---
 

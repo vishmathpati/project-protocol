@@ -1,11 +1,6 @@
 ---
 name: discipline
-description: >
-  Pre-action gate. Use before ANY non-trivial action — editing files, locking
-  decisions in BRIEF.md, committing to a recommendation, proposing a structural
-  change, or agreeing to a course of action that affects multiple files or
-  downstream work. Forces a pause to declare what's about to change, list
-  cascade effects, verify canon, and get explicit confirmation before acting.
+description: Pre-action gate before any non-trivial change — editing files, locking decisions, structural changes. Forces pause, declare what's changing, list cascades, verify canon, confirm before acting.
 allowed-tools: Read, Glob, Grep
 ---
 

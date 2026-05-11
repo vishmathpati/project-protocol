@@ -1,7 +1,7 @@
 cask "project-protocol" do
-  version "1.0.1"
-  # TODO: regenerate sha256 after building and uploading v1.0.1 release.
-  # Compute with: shasum -a 256 dist/project-protocol-v1.0.1.zip
+  version "1.0.2"
+  # TODO: regenerate sha256 after building and uploading v1.0.2 release.
+  # Compute with: shasum -a 256 dist/project-protocol-v1.0.2.zip
   sha256 "0000000000000000000000000000000000000000000000000000000000000000"
 
   url "https://github.com/vishmathpati/project-protocol/releases/download/v#{version}/project-protocol-v#{version}.zip"

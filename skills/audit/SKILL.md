@@ -1,11 +1,6 @@
 ---
 name: audit
-description: >
-  Periodic consistency check across project canon files. Use when invoked
-  explicitly to verify that CLAUDE.md, STATUS.md, BRIEF.md, ROADMAP.md, and
-  related files are internally consistent and do not contradict each other.
-  Reports findings categorized by severity — does not auto-fix. Run periodically
-  or whenever drift is suspected.
+description: Periodic consistency check across canon files (CLAUDE.md, STATUS.md, BRIEF.md, ROADMAP.md, etc.). Reports drift by severity. Does not auto-fix. Run when drift is suspected.
 allowed-tools: Read, Glob, Grep
 ---
 

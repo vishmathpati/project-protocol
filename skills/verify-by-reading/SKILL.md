@@ -1,11 +1,6 @@
 ---
 name: verify-by-reading
-description: >
-  Read-before-answer enforcement. Use before answering any question about file
-  content, project state, decisions, or recommendations that reference specific
-  files. Forces opening the actual file rather than relying on conversational
-  memory or recall. Catches "memory drift" — when an agent answers from prior
-  context instead of current file state.
+description: Read-before-answer enforcement. Before answering questions about file content or project state, open the actual file. Catches memory drift from prior conversational context.
 allowed-tools: Read, Glob, Grep
 ---
 

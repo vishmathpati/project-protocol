@@ -1,11 +1,6 @@
 ---
 name: project-protocol
-description: >
-  Standard protocol for any coding project that uses this plugin. Defines the
-  file set, session discipline, worklog rules, and agent signatures that all
-  agents (Claude Code, Codex) must follow. Read at the start of every session.
-  Triggers: "project start", "init project", "project protocol", "session start",
-  "read protocol".
+description: Standard project protocol — file set, session discipline, worklog rules, agent signatures. Read at session start. Triggers — "project start", "init project", "session start", "read protocol".
 allowed-tools: Read, Glob, Grep
 ---
 

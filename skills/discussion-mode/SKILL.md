@@ -1,11 +1,6 @@
 ---
 name: discussion-mode
-description: >
-  No-edit conversation mode. Activate when the user signals they want to think,
-  discuss, or explore rather than execute — phrases like "discuss", "let's
-  talk", "I want to chat", "what do you think", "your opinion", "brainstorm",
-  "explore". Prevents file edits, premature artifact production, and unsolicited
-  recommendations during what should be a thinking session.
+description: No-edit conversation mode. Activate on "discuss", "let's talk", "what do you think", "your opinion", "brainstorm", "explore". Prevents file edits and premature production during thinking.
 allowed-tools: Read, Glob, Grep
 ---
 

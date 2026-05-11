@@ -5,6 +5,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [1.0.2] — 2026-05-11
+
+### Changed
+- Shortened every SKILL.md frontmatter `description` to ≤200 chars so Cowork accepts the plugin (previous descriptions were 287–589 chars and were rejected by Cowork's 200-char validation cap).
+- `init-project` description retains the "or when a project has no root CLAUDE.md" auto-trigger hint.
+- Kept the strongest trigger phrases per skill; trimmed redundant variants. Functionality unchanged.
+
 ## [1.0.1] — 2026-05-11
 
 ### Changed

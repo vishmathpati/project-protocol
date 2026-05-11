@@ -1,15 +1,6 @@
 ---
 name: init-project
-description: >
-  Initialize or audit a project with the standard three-folder protocol layout.
-  Scans ALL markdown files in the project, asks what to do with each one, and
-  merges everything into a unified protocol. Creates the root CLAUDE.md and
-  README.md plus three subfolders: cowork/ (orchestration tier), agents/
-  (project canon tier), and human/ (human-facing checklist). Also generates
-  agents/docs/INDEX.md by analyzing the codebase.
-  Triggers: "init project", "bootstrap this project", "set up protocol files",
-  "create protocol files", "initialize protocol", or when a project has no
-  CLAUDE.md at root.
+description: Initialize or audit a project with the three-folder protocol (cowork/agents/human + root CLAUDE.md/README.md). Triggers — "init project", "bootstrap project", or when a project has no root CLAUDE.md.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir:*,ls:*,find:*,cat:*,cp:*), AskUserQuestion, Task
 ---
 

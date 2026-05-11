@@ -1,12 +1,6 @@
 ---
 name: save-session
-description: >
-  Save and close a Claude Code, Codex, or Cowork project session. Use whenever the
-  session is ending — triggered by "save", "save session", "close session",
-  "end session", "done for today", or "lock session". Reads the active WORKLOG
-  for the current tier (cowork/ or agents/), appends to that tier's CHANGELOG,
-  updates the matching STATUS, signs the matching BRIEF if decisions were made,
-  and clears the WORKLOG. Works for any project using the three-folder protocol.
+description: Save and close a project session. Updates the active tier's WORKLOG → CHANGELOG, STATUS, BRIEF. Triggers — "save", "save session", "close session", "end session", "done for today".
 allowed-tools: Read, Write, Edit, Glob, Bash(ls:*,date:*,wc:*)
 ---
 

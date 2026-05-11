@@ -1,14 +1,6 @@
 ---
 name: add-context
-description: >
-  Add extended context files to an already-initialized project. Use when a project
-  needs deep-reference documentation beyond the standard protocol — data contracts,
-  domain reference, architecture supplements, or external integration docs. Files
-  are written into `agents/docs/` and automatically cross-referenced in root
-  CLAUDE.md and `agents/docs/INDEX.md`.
-  Triggers: "add context", "add context file", "I need a data contracts file",
-  "add domain reference", "create an integration doc", or any request to add a
-  deep-reference markdown file to a project.
+description: Add an extended-context doc to `agents/docs/` and cross-reference it in root CLAUDE.md + agents/docs/INDEX.md. Triggers — "add context", "add context file", "create an integration doc".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir:*,ls:*,cat:*)
 ---
 

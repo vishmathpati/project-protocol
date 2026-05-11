@@ -1,11 +1,6 @@
 ---
 name: session-recap
-description: >
-  Mid-session snapshot for any project following the standard project protocol.
-  Use when someone says "recap", "where are we", "what have we done", "catch me up",
-  or when context feels lost after a long session. Reads WORKLOG.md and STATUS.md
-  to give a crisp snapshot of what happened this session and what is still open.
-  Does not save the session — use save-session for that.
+description: Mid-session snapshot. Reads WORKLOG.md + STATUS.md and reports current state. Not a save. Triggers — "recap", "where are we", "what have we done", "catch me up".
 allowed-tools: Read, Glob, Bash(ls:*,date:*,git:*,pwd:*)
 ---
 
