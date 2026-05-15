@@ -1,8 +1,13 @@
 # Phase 7 — Final summary
 
-Surface everything that needs user attention after init-project completes.
+Surface everything that needs user attention after init-project completes. The summary varies slightly by mode (from Phase 0):
 
-## Output
+- `audit` — report what was filled in vs. what was already populated.
+- `migration` — include the migration summary line from Phase 0b plus the layered-in new files.
+- `empty` — include the bootstrap answer object and every `[VERIFY]` item produced because of "skip"/"undecided" answers.
+- `fresh` — standard output (below).
+
+## Output (fresh)
 
 ```
 ✅ Init complete — three-folder layout created.
@@ -14,13 +19,75 @@ Created:
   human/: agenda.md (stub)
 
 Phase 2 decisions applied:
-  [list each merge/reference action taken]
+  [list each cowork / agent-docs / merge / reference / leave / skip action taken]
 
 Extended context added:
   [list any agents/docs/ files created in Phase 6, or "none"]
 
 Sub-agent runs used:
   [list which Haiku/Sonnet sub-agents fired, for transparency]
+```
+
+## Output (empty bootstrap)
+
+```
+✅ Init complete — three-folder layout created from bootstrap answers.
+
+Bootstrap captured:
+  Project: <name>
+  One sentence: <sentence>
+  Target user: <user>
+  Stack: <stack> [VERIFY if "undecided"]
+  Stage: <stage>
+  Locked decisions: <count>
+  First direction: <direction>
+
+Created:
+  [same file list as fresh mode]
+
+Populated from your answers (not placeholders):
+  Root CLAUDE.md "What this is", README.md opening, cowork/STATUS.md current focus,
+  agents/BRIEF.md v1.0 (What we're building / Tech stack / Architecture decisions),
+  agents/ROADMAP.md Direction, agents/STATUS.md sprint line.
+
+Still placeholder ([VERIFY] markers):
+  [list each]
+```
+
+## Output (migration)
+
+```
+✅ Migration complete — three-folder layout in place. All your old content preserved.
+
+From Phase 0b:
+  <N> clean moves applied (mechanical, no questions asked)
+  <M> sub-agent classifications applied
+  Root CLAUDE.md split into <X> destinations
+  <K> non-standard files passed to Phase 2
+
+Phase 2 decisions applied:
+  [cowork / agent-docs / merge / reference / leave / skip per non-standard file]
+
+New files this version added (only where missing):
+  [list each — these are the v1.0+ additions that didn't exist in your old layout]
+
+Skipped (already present from migration, never overwritten):
+  [list each migrated file]
+```
+
+## Output (audit)
+
+```
+✅ Audit complete — three-folder layout already present.
+
+Filled missing files:
+  [list each]
+
+Populated files left untouched:
+  [list each]
+
+Drift / mismatch reports:
+  [run the audit skill output here, by category A/B/C]
 ```
 
 ## Items the user needs to confirm

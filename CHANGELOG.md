@@ -5,12 +5,59 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
-## [1.0.2] — 2026-05-11
+## [1.2.0] — 2026-05-15
+
+### Added
+- **Global Node tooling standard** — new `templates/TOOLING.md` template, locked 2026-05-15. Covers bun as the only package manager, Node 24 LTS via Homebrew, required project files (`.nvmrc`, `.npmrc`, `package.json` fields), and the Next.js / Turbopack defaults for Next 16. Same global-standard pattern as `FUNDAMENTALS.md` — overwritten verbatim from the plugin template on every `init-project` run.
+- **`init-project` Phase 4 — `agents/TOOLING.md` step** — copies the new template into `agents/TOOLING.md` **only for Node projects** (detected by a `package.json` at the project root). Swift / Python / non-Node projects skip silently. If the project's actual `package.json` / `.nvmrc` / `.npmrc` drift from the standard, the mismatch surfaces as a `[VERIFY]` item at Phase 7 — never auto-fixed.
 
 ### Changed
-- Shortened every SKILL.md frontmatter `description` to ≤200 chars so Cowork accepts the plugin (previous descriptions were 287–589 chars and were rejected by Cowork's 200-char validation cap).
+- **`init-project` SKILL.md Hard rules** — `agents/TOOLING.md` added as a second explicit silent-overwrite exception alongside `agents/FUNDAMENTALS.md`. Both are global locked standards, neither is per-project.
+- **Phase 3 root `CLAUDE.md` template** — non-negotiable rules gain rule #7: "If Node project: read `agents/TOOLING.md` before any package, install, or dev-server work. Use `bun` only — never `npm`, `pnpm`, or `yarn`." Gives the standard teeth at session start for Node projects without polluting Swift/Python ones.
+- **Phase 3 root `README.md` template** — `agents/TOOLING.md` entry added to the agents/ catalog with the "Node only · never edited per project" cascade note.
+- **Plugin README.md** — project-layout block now shows `TOOLING.md (Node only)` in the agents/ tier so installers see the addition before installing.
+
+### Compatibility
+- Existing Node projects on the v1.1.x layout get `agents/TOOLING.md` written on next `init-project` run (silent overwrite — global standard).
+- Non-Node projects are unaffected: no new file is created and the root `CLAUDE.md` Node-only rule is a no-op for them.
+
+## [1.1.0] — 2026-05-12
+
+### Added
+- **`init-project` Phase 0 (mode detection)** — runs first on every invocation and classifies the project as one of `audit | migration | empty | fresh`. Replaces the old inline audit-mode check inside Phase 1. See `skills/init-project/references/phase-0-mode-detection.md`.
+- **`init-project` Phase 0a (empty bootstrap)** — when the project has no markdown anywhere, ask the user a short set of questions (project name, one sentence, target user, tech stack, stage, locked decisions, first direction) and use the answers to populate templates with real content instead of `[Project Name]` placeholders. See `skills/init-project/references/phase-0a-empty-bootstrap.md`.
+- **`init-project` Phase 0b (old-version migration)** — when the project is on the older flat-root layout (root `CLAUDE.md` + protocol files at root, no `cowork/` / `agents/` / `human/` folders), migrate every old-layout file into the three-folder layout. Clean moves are mechanical (no user questions); ambiguous files (`STATUS.md`, `BRIEF.md`, `WORKLOG.md`, `CHANGELOG.md`) get a Haiku sub-agent classification. Root `CLAUDE.md` is split via sub-agent into root rules + `cowork/CLAUDE.md` + `agents/BRIEF.md`. All user content is preserved; new-version files are layered in only where missing. See `skills/init-project/references/phase-0b-migration.md`.
+
+### Changed
+- **Phase 2 (non-protocol merge)** now offers six routing options instead of four: **Cowork** (move into `cowork/`), **Agent docs** (move into `agents/docs/` or `agents/docs/detail/` and auto-register in `agents/docs/INDEX.md` + root `CLAUDE.md` `## Extended Context` — same pattern as the `add-context` skill), Merge, Reference, Leave, Skip. Closes the gap where extra markdown files (`ARCHITECTURE.md`, `NOTES.md`, team conventions, internal docs) had no clean tier-aware destination.
+- **Phase 1 (discovery)** — layout detection moved upstream to Phase 0. Phase 1 still buckets every `.md` file but the mode + audit flag are passed in from Phase 0.
+- **Phase 7 (final summary)** — output now varies by mode. Migration mode reports clean moves + sub-agent classifications + root `CLAUDE.md` split destinations + which new-version files were layered in. Empty mode reports the bootstrap answer object and surfaces `[VERIFY]` items. Audit mode lists filled-vs-untouched files and runs the `audit` skill's drift report.
+- **`init-project` SKILL.md** — phase list expanded from 7 to 10 logical phases (0, 0a, 0b, 1–7). The mode-detection section replaces the old "Audit-mode detection" inline block.
+
+### Build
+- **`build.sh` now produces two zips per release.** Restoring the dual-zip shape that v1.0.2 dist had but the v1.0.2 build script had collapsed into one:
+  - `project-protocol-vX.Y.Z.zip` — FULL build for Claude Code + Codex. Includes `hooks/`, `templates/`, `.codex-plugin/`, every `skills/<name>/agents/openai.yaml` Codex sidecar, and the `allowed-tools:` SKILL.md frontmatter line.
+  - `project-protocol-vX.Y.Z-cowork.zip` — STRIPPED build for Cowork. Only `.claude-plugin/` + `skills/<name>/SKILL.md` (with `allowed-tools:` stripped) + `references/` / `examples/`. `FUNDAMENTALS.md` relocated into `skills/init-project/references/` and SKILL.md path reference patched at build time.
+
+### Compatibility
+- Existing projects on the v1.0.x three-folder layout are unaffected — they get classified as `audit` mode and the flow is the same as before.
+- Old flat-root projects can now be migrated automatically via `init-project` instead of needing manual file moves.
+- Empty repos can now be initialised meaningfully without writing placeholder-heavy templates the user has to clean up after.
+
+## [1.0.2] — 2026-05-12
+
+### Fixed
+- **Cowork install:** `build.sh` now produces a Cowork-spec-compliant zip — the same zip also installs in Claude Code and Codex. Previously Cowork rejected the zip with "Plugin validation failed" because the build shipped components outside Anthropic's documented plugin spec.
+
+### Changed
+- Build artifact is stripped at build time to the Cowork plugin shape:
+  - Kept: `.claude-plugin/plugin.json`, `skills/<name>/SKILL.md` (+ `references/`, `examples/` sub-folders).
+  - Stripped: `.codex-plugin/`, `hooks/`, `templates/`, `skills/<name>/agents/openai.yaml` (Codex sidecars), and the `allowed-tools:` SKILL.md frontmatter line.
+  - `templates/FUNDAMENTALS.md` is relocated into `skills/init-project/references/` and the init-project SKILL.md path reference is patched at build time.
+- Source repo still contains `.codex-plugin/`, `hooks/`, `templates/`, and `agents/openai.yaml` sidecars — they're just excluded from the shipped artifact. Re-enable them later if/when Cowork's validator loosens.
+- Removed `keywords` field from both `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`. Cowork's validator accepts only the four fields documented in Anthropic's plugin manifest schema (`name`, `version`, `description`, `author`).
+- Shortened every SKILL.md frontmatter `description` for cleaner triggering. Previous: 287–589 chars. New: 160–198 chars. (The 200-char cap I had been "fixing for" turned out to be wrong — Anthropic's `create-cowork-plugin` SKILL ships a 340-char description and works — but shorter is still better.)
 - `init-project` description retains the "or when a project has no root CLAUDE.md" auto-trigger hint.
-- Kept the strongest trigger phrases per skill; trimmed redundant variants. Functionality unchanged.
 
 ## [1.0.1] — 2026-05-11
 

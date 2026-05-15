@@ -1,6 +1,6 @@
 # Phase 4 — Design system files
 
-Create `agents/BRAND.md`, `agents/FUNDAMENTALS.md`, `agents/DESIGN.md`, `agents/DISCOVERIES.md`. Also confirm `agents/BRIEF.md` from Phase 3 is the right shape.
+Create `agents/BRAND.md`, `agents/FUNDAMENTALS.md`, `agents/TOOLING.md` (Node only), `agents/DESIGN.md`, `agents/DISCOVERIES.md`. Also confirm `agents/BRIEF.md` from Phase 3 is the right shape.
 
 Never silently overwrite. Always read first, ask before replacing.
 
@@ -72,6 +72,26 @@ cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/FUNDAMENTALS.md" agent
 ```
 
 If the plugin-root env var is unset (some agents don't expose it): use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/FUNDAMENTALS.md`. Do not modify per project.
+
+---
+
+## `agents/TOOLING.md` (Node projects only)
+
+**Detect:** Node project if a `package.json` exists at the project root. If not Node (Swift, Python, plain repo): skip this section silently — do not create `agents/TOOLING.md`.
+
+**If Node and `agents/TOOLING.md` exists:** silently overwrite from the plugin template. Same rule as `FUNDAMENTALS.md` — this is a global locked standard, not per-project.
+
+**If Node and missing:** copy verbatim from the plugin template at `${CLAUDE_PLUGIN_ROOT}/templates/TOOLING.md` to `agents/TOOLING.md`.
+
+```bash
+if [ -f package.json ]; then
+  cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TOOLING.md" agents/TOOLING.md
+fi
+```
+
+If the plugin-root env var is unset: use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/TOOLING.md`. Do not modify per project.
+
+When copied, also confirm the project's actual `package.json` / `.nvmrc` / `.npmrc` match the standard. If they drift, surface the mismatch as a `[VERIFY]` item at Phase 7 — do not auto-fix.
 
 ---
 

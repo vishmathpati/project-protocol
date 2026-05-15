@@ -38,6 +38,7 @@ mkdir -p cowork agents human agents/docs/detail
 4. Audit before close: independent verification before any chapter is marked done.
 5. Commit + push before leaving any chat. Pull main before starting one.
 6. One tool active at a time.
+7. **If Node project:** read `agents/TOOLING.md` before any package, install, or dev-server work. Use `bun` only — never `npm`, `pnpm`, or `yarn`.
 
 ## Folder map
 
@@ -81,6 +82,7 @@ Check `agents/docs/INDEX.md` dependency entries before classifying.
 - **ROADMAP.md** — phases and ordering. When this changes: `agents/STATUS.md` Next Actions update, `human/agenda.md` re-derive.
 - **BRAND.md** — product identity. When this changes: `agents/DESIGN.md` may need updating.
 - **FUNDAMENTALS.md** — global design framework. Never edited per project.
+- **TOOLING.md** — global Node tooling standard (Node projects only). Never edited per project. When this changes: refreshed from plugin template, not by hand.
 - **DESIGN.md** — project tokens. When this changes: pending UI work pauses until tokens validate.
 - **DISCOVERIES.md** — append-only UI patterns. No cascade.
 - **WORKLOG.md** / **CHANGELOG.md** — same role as cowork's but for project work.

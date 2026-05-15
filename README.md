@@ -84,7 +84,7 @@ project-root/
 │   └── CLAUDE.md, STATUS.md, BRIEF.md, WORKLOG.md, CHANGELOG.md
 ├── agents/                ← project canon tier (Codex / Claude Code read here)
 │   ├── STATUS.md, BRIEF.md, ROADMAP.md, BRAND.md, FUNDAMENTALS.md,
-│   │   DESIGN.md, DISCOVERIES.md, WORKLOG.md, CHANGELOG.md
+│   │   TOOLING.md (Node only), DESIGN.md, DISCOVERIES.md, WORKLOG.md, CHANGELOG.md
 │   └── docs/
 │       ├── INDEX.md
 │       └── detail/
