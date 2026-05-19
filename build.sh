@@ -116,6 +116,23 @@ if [ -f templates/FUNDAMENTALS.md ]; then
       "$STAGE_COWORK/skills/init-project/SKILL.md"
     rm -f "$STAGE_COWORK/skills/init-project/SKILL.md.bak"
   fi
+  # phase-4 reference also points at templates/FUNDAMENTALS.md
+  if [ -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md" ]; then
+    sed -i.bak 's|templates/FUNDAMENTALS.md|references/FUNDAMENTALS.md|g' \
+      "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md"
+    rm -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md.bak"
+  fi
+fi
+
+# Relocate DESIGN.md template into init-project/references and patch the path reference
+if [ -f templates/DESIGN.md ]; then
+  mkdir -p "$STAGE_COWORK/skills/init-project/references"
+  cp templates/DESIGN.md "$STAGE_COWORK/skills/init-project/references/"
+  if [ -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md" ]; then
+    sed -i.bak 's|templates/DESIGN.md|references/DESIGN.md|g' \
+      "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md"
+    rm -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md.bak"
+  fi
 fi
 
 (cd "$STAGE_COWORK" && zip -r "$OUTPUT_COWORK" . -x "*.DS_Store" > /dev/null)

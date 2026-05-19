@@ -1,7 +1,7 @@
 {
   "name": "project-protocol",
-  "version": "1.2.0",
-  "description": "Project session discipline plugin: three-folder layout (cowork/agents/human) + root CLAUDE.md/README.md. 10 skills, 8 hooks. agentskills.io-conformant — Claude Code + Codex.",
+  "version": "1.3.0",
+  "description": "Project session discipline plugin: three-folder layout (cowork/agents/human) + root CLAUDE.md/README.md. 11 skills (incl. design-check UI gate), 8 hooks. agentskills.io-conformant — Claude Code + Codex.",
   "author": {
     "name": "Vish Mathpati"
   }

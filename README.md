@@ -38,7 +38,7 @@ claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 ## What you get
 
-10 skills + 8 hooks that turn every AI coding session into a disciplined operation.
+11 skills + 8 hooks that turn every AI coding session into a disciplined operation.
 
 ### Session lifecycle (the core 5)
 
@@ -56,7 +56,8 @@ Auto-fire on description match, also invokable via slash command.
 - **`verify-by-reading`** — Open the file before answering questions about it. Catches memory drift.
 - **`audit-before-close`** — Spec-vs-implementation check before any chapter or task is marked done.
 - **`discussion-mode`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
-- **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix.
+- **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix. v1.3 adds a design-system raw-value / cardinal-sin scan.
+- **`design-check`** *(new in v1.3)* — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Fires on any visual change.
 
 ### Hooks (8 total)
 

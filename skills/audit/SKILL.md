@@ -26,6 +26,8 @@ Cross-file consistency check. Surfaces drift, does not fix.
 - `STATUS.md` (current state, next actions)
 - `BRIEF.md` (decisions, all version blocks)
 - `ROADMAP.md` (direction, phases, slots)
+- `DESIGN.md` (brand tokens)
+- `FUNDAMENTALS.md` (universal craft rules + pre-ship checklist)
 - `docs/INDEX.md` (file dependency map)
 - Any project-specific canon files referenced from `CLAUDE.md`.
 
@@ -35,20 +37,33 @@ Cross-file consistency check. Surfaces drift, does not fix.
 - Does `CLAUDE.md` describe rules that the actual project structure violates?
 - Does `docs/INDEX.md` list features that no longer exist? Miss features that do?
 
-**3. Categorize findings:**
-- **(A) Real contradiction** — two files state mutually exclusive facts. Must fix.
+**3. Design-system scan** (UI projects only — skip if no `components/` or equivalent).
+
+Run the pre-ship checklist from `FUNDAMENTALS.md` against the current codebase:
+
+- **Raw values:** grep component files for hex literals (`#[0-9a-fA-F]{3,8}`), raw px outside utility classes, raw `font-family` strings. Any hit = token rule violation.
+- **Cardinal sins:** grep for any indigo / violet Tailwind hex from FUNDAMENTALS.md's list. Grep for emoji characters inside `<button>`, `<h*>`, `<li>`. Grep for two-stop gradients on hero elements.
+- **Accessibility floor:** grep for `outline: none` without `:focus-visible` nearby. Grep for `<img>` without `alt` or `width`/`height`. Grep for `<div onClick>`.
+- **Banned words:** grep shipped copy (page files, marketing components) for the banned-words list from FUNDAMENTALS.md.
+
+Findings here are category (A) — real violations.
+
+**4. Categorize findings:**
+- **(A) Real contradiction / violation** — two files state mutually exclusive facts, OR a design-system rule is broken in code. Must fix.
 - **(B) Stale wording** — wording that's no longer accurate but not strictly conflicting. Should fix.
 - **(C) Intentional difference** — files differ on purpose (e.g., human-facing vs. agent-facing wording). No fix needed.
 
-**4. Report.** Output each finding with category and source files. Example:
+**5. Report.** Output each finding with category and source files. Example:
 
 ```
 [A] STATUS.md Next Action #3 references "ChannelTypes audit" but ROADMAP §7 slot 5 is named "Channel Types CRUD". Names disagree.
+[A] src/components/Pricing.tsx:42 uses raw hex #1a1a1a — token rule violation. Should be var(--surface).
+[A] src/components/Hero.tsx:28 has emoji 🚀 inside <button> — cardinal sin #3.
 [B] CLAUDE.md "Tech stack" still says "Next.js" but BRIEF v1.4 locked "React + Vite". Wording is stale.
 [C] human/agenda.md uses "you" wording; agents/STATUS.md uses neutral wording. Two-audience rule — no fix.
 ```
 
-**5. Do not auto-fix.** Show findings. Let the user decide which to fix and in what order. The fix typically requires the `discipline` skill for the actual edits.
+**6. Do not auto-fix.** Show findings. Let the user decide which to fix and in what order. The fix typically requires the `discipline` skill for canon edits or the `design-check` skill for UI fixes.
 
 ---
 

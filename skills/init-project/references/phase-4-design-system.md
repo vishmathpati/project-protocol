@@ -97,22 +97,31 @@ When copied, also confirm the project's actual `package.json` / `.nvmrc` / `.npm
 
 ## `agents/DESIGN.md`
 
-Most important file in Phase 4. Decision process must be open — never force two options.
+Most important file in Phase 4. The shape is fixed — `templates/DESIGN.md` is a complete scaffold with token categories, DO NOT section, and Extension protocol already filled in. **Phase 4 fills the placeholders, it does not invent the shape.**
 
 DESIGN.md follows the [google-labs-code/design.md](https://github.com/google-labs-code/design.md) spec: YAML frontmatter (machine-readable tokens) + markdown body (human rationale).
 
-### Step 1 — Detect existing tokens
+### Step 1 — Read the template
+
+Source: `${CLAUDE_PLUGIN_ROOT:-${CODEX_PLUGIN_ROOT}}/templates/DESIGN.md`.
+
+This file is the contract for what every project's DESIGN.md must contain — token categories, the accent-discipline rules, the DO NOT section, the Extension protocol, and the Agent prompt guide. Do not strip or shorten any section. Only fill placeholders.
+
+If the plugin-root env var is unset: use the Read tool to fetch the template content from the plugin install path.
+
+### Step 2 — Detect existing tokens in the project
 
 Read `agents/DESIGN.md` if it exists. Check for YAML frontmatter (starts with `---` and contains `colors:` or `name:` before the closing `---`).
 
-- Has frontmatter → already new format. Branch: "Existing DESIGN.md".
-- No frontmatter → legacy format. Branch: "Legacy upgrade".
+- Has frontmatter → already new format. Branch: "Existing DESIGN.md — fill gaps only".
+- No frontmatter → legacy format. Branch: "Legacy upgrade — re-shape into template".
 - Doesn't exist → scan codebase:
   - `src/app/globals.css` / `app/globals.css` — CSS custom properties
   - `tailwind.config.{js,ts}` — `theme.extend`
   - `src/styles/`, `tokens.css`, `design-tokens.ts`, `theme.ts`
+  - Swift: `DesignTokens.swift`, asset catalog colors, `Color` extensions
 
-### Step 2 — Ask the open question
+### Step 3 — Ask the open question
 
 If existing tokens found, present them and ask:
 
@@ -122,7 +131,7 @@ Sample: [5–10 CSS variables or Tailwind values]
 
 What would you like to do with agents/DESIGN.md?
 
-A — Transfer existing system as-is (document what's there, no visual change)
+A — Transfer existing system as-is into the template (document what's there, no visual change)
 B — Transfer existing + I'll tell you what to add or change
 C — Generate a completely fresh design system (based on BRAND.md + your direction)
 
@@ -140,15 +149,20 @@ B — I'll describe the vibe and you generate from that
 Or type your own direction.
 ```
 
-### Step 3 — Execute
+### Step 4 — Execute
 
-All paths produce the same output: YAML frontmatter + 9-section markdown body.
+All paths produce the same output: the `templates/DESIGN.md` scaffold with placeholders replaced by real values.
 
-- **A (transfer)**: Haiku sub-agent extracts CSS vars and Tailwind config. Sonnet sub-agent structures them into DESIGN.md format.
-- **B (transfer + add)**: extract as A, then ask "What to add or change?" Apply additions.
-- **C (fresh)**: use BRAND.md + user description; Sonnet sub-agent generates both layers from scratch.
+- **A (transfer):** Haiku sub-agent extracts CSS vars / Tailwind config / Swift tokens. Sonnet sub-agent maps them onto the template's frontmatter and body placeholders. Sections without source values stay as `[VERIFY]` placeholders.
+- **B (transfer + add):** extract as A, then ask "What to add or change?" Apply additions while preserving the template structure.
+- **C (fresh):** use `BRAND.md` + user description; Sonnet sub-agent generates token values for the template. Never skip a section — fill or `[VERIFY]`.
 
-### Step 4 — Lint after writing
+**Hard rules for any path:**
+- Do not delete sections from the template (Overview, Colors, Typography, Spacing, Radius, Shadow, Components, DO NOT, Extension protocol, Agent prompt guide).
+- Do not change the DO NOT section's universal items — only **add** brand-specific anti-patterns.
+- Do not edit the Extension protocol wording — it's enforced by the `design-check` skill.
+
+### Step 5 — Lint after writing
 
 ```bash
 npx @google/design.md lint agents/DESIGN.md
@@ -157,57 +171,6 @@ npx @google/design.md lint agents/DESIGN.md
 Report errors (must fix), warnings (show, ask), info (silent).
 
 If linter not available: note "Linter not available — install `@google/design.md` to validate."
-
-### DESIGN.md format
-
-**Layer 1 — YAML frontmatter:**
-
-```yaml
----
-version: alpha
-name: [Project Name]
-colors:
-  primary: "#[hex]"
-  secondary: "#[hex]"
-  background: "#[hex]"
-  foreground: "#[hex]"
-  muted: "#[hex]"
-  border: "#[hex]"
-typography:
-  heading: { fontFamily: ..., fontSize: ..., fontWeight: ... }
-  body: { fontFamily: ..., fontSize: ..., fontWeight: ... }
-  caption: { fontFamily: ..., fontSize: ... }
-rounded: { sm: ..., md: ..., lg: ... }
-spacing: { sm: ..., md: ..., lg: ... }
-components:
-  button-primary:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.foreground}"
-    rounded: "{rounded.sm}"
-  # etc.
----
-```
-
-Rules:
-- All color values `#` + 6-digit hex (sRGB)
-- Use `{token.reference}` syntax in components
-- Mark uncertain values with `[VERIFY]` inline comment
-
-**Layer 2 — Markdown body, 9 sections:**
-
-```
-## Overview
-## Colors
-## Typography
-## Layout
-## Elevation & Depth
-## Components
-## Do's and Don'ts
-## Responsive Behavior
-## Agent Prompt Guide (one paragraph for agents — written last)
-```
-
-Generate all 9 sections even if some need [VERIFY] placeholders.
 
 ---
 

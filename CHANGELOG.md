@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [1.3.0] — 2026-05-19
+
+### Added
+- **`design-check` skill** — UI-work gate (new, 11th skill). Fires on any visual change (creating/editing components, styles, pages). Walks the agent through a 7-step sequence: read `DESIGN.md` + `FUNDAMENTALS.md`, search existing components for reuse, identify tokens needed, **halt on missing tokens** (propose addition, wait for user confirmation), write code using approved tokens only, scan diff for raw hex / px / font / `outline: none` / `<div onClick>` / images without alt-width-height, halt on violations. Same gate-skill shape as `discipline` and `audit-before-close`; ships with a Codex sidecar.
+- **`templates/DESIGN.md` (new shaped template)** — Phase 4 now fills a complete scaffold instead of generating the shape from scratch. Token categories, accent-discipline rule (≤ 2 visible uses of `--primary` per screen), DO NOT section with universal anti-patterns, Extension protocol (need a missing value? stop, propose, wait, then add), and an Agent prompt guide are all baked in. The scaffold also formalises OKLCH-based derivation for hover/disabled tints so adding a "fourth color" isn't a new hex code, it's `oklch(from var(--primary) ...)`.
+
+### Changed
+- **`templates/FUNDAMENTALS.md` significantly tightened.** Existing 6 Levels / Ratio Rule / Motion Principles / Token Rule kept verbatim. Added: the **7 cardinal sins** (indigo hex, two-stop trust gradients, emoji-as-icons, hardcoded display fonts, AI-dashboard-tile shape, invented metrics, filler copy), the **5 required states** table (loading / empty / error / populated / edge) with loading-duration thresholds and error/empty composition rules, a **craft-details** section (focus / forms / images / touch / semantic HTML / URL state / performance), a **banned-words** list (hype / filler / corporate zombie / AI-slop openers), **icon discipline** (one library, `currentColor`, 3:1 contrast, semantic alt), **copy rules**, and a **pre-ship checklist** that `audit-before-close` runs. Type 2 of the Token Rule ("missing token") now reads **STOP and propose to the user; do not improvise** — the language change converts the rule from agent judgment into a halt-and-confirm enforced by `design-check`.
+- **`init-project` Phase 4 reference** — DESIGN.md generation refactored. The skill no longer invents the shape per project; it reads `templates/DESIGN.md` and fills the placeholders (A: transfer existing, B: transfer + add, C: fresh). Hard rules: never delete the template's sections, never edit the DO NOT universals (only add brand-specific items), never edit the Extension protocol wording (it's enforced by `design-check`).
+- **`audit` skill** — added a design-system scan step (UI projects only). Greps component files for raw hex / px / `font-family` strings, cardinal-sin patterns, accessibility floor violations (`outline: none` without `:focus-visible`, `<img>` missing alt/width/height, `<div onClick>`), and banned-words in shipped copy. Findings reported as category (A) — real violations.
+- **`README.md`** — skill count updated from 10 to 11; `design-check` listed under Discipline skills; `audit` description notes the new design-system scan.
+
+### Compatibility
+- Existing projects on v1.2.x get the richer `FUNDAMENTALS.md` written on next `init-project` run (silent overwrite — global standard, same rule as before). DESIGN.md handling: if the project's existing DESIGN.md has the new format already (YAML frontmatter), Phase 4 fills gaps only; if it has the legacy format, Phase 4 re-shapes it into the template. No silent destruction of existing content.
+- `design-check` fires on description match in any project that has both `agents/DESIGN.md` and `agents/FUNDAMENTALS.md` present. Projects without those files: the skill stops at step 1 and tells the user to run `init-project` first.
+
 ## [1.2.0] — 2026-05-15
 
 ### Added

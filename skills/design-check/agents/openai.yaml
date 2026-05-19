@@ -1,0 +1,7 @@
+interface:
+  display_name: "Design Check"
+  short_description: "UI-work gate: read DESIGN.md + FUNDAMENTALS.md, reuse components, halt on missing tokens, scan diff for raw values"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

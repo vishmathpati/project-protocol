@@ -1,5 +1,7 @@
-# FUNDAMENTALS.md — Design Principles
+# FUNDAMENTALS.md — Craft Rules
 > Global. Read before any UI work. Same content on every project.
+> Brand-specific values (which colors, which fonts) live in `DESIGN.md`.
+> This file is the craft layer: universal rules that apply regardless of brand.
 
 ---
 
@@ -77,8 +79,8 @@ background: #1a1a1a;
 border-radius: 12px;
 
 /* CORRECT — named, inheritable, changeable in one place */
-background: var(--card);
-border-radius: var(--radius);
+background: var(--surface);
+border-radius: var(--radius-md);
 ```
 
 When you see a component you want to add:
@@ -86,17 +88,188 @@ When you see a component you want to add:
 2. If CSS variables → import it, it inherits your tokens automatically. Nothing to do.
 3. If hardcoded → find the 2–3 hardcoded values, replace with your tokens. Five minutes.
 
-### The 3 types of "different" (when adding a component you like)
+### The 3 types of "different" (when reusing a component)
 
-- **Type 1 — Token difference**: component uses tokens, your values differ → your tokens override automatically
-- **Type 2 — Missing token**: gradient, glow, blur not in your token set → add it as a new named token, now it's inside your system
-- **Type 3 — Structural intention**: sharp corners vs rounded — decide once: update your whole token, or document as a named exception with a reason
+- **Type 1 — Token difference**: component uses tokens, your values differ → your tokens override automatically. Nothing to do.
+- **Type 2 — Missing token**: gradient, glow, or value the component needs that isn't in `DESIGN.md`. **STOP. Propose the new token to the user. Wait for explicit confirmation. Then add it to `DESIGN.md` AND `global.css` (or `DesignTokens.swift`). Do not improvise.**
+- **Type 3 — Structural intention**: sharp corners vs rounded, dense vs spacious — decide once. Either update your whole token, or document as a named exception with a reason.
+
+---
+
+## The 7 Cardinal Sins (auto-stop)
+
+These are the AI-slop tells. Each is a hard fail — flag in the diff, ask the user, fix before declaring done.
+
+1. **Default Tailwind indigo as accent** — `#6366f1`, `#4f46e5`, `#4338ca`, `#3730a3`, `#8b5cf6`, `#7c3aed`, `#a855f7`. The brand's `DESIGN.md` provides `--primary`; use it. Indigo is the textbook AI tell.
+2. **Two-stop "trust" gradient on the hero** — purple→blue, blue→cyan, indigo→pink. A flat surface + intentional type beats it every time.
+3. **Emoji as feature icons** — `✨ 🚀 🎯 ⚡ 🔥 💡` inside `<h*>`, `<button>`, `<li>`, or `class*="icon"`. Use 1.6–1.8 px-stroke monoline SVG with `currentColor`.
+4. **Sans-serif on display when the brand binds a serif** (or vice versa). Headings must use the display font from `DESIGN.md`, not a hardcoded `Inter` / `Roboto` / `system-ui`.
+5. **Rounded card with a colored left-border accent** — the canonical "AI dashboard tile" shape. Drop either the radius or the left border.
+6. **Invented metrics** — "10× faster", "99.9% uptime", "3× more productive". Either pull from a real source or use a labelled placeholder.
+7. **Filler copy** — `lorem ipsum`, `feature one / two / three`, `placeholder text`, `sample content`. An empty section is a composition problem to solve, not a hole to fill with invented words.
+
+---
+
+## The 5 Required States
+
+Every interactive surface — list, table, card, form, panel, search, dashboard — must render all five. Missing states are the loudest "AI-built UI" signal there is.
+
+| State | Triggered when | Must contain |
+|---|---|---|
+| **Loading** | Data is in flight | Skeleton, spinner, or shell — plus a 15s "taking longer than expected" fallback |
+| **Empty** | No records yet, or query returned nothing | Headline, plain explanation, primary CTA |
+| **Error** | Fetch failed, server failure, validation rejection | Plain-language cause, recovery action, preserved user input |
+| **Populated** | Data present, primary case | The state the design was actually drawn for |
+| **Edge** | Extreme volume, long strings, missing optional fields, RTL or long-word content, partial network | Layout that does not break |
+
+### Loading thresholds
+
+Pick the indicator by expected duration, not by what's in the component library.
+
+| Duration | Indicator |
+|---|---|
+| 0–300 ms | None. Render synchronously; users perceive no delay. |
+| 300 ms – 2 s | Subtle spinner or skeleton. |
+| 2 – 10 s | Skeleton matched to expected layout, or labelled spinner ("Loading…"). |
+| 10 – 30 s | Determinate progress bar with cancel option. |
+| 30 – 60 s | Progress bar with explicit cancel affordance. |
+| 60 s+ | Stop animation. Show error with retry, cancel, or continue. |
+
+Never leave a spinner running indefinitely. Start a timeout on every request.
+
+### Error composition
+
+Every error must answer three questions, in order:
+1. **What happened** — "Your card was declined." Not "Something went wrong."
+2. **Why, if knowable** — "Insufficient funds." Or "Network unreachable — check your connection."
+3. **What the user can do** — A retry button, an alternative path, or a support link.
+
+Preserve user input across the error. Never clear a form on submit failure.
+
+### Empty state composition
+
+Empty is not the absence of state. It is its own state with a job.
+- **First-use empty** — illustration + headline + value sentence + primary CTA. The empty is the onboarding moment.
+- **No-results empty** — echo the query, suggest alternatives, never a true blank.
+- **Cleared empty** — celebratory phrasing, optional next action.
+- **Error-as-empty** — never. An error is its own state.
+
+---
+
+## Craft Details
+
+The implementation rules that separate "works" from "feels right." Most AI-generated UI misses these.
+
+### Focus
+
+- Use `:focus-visible`, not `:focus`. Keyboard-only ring, no ring on mouse click.
+- **Never** bare `outline: none` without a replacement. That's a triple WCAG failure (1.4.11, 2.4.7, 2.4.13).
+- Use `:focus-within` on compound controls (search input + icon, etc.) so the parent highlights when any child gets focus.
+
+### Forms
+
+- Correct `type`, `inputmode`, and `autocomplete` on every input. Mobile keyboards depend on it; password managers depend on it.
+- Labels always. Never placeholder-as-label — placeholder disappears on input.
+- Never block paste (`onPaste preventDefault`). Hostile and an accessibility violation.
+- Validate on **blur**, not on first keystroke. After invalid, switch to re-validate on `input` so the error clears the moment input becomes valid.
+- Preserve user input on error. Never clear a form on submit failure.
+- Disable spellcheck on emails, codes, usernames, URLs: `spellcheck="false"`.
+
+### Images
+
+- Always set `width` and `height` — prevents cumulative layout shift.
+- Above the fold: `fetchpriority="high"`. Below the fold: `loading="lazy"`.
+- Meaningful images need `alt`. Decorative: `alt=""` or `aria-hidden="true"`.
+
+### Touch and mobile
+
+- AA touch target floor: **24×24 CSS px**. AAA / native expected: 44×44 (iOS) or 48×48 (Material).
+- `touch-action: manipulation` removes the 300 ms tap delay.
+- `overscroll-behavior: contain` on modals and drawers prevents scroll chaining.
+- Avoid `autoFocus` on mobile — it opens the keyboard unexpectedly.
+
+### Semantic HTML
+
+- `<button>` for actions. `<a href>` for navigation. Never `<div onClick>` for either.
+- One `<h1>` per page. Don't skip heading levels (`h1` → `h3` without `h2`).
+- `<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>` over `<div role="banner">`.
+- Toast / status: `role="status" aria-live="polite"`. Critical error: `role="alert"`.
+
+### URLs reflect state
+
+- Filters, tabs, sort, pagination belong in the URL. Users expect to bookmark and share.
+- Use proper `<Link>` / `<a href>` so Cmd-click and middle-click work.
+
+### Performance
+
+- Lists with 50+ items: virtualize (`virtua`, `react-window`) or `content-visibility: auto`.
+- Avoid layout reads in render (`offsetHeight`, `getBoundingClientRect`) — use `ResizeObserver`.
+- Preconnect to asset CDNs; preload critical fonts.
+- No `transition: all` — performance killer and unpredictable.
+
+---
+
+## Banned Words
+
+If a word can be removed without changing meaning, it's dead. Replace with facts, numbers, scenarios, real outputs.
+
+**Hype:** revolutionary, seamless, cutting-edge, best-in-class, next-generation, world-class, game-changing, disruptive, robust, state-of-the-art, groundbreaking, supercharge, elevate, unlock (metaphorical), harness, empower.
+
+**Filler:** very, really, just, actually, basically, literally, simply, easily, highly, incredibly, extremely, absolutely.
+
+**Corporate zombie:** leverage, synergy, ecosystem, paradigm, holistic, end-to-end, mission-critical, value proposition, stakeholder, thought leader, optimize (in marketing), streamline (without specifics).
+
+**AI-slop openers:** "In today's fast-paced world...", "In an era of...", "Look no further", "Say goodbye to...", "Introducing the future of...", "Reimagine...", "Take your X to the next level", "Harness the power of...".
+
+---
+
+## Icon Discipline
+
+- Treat icons as typography, not decoration. Functional, not ornamental.
+- One library per product. No mixing Lucide + Heroicons + Phosphor.
+- Default fill: `currentColor` so icons inherit text color and sync with themes automatically.
+- Meaningful icons need **3:1 contrast** (WCAG non-text).
+- Icon buttons need `aria-label` and a hit area of at least 44×44 CSS px on touch (32×32 on desktop is OK if the visual is smaller).
+- Product UI: clean outline OR solid, **one** consistent set. Never duotone / gradient inside product UI; reserve those for marketing.
+
+---
+
+## Copy Rules
+
+- Active voice. "Install the CLI" not "The CLI will be installed."
+- Specific labels. "Save API key" not "Continue". "Create project" not "OK".
+- Error messages include the fix. "Email must include @ and a domain" not "Invalid input".
+- Numerals for counts. "8 deployments" not "eight."
+- Second person. "Your account" not "My account."
+- Empty states teach: "Projects will appear here. Create your first one." Not "No data."
 
 ---
 
 ## Quality Questions (ask before finishing any UI work)
 
-1. **Does this decoration earn its place?** Is it rare enough to have impact?
+1. **Does this decoration earn its place?** Is it rare enough to have impact? (90% plain / 10% decoration.)
 2. **Is the visual hierarchy immediately clear?** Can someone tell in 2 seconds what's most important?
+3. **Are all 5 required states present** for every interactive surface?
+4. **Did I commit any of the 7 cardinal sins?**
+5. **Did I improvise a token instead of stopping to propose it?**
 
-If either answer is no, fix the foundation before adding more.
+If any answer is "no" or "yes I did" — fix the foundation before adding more.
+
+---
+
+## Pre-Ship Checklist (the audit-before-close skill runs this)
+
+- [ ] No raw hex / px / font-family in component files — everything via tokens.
+- [ ] No cardinal-sin patterns (indigo accent, two-stop gradients, emoji icons, hardcoded display font, AI-dashboard tile shape, invented metrics, filler copy).
+- [ ] All 5 states rendered for every interactive surface.
+- [ ] Focus rings present and visible (`:focus-visible`, never bare `outline: none`).
+- [ ] Forms: labels, `autocomplete`, `type`, `inputmode` all set. Validation on blur, not keystroke. Paste not blocked.
+- [ ] Images: `width` and `height` set, meaningful images have `alt`.
+- [ ] Touch targets ≥ 24×24 CSS px (44×44 on touch for primary actions).
+- [ ] Semantic HTML — no `<div onClick>` for what should be `<button>` or `<a>`.
+- [ ] No banned words in shipped copy.
+- [ ] One icon library, all icons use `currentColor`.
+- [ ] Heading hierarchy clean — one h1, no skipped levels.
+- [ ] URL reflects state (filters, tabs, pagination).
+
+If any item fails: stop, flag, fix. Don't ship.
