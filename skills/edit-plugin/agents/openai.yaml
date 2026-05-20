@@ -1,0 +1,7 @@
+interface:
+  display_name: "Edit Plugin"
+  short_description: "Self-discipline gate: edits to this plugin's source always commit + push"
+  brand_color: "#7C2D12"
+
+policy:
+  allow_implicit_invocation: true

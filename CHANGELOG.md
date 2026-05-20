@@ -5,6 +5,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-05-20
+
+### Added
+- **`edit-plugin` skill** — 12th skill. Self-discipline gate for any change to this plugin's own source (skills, hooks, manifests, templates, README, build scripts). 7-step protocol that chains `git add` → `commit` → `push` to every edit so the plugin source repo on disk stays in lockstep with `origin/main` on GitHub. Fixes the gap where an agent edited a skill, the user thanked them, and the change was never pushed — so the next pull / reinstall would lose it. Same gate-skill shape as `discipline` and `audit-before-close`; ships with a Codex sidecar.
+
+### Changed
+- **`save-session` skill** — added Step 10 "Git sync (commit, push, auto-merge into `main`)". After the WORKLOG → CHANGELOG/STATUS/BRIEF cascade, save-session now stages protocol .md changes, commits with a structured message, pushes the current branch to GitHub, and auto-merges into `main` via the worktree path resolved from `git worktree list`. Asks before staging anything outside `cowork/`, `agents/`, `human/`. Stops cleanly on detached HEAD / push failure / merge conflict with an exact recovery command. `allowed-tools` expanded to include `git:*`. Step 11 (Confirm) now reports the git outcome.
+- **`README.md`** — skill count updated from 11 to 12; `edit-plugin` listed under Discipline skills.
+
+### Compatibility
+- Existing projects on v1.3.x: `save-session` works without configuration as long as the project's working directory is a git repo with a remote. Repos with no remote skip the push step and still merge locally.
+- `edit-plugin` fires only for edits to this plugin's source repo — has no effect on consumer projects.
+
 ## [1.3.0] — 2026-05-19
 
 ### Added
