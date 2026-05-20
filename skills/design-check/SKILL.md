@@ -1,12 +1,12 @@
 ---
 name: design-check
 description: Pre-action gate for any UI work. Reads DESIGN.md + FUNDAMENTALS.md, searches existing components for reuse, identifies tokens needed, halts on missing tokens, scans diff for raw hex/px/font values. Fires on — "create component", "edit UI", "change styles", "add page", any visual change.
-allowed-tools: Read, Glob, Grep
+allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
 # Design Check
 
-The 7-step gate fired before any UI work. The skill does not write code — it forces a sequence the agent walks through before and during the change.
+The 8-step gate fired before any UI work. The skill walks the agent through a sequence before, during, and after the change. Steps 1–7 are detection. Step 8 offers auto-fixes for mechanical violations and surfaces human-judgment ones.
 
 ---
 
@@ -22,7 +22,7 @@ If the file does not produce visible UI (config, types, pure utility logic), thi
 
 ---
 
-## The 7 steps
+## The 8 steps
 
 **1. Read the canon.**
 - `agents/DESIGN.md` — the brand tokens.
@@ -69,6 +69,62 @@ If either file is missing → STOP. Run `init-project` first.
 - Fix or escalate. Do not declare done.
 - After fixes, re-run step 6 until clean.
 
+**8. Offer fixes.**
+
+After step 7 surfaces violations, do not just halt and hand back. Sort every finding into one of two buckets and present them as a structured report.
+
+**Auto-fixable** (mechanical, low-risk, the agent can apply directly):
+- Raw hex that matches an exact known token value in `agents/DESIGN.md` frontmatter → replace with the corresponding Tailwind class (e.g. `bg-[#0a0a0a]` → `bg-background` if `--bg: #0a0a0a` is defined).
+- Raw `...` (three periods) in user-facing strings → replace with `…` (U+2026).
+- `10MB` / `10 GB` style unit pairs → replace with `10&nbsp;MB`.
+- `<div onClick>` for what should be a button → swap to `<button type="button">`.
+- `<img>` missing `width` / `height` and the image file exists locally → read its dimensions, set them on the tag.
+- `<img>` decorative-only with no `alt` → add `alt=""` plus `aria-hidden="true"`.
+- `outline: none` without a `:focus-visible` replacement → add `outline-none focus-visible:ring-2 focus-visible:ring-ring` (or the project equivalent).
+- `transition: all` → ask the user which properties were intended; only auto-fix if it's obviously safe (rare).
+
+**Human-judgment** (never auto-fix — surface only, ask the user):
+- Raw hex with NO matching token in `DESIGN.md` → "which token should this map to?"
+- Cardinal sin #1: indigo accent → "which color should replace it?"
+- Cardinal sin #3: emoji-as-icon → "which Lucide icon?"
+- Cardinal sin #6: invented metric → "real source or remove?"
+- Cardinal sin #7: filler / lorem ipsum copy → user rewrites.
+- Banned words from `FUNDAMENTALS.md` (hype / filler / corporate zombie / AI-slop openers) in shipped copy → user rewrites.
+- Cardinal sin #2: two-stop trust gradient on hero → user decides (could be intentional brand choice).
+- Cardinal sin #5: AI-dashboard-tile shape (rounded card + colored left-border accent) → user decides.
+- `<img>` missing `alt` AND clearly meaningful (used in a hero, has descriptive surrounding text) → user must write alt text.
+
+**Safety rule.** Never auto-fix a finding when the proposed fix can't be verified. Before applying any raw-hex → token replacement, confirm the matching token is actually defined in the `DESIGN.md` frontmatter. If it isn't, that finding moves to human-judgment with the prompt "this raw hex has no matching token — what should this map to?" — not a silent guess.
+
+**Batching for large diffs.** If there are more than 20 findings, group them by file. Show the top 10 first by severity (cardinal sins > raw values > craft details), with a `show N more` affordance. Apply auto-fixes in batches of one-confirmation-per-file, not one-confirmation-per-finding.
+
+**Interaction shape.** Output a single report and ask for one decision per bucket:
+
+```
+design-check — found 7 violations
+
+Auto-fixable (4 findings):
+  • src/Pricing.tsx:42  bg-[#0a0a0a] → bg-background
+  • src/Hero.tsx:28     <div onClick> → <button type="button">
+  • src/Hero.tsx:51     <img> missing dimensions (will read from /public/hero.jpg)
+  • src/Footer.tsx:67   "..." → "…"
+
+Apply all auto-fixes?
+  [yes — apply all]
+  [pick — choose which to apply]
+  [no — leave for me to fix manually]
+
+Human-judgment (3 findings — surfacing for your input):
+  • src/Hero.tsx:18  raw hex #6366f1 (indigo accent — cardinal sin #1)
+      → which token should this map to? (--primary / new token / different fix)
+  • src/Hero.tsx:34  emoji 🚀 inside <button> (cardinal sin #3)
+      → which Lucide icon? (rocket / send / play / other)
+  • src/Footer.tsx:12  "supercharge your marketing" (banned word)
+      → rewrite (suggest: "see real campaign performance")
+```
+
+**After applying fixes.** Re-run step 6 (diff scan) to confirm every auto-fix target is now clean. If any auto-fix introduced a new violation, surface it and stop — do not loop silently.
+
 ---
 
 ## Output shape
@@ -106,17 +162,47 @@ design-check — raw values in diff:
 Fix before continuing.
 ```
 
+At step 8 (offer fixes):
+
+```
+design-check — found 5 violations
+
+Auto-fixable (3 findings):
+  • src/Pricing.tsx:42  bg-[#1a1a1a] → bg-surface  (matches --surface in DESIGN.md)
+  • src/Hero.tsx:28     <div onClick> → <button type="button">
+  • src/Footer.tsx:67   "Loading..." → "Loading…"
+
+Apply all auto-fixes?
+  [yes — apply all]
+  [pick — choose which to apply]
+  [no — leave for me to fix manually]
+
+Human-judgment (2 findings — surfacing for your input):
+  • src/Hero.tsx:18  raw hex #6366f1 (indigo accent — cardinal sin #1)
+      → which token should this map to? (--primary / new token / different fix)
+  • src/Pricing.tsx:67  raw padding 17px (no matching --space token)
+      → 16 (--space-4) or 20 (--space-5)?
+```
+
+After auto-fixes apply, step 6 re-runs:
+
+```
+design-check — re-scan after auto-fix:
+- 3 of 3 auto-fix targets now clean.
+- 2 human-judgment findings still open — awaiting your input.
+```
+
 ---
 
 ## Skip conditions
 
-The user can override with explicit phrases like "skip design-check, just do it" or "no gate, proceed". Default is the full 7 steps.
+The user can override with explicit phrases like "skip design-check, just do it" or "no gate, proceed". Default is the full 8 steps.
 
 ---
 
 ## Why it exists
 
-`DESIGN.md` and `FUNDAMENTALS.md` already encode what the project commits to visually. Agents drift when they aren't forced to consult those files. This skill makes the consultation mechanical — the agent walks the same 7 steps every time, can't skip, can't improvise tokens, can't ship raw values silently.
+`DESIGN.md` and `FUNDAMENTALS.md` already encode what the project commits to visually. Agents drift when they aren't forced to consult those files. This skill makes the consultation mechanical — the agent walks the same 8 steps every time, can't skip, can't improvise tokens, can't ship raw values silently.
 
 The Extension protocol in `DESIGN.md` is enforced here at step 4. The pre-ship checklist in `FUNDAMENTALS.md` is enforced here at steps 6–7 and again by `audit-before-close`.
 
@@ -127,5 +213,6 @@ The Extension protocol in `DESIGN.md` is enforced here at step 4. The pre-ship c
 - `discipline` — universal pre-action gate for any non-trivial change.
 - `audit-before-close` — universal end-of-work gate.
 - `design-check` — UI-specific gate. Runs at both moments (pre-write at steps 1–4, post-write at steps 6–7). More concrete because the rules are pixel-level.
+- `design-check` now also offers auto-fixes (via Step 8). `audit-before-close` and `audit` remain detection-only and do not modify files.
 
 All three can fire on the same task. `design-check` is the UI-specific layer.

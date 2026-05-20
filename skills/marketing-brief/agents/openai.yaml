@@ -1,0 +1,7 @@
+interface:
+  display_name: "Marketing Brief"
+  short_description: "End-of-project marketing-site planning pass: writes CONTENT registry, sitemap, per-page briefs/copy/layouts, media manifest to agents/marketing/ for build-component to consume"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

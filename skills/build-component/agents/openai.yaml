@@ -1,0 +1,7 @@
+interface:
+  display_name: "Build Component"
+  short_description: "Build a new component or adopt an external one into the project's existing design system: pick tier (Generic / Marketing / App), reuse existing primitives, normalize against DESIGN.md tokens, write to STRUCTURE.md location"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

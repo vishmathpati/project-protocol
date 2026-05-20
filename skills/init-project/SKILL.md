@@ -53,6 +53,9 @@ project-root/
 0b. **Old-version migration** — only when mode = migration. Move every old-layout file into the three-folder layout, split root `CLAUDE.md`, preserve all user content, layer in new-version files where missing.
     → See `references/phase-0b-migration.md`. After this, continue to Phase 1 with `migration_complete = true`.
 
+0c. **Modernize existing project** — only when mode = modernize. Re-confirm canon with user, sweep for drift, archive waste.
+    → See `references/phase-0c-modernize.md`.
+
 1.  **Discovery** — find every `.md` file, bucket into protocol / design / other.
     → See `references/phase-1-discovery.md`. Skipped if mode = empty.
 
@@ -111,8 +114,9 @@ Rule: fast/cheap model for extraction, reasoning model for judgment. Never the m
 
 ## Mode detection (Phase 0)
 
-Phase 0 runs before anything else and produces one of four modes:
+Phase 0 runs before anything else and produces one of five modes:
 
+- **`modernize`** — three-folder layout already in place AND canon files are populated AND the user invoked an upgrade pass (or opted in from audit). Phase 0c re-confirms each populated canon file with the user, sweeps the codebase for design-system drift, archives waste, reconciles STRUCTURE.md, and silently re-applies global standards.
 - **`audit`** — three-folder layout already in place. Read existing files; do not overwrite populated content. Fill missing files only. Report mismatches at Phase 7. Apply the `audit` skill at the end to surface canon inconsistencies.
 - **`migration`** — older flat-root layout detected. Phase 0b migrates everything into the three-folder layout (preserving all user content) before the standard phases run.
 - **`empty`** — no markdown anywhere. Phase 0a collects basic project info from the user so templates can be populated with real content.
