@@ -1,7 +1,7 @@
 ---
 name: save-session
 description: Save and close a project session. Updates the active tier's WORKLOG → CHANGELOG, STATUS, BRIEF. Triggers — "save", "save session", "close session", "end session", "done for today".
-allowed-tools: Read, Write, Edit, Glob, Bash(ls:*,date:*,wc:*)
+allowed-tools: Read, Write, Edit, Glob, Bash(ls:*,date:*,wc:*,git:*)
 ---
 
 # Save Session — Project Protocol
@@ -173,7 +173,80 @@ Replace contents with:
 
 ---
 
-## Step 10 — Confirm
+## Step 10 — Git sync (commit, push, auto-merge into `main`)
+
+Without this step the canon updates from steps 3–9 stay stranded on the session's worktree branch. The user's local folder is on `main` and will not see them. Run this every save.
+
+### 10a — Capture git state
+
+From the active worktree directory, run:
+
+```bash
+git rev-parse --show-toplevel       # current worktree path
+git rev-parse --abbrev-ref HEAD     # current branch
+git status --porcelain              # uncommitted changes
+git worktree list --porcelain       # all worktrees + which holds main
+git remote -v                       # confirm a remote exists
+```
+
+If `HEAD` is detached (not on a branch): **STOP** and report — "Not on a branch — cannot auto-merge. Checkout a branch first, then re-run save."
+
+If the repo has no remote: skip the push in 10c and the push in 10d; still do the local merge into `main`.
+
+### 10b — Stage and commit session updates
+
+If `git status --porcelain` is clean: skip to 10c.
+
+Otherwise, separate the changed files into two groups:
+
+- **Protocol .md files** under `cowork/`, `agents/`, or `human/` → expected output of steps 3–9. Stage automatically.
+- **Anything else** (code files, configs, untracked files outside the protocol folders) → list them to the user and ASK before staging. Never sweep arbitrary changes into a `save-session` commit.
+
+Stage protocol files only:
+
+```bash
+git add cowork/ agents/ human/
+git commit -m "chore(session): save session YYYY-MM-DD · <agent label>"
+```
+
+### 10c — Push the worktree branch to GitHub
+
+If current branch is already `main`: skip to 10d.
+
+```bash
+git push -u origin <current-branch>
+```
+
+If push fails (auth, non-fast-forward, network): **STOP** and report the exact error. Do not attempt the merge — leave the user in a clean recoverable state.
+
+### 10d — Auto-merge into `main`
+
+From `git worktree list --porcelain`, find the worktree on `main` (the user's local folder in Finder). Call its absolute path `<MAIN_PATH>`.
+
+If current branch IS `main`: just run `git -C "<MAIN_PATH>" push origin main` and skip the merge.
+
+Otherwise:
+
+```bash
+git -C "<MAIN_PATH>" fetch origin
+git -C "<MAIN_PATH>" merge --no-ff <current-branch> -m "merge: session YYYY-MM-DD · <agent label>"
+git -C "<MAIN_PATH>" push origin main
+```
+
+If merge fails (conflicts): **STOP** and report — list the conflicted files and tell the user: "Resolve conflicts in `<MAIN_PATH>`, then run `git merge --continue && git push origin main`."
+
+### 10e — Report git outcome (feeds into Step 11)
+
+Capture for the final confirmation:
+- Files committed (count + tier)
+- Branch pushed to origin
+- Merge commit SHA on main (or "fast-forward")
+- Main pushed to origin
+- Anything skipped or that requires user follow-up
+
+---
+
+## Step 11 — Confirm
 
 ```
 ✅ <tier>/CHANGELOG.md updated — [N Added, N Changed, N Fixed]
@@ -182,8 +255,16 @@ Replace contents with:
 ✅ <tier>/WORKLOG.md cleared
 ✅ agents/DISCOVERIES.md appended — [Y/N]
 ✅ human/agenda.md updated — [Y/N]
+✅ Git: committed N file(s) · pushed <branch> → GitHub · merged into main · main pushed
+   Your local folder is now up to date.
 
 Session closed.
+```
+
+If git sync was skipped or halted partway, replace the last `✅ Git:` line with:
+
+```
+⚠️ Git: <what happened> — <exact command the user needs to run>
 ```
 
 ---
