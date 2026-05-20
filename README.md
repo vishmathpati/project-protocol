@@ -38,7 +38,7 @@ claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 ## What you get
 
-12 skills + 8 hooks that turn every AI coding session into a disciplined operation.
+13 skills + 8 hooks that turn every AI coding session into a disciplined operation.
 
 ### Session lifecycle (the core 5)
 
@@ -59,6 +59,7 @@ Auto-fire on description match, also invokable via slash command.
 - **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix. v1.3 adds a design-system raw-value / cardinal-sin scan.
 - **`design-check`** *(new in v1.3)* — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Fires on any visual change.
 - **`edit-plugin`** *(new in v1.4)* — Self-discipline gate for changes to this plugin's own source (skills, hooks, manifests, README). Chains commit + push to every edit so changes always reach `origin/main` on GitHub.
+- **`design-direction`** *(new in v1.5)* — Deep brand-direction diagnostic. Takes a raw brand dump, silently extracts 9 taste axes (trust, frequency, density, culture, archetype, tribe, surface, tempo, refusals), proposes 3 named directions with a moodboard, and writes a rich `BRAND.md` + `DESIGN.md` Overview + brand-specific refusal list. Sits one layer upstream of `init-project` Phase 4 — or runs standalone on already-initiated projects to re-anchor brand.
 
 ### Hooks (8 total)
 

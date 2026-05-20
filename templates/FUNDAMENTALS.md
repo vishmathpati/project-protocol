@@ -207,6 +207,96 @@ The implementation rules that separate "works" from "feels right." Most AI-gener
 - Preconnect to asset CDNs; preload critical fonts.
 - No `transition: all` — performance killer and unpredictable.
 
+### Loading-state timing (avoid flicker)
+
+When you show a spinner or skeleton:
+
+- **Show-delay 150–300 ms** — don't render the indicator instantly. If the request finishes in under 150 ms the user perceives no delay; rendering a spinner that flashes for 80 ms feels worse than no spinner.
+- **Minimum visible window 300–500 ms** — once shown, the indicator must stay visible for at least 300 ms even if the request resolves immediately after. A spinner that appears and disappears in one frame reads as a layout glitch.
+- React `<Suspense>` does this for you automatically. For other frameworks, gate the indicator with a timeout.
+
+### Stable skeletons
+
+Skeletons must mirror the final layout exactly — same element count, same approximate sizes, same grid positions. A skeleton that looks nothing like the final content causes layout shift on resolve, which feels like a hydration bug even when it isn't.
+
+### Loading buttons preserve the label
+
+A button in loading state shows an indicator AND keeps the original label. "Save" becomes "Save…" with a spinner — never replaced by just a spinner. Users need the label to remember which action is in flight.
+
+### Tooltip timing
+
+- First tooltip in a group has a delay (~500 ms hover) — prevents accidental tooltip storms.
+- Subsequent peers in the same group have **no delay** — once the user has invoked one tooltip, they're committed to reading.
+- Tooltips never fire on touch.
+
+---
+
+## Typography craft (small but visible)
+
+These are the details that separate a polished UI from one that feels off without the user being able to say why.
+
+### Use the ellipsis character
+
+`…` (U+2026), not three periods `...`. Applies to:
+
+- Menu items that open follow-ups: "Rename…", "Move to…"
+- Loading / processing states: "Loading…", "Saving…", "Generating…"
+- Placeholders ending in ellipsis: "Search projects…"
+
+Three periods reads as casual typing; the ellipsis character reads as designed.
+
+### Curly quotes, not straight quotes
+
+`"like this"` and `'like this'`, not `"like this"` and `'like this'`. Straight quotes are a code-editor habit, not a typography choice.
+
+### Non-breaking spaces for glued terms
+
+Units and product names should never line-break in the middle:
+
+- `10&nbsp;MB`, not `10 MB`
+- `⌘&nbsp;+&nbsp;K`, not `⌘ + K`
+- `Vercel&nbsp;SDK`, not `Vercel SDK`
+- `Next.js&nbsp;16`, not `Next.js 16`
+
+Use `&#x2060;` (word joiner) when you want zero-width glue — useful inside code identifiers.
+
+### Anchored headings
+
+Section headings that get deep-linked need `scroll-margin-top` equal to your fixed-header height — otherwise the anchor lands with the heading hidden behind the header.
+
+```css
+h2[id], h3[id], h4[id] { scroll-margin-top: 80px; }
+```
+
+### Tabular numbers in tables
+
+Already covered in "Tabular numbers for comparisons" — restating to confirm: `font-variant-numeric: tabular-nums` on any column of numerals that should align by digit position.
+
+---
+
+## Browser-chrome integration
+
+Two one-liners that make a dark UI look intentional instead of patched together.
+
+### `color-scheme` on `<html>`
+
+```css
+html { color-scheme: dark light; }
+/* Or, for a dark-only product: */
+html.dark { color-scheme: dark; }
+```
+
+This tells the browser to render its native UI (scrollbars, form-control internals, autofill backgrounds) in the matching scheme. Without it, dark themes get light-mode scrollbars and autofill highlights, which read as broken.
+
+### `theme-color` meta
+
+```html
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+```
+
+Aligns the mobile browser's address bar and the OS task-switcher card with the page background. The difference between this set and not is the difference between "feels like a polished app" and "feels like a website".
+
 ---
 
 ## Banned Words

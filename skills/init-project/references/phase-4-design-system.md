@@ -6,6 +6,32 @@ Never silently overwrite. Always read first, ask before replacing.
 
 ---
 
+## Optional handoff to `design-direction` (deep flow)
+
+Before running the standard A/B/C flow for BRAND.md and DESIGN.md below, offer the user the deeper alternative — the `design-direction` skill produces a much richer BRAND.md by extracting 9 taste axes from a raw brand dump and proposing 3 named directions to choose from.
+
+Ask via `AskUserQuestion`:
+
+```
+Design system bootstrap — two paths:
+
+A — Quick (default): 3 questions for BRAND.md, then A/B/C for DESIGN.md.
+    Good when you already have a clear design direction in mind.
+
+B — Deep (design-direction skill): one free-text brand dump, then I extract
+    the taste axes and propose 3 named directions with a moodboard. Produces
+    a much richer BRAND.md. Adds ~5 minutes.
+
+Pick A or B.
+```
+
+- **A (default)** → continue with the existing BRAND.md flow below.
+- **B (deep)** → hand off to `design-direction`. That skill writes a populated BRAND.md and DESIGN.md Overview + brand-specific DO NOT additions, then returns control here. When it returns, the BRAND.md step below is skipped (already done) and the DESIGN.md step runs as path C (fresh generation) using the newly-populated BRAND.md as the brief.
+
+If `design-direction` is unavailable (older plugin version, or skill missing on disk): silently fall through to path A.
+
+---
+
 ## `agents/BRAND.md`
 
 **If exists:** read, use as context for DESIGN.md generation, do not overwrite.

@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [1.5.0] — 2026-05-20
+
+### Added
+- **`design-direction` skill** — 13th skill. Deep brand-direction diagnostic that sits one layer upstream of `init-project` Phase 4. Takes a single free-text brand dump (product, audience, problem, surfaces, monetisation, what-it-should-not-look-like) and silently extracts 9 taste axes — trust temperature, use frequency, information density, cultural anchor, brand archetype, reference tribe (look-like + look-unlike), surface mix, tempo, brand-specific refusal list. Returns a plain-English diagnostic for one-pass confirmation, proposes a 3–5 site reference moodboard, then offers 3 *meaningfully different* named design directions (e.g. "Editorial Cream", "Color Lab", "Warm Modern Indian") each with palette intent in words, type pairing, reference URL, and a "why this fits" line tied back to the diagnostic. After the user picks (hybrids allowed), writes a rich `agents/BRAND.md`, fills the `agents/DESIGN.md` Overview, and adds brand-specific anti-patterns to the DO NOT block — universal anti-patterns above are never edited, token frontmatter is never touched. Ends with an optional handoff to `init-project` Phase 4 path C to regenerate tokens against the locked direction. Works standalone on already-initiated projects to re-anchor brand. Ships with Codex sidecar; 7-phase skill structure with each phase in `references/` for progressive disclosure.
+- **`templates/FUNDAMENTALS.md` — small Vercel-derived craft items.** Appended under existing sections: loading-state timing (150–300ms show-delay + 300–500ms minimum visible window to avoid flicker), stable skeletons (must mirror final layout exactly), loading buttons preserve label (`Save…` with spinner, never replaced by just a spinner), tooltip timing (first delayed, peers no-delay), ellipsis character (`…` not `...`), curly quotes, non-breaking spaces for glued terms (`10&nbsp;MB`, `⌘&nbsp;+&nbsp;K`, `Next.js&nbsp;16`), `scroll-margin-top` on anchored headings, `color-scheme` on `<html>`, `theme-color` meta for mobile address-bar / OS-task-switcher polish.
+
+### Changed
+- **`init-project` Phase 4 reference** — new "Optional handoff to `design-direction`" sub-section added before the existing BRAND.md A/B/C flow. Phase 4 now offers two paths: A (quick — existing 3-question BRAND.md flow), B (deep — hand off to `design-direction`). Default remains A. If the deep skill is unavailable on disk, silently falls through to A. When B is chosen, `design-direction` populates BRAND.md and DESIGN.md Overview + brand-specific DO NOT additions; Phase 4 then runs as path C with the much richer brief.
+- **`README.md`** — skill count updated from 12 to 13; `design-direction` listed under Discipline skills.
+
+### Compatibility
+- **Existing projects on v1.4.x** — no breaking change. `design-direction` can be invoked standalone (`/design-direction` or trigger phrase like "re-anchor brand") against an already-initiated project. It reads existing `agents/BRAND.md` / `agents/STATUS.md` first and only asks for missing pieces. Existing populated sections are never silently overwritten — shown to user with a 3-way merge offer (replace / merge / append). DESIGN.md universal anti-patterns block is never touched; only the bottom brand-specific placeholder is filled. Token frontmatter is read-only in this skill — projects keep their existing tokens unless the user explicitly accepts the optional handoff to Phase 4 path C at the end.
+- **Existing `FUNDAMENTALS.md` files** in initiated projects get the small Vercel-derived additions on next `init-project` run (silent overwrite — same global-standard rule as before).
+- **Phase 4 handoff** — old `init-project` SKILL flow still works exactly as before for path A. Path B is opt-in via the new question.
+
 ## [1.4.0] — 2026-05-20
 
 ### Added
