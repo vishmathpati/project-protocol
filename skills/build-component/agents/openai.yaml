@@ -1,6 +1,6 @@
 interface:
   display_name: "Build Component"
-  short_description: "Build a new component or adopt an external one into the project's existing design system: pick tier (Generic / Marketing / App), reuse existing primitives, normalize against DESIGN.md tokens, write to STRUCTURE.md location"
+  short_description: "5-phase, tier-aware (Generic/Marketing/App), surface-aware build for a new component — reuse first, normalize to DESIGN.md tokens, write to STRUCTURE.md location, then chain into design-check."
   brand_color: "#475569"
 
 policy:

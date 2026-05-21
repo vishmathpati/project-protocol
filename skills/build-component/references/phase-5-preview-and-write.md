@@ -1,6 +1,6 @@
 # Phase 5 — Preview and write
 
-Everything is decided: tier, strategy, data shape, location, convention. Phase 5 generates the actual component code, shows it to the user, and writes the file on approval. After the write, `design-check` fires as the post-write gate — do not duplicate its 7 steps here.
+Everything is decided: tier, strategy, data shape, location, convention. Phase 5 generates the actual component code, shows it to the user, and writes the file on approval. After the write, `design-check` fires as the post-write gate — do not duplicate its 8 steps here.
 
 ---
 
@@ -155,7 +155,7 @@ build-component — wrote src/components/marketing/pricing-card.tsx.
   sins, and the 5 required states. Run it now? (y / skip)
 ```
 
-Do not duplicate `design-check`'s 7 steps here. The two skills chain — `build-component` writes, `design-check` audits.
+Do not duplicate `design-check`'s 8 steps here. The two skills chain — `build-component` writes, `design-check` audits.
 
 ---
 

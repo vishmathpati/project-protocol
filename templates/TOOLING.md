@@ -2,6 +2,8 @@
 > Global. Locked 2026-05-15. Same content on every Node project.
 > Skip this file in Swift / Python / non-Node projects.
 
+> **Note:** This file uses the author's personal layout (`~/Arel OS/Projects/`) as the working example. Adapt to your own machine — replace the path prefix with your actual projects root. The rules and conventions below apply universally.
+
 ---
 
 ## Package manager — bun

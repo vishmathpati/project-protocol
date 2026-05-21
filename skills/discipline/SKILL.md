@@ -1,6 +1,6 @@
 ---
 name: discipline
-description: Pre-action gate before any non-trivial change — editing files, locking decisions, structural changes. Forces pause, declare what's changing, list cascades, verify canon, confirm before acting.
+description: Pre-action gate before any non-trivial change — editing files, locking decisions, structural changes. Forces pause, declare what's changing, list cascades, verify canon, confirm before acting. Triggers — "before I do this", "let me change X", "I'm about to edit Y", or any explicit non-trivial action.
 allowed-tools: Read, Glob, Grep
 ---
 

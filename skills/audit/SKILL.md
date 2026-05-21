@@ -36,6 +36,7 @@ Cross-file consistency check. Surfaces drift, does not fix.
 - Does any `BRIEF.md` decision contradict the latest `STATUS.md` state?
 - Does `CLAUDE.md` describe rules that the actual project structure violates?
 - Does `docs/INDEX.md` list features that no longer exist? Miss features that do?
+- Does `agents/STRUCTURE.md`'s declared surfaces match the actual codebase? (Marketing surface declared but no `(marketing)` route group on disk → drift. New `(dashboard)` folder added but STRUCTURE.md doesn't mention it → drift.) Surfaces with file-system mismatch are category (A) violations.
 
 **3. Design-system scan** (UI projects only — skip if no `components/` or equivalent).
 
@@ -59,6 +60,7 @@ Findings here are category (A) — real violations.
 [A] STATUS.md Next Action #3 references "ChannelTypes audit" but ROADMAP §7 slot 5 is named "Channel Types CRUD". Names disagree.
 [A] src/components/Pricing.tsx:42 uses raw hex #1a1a1a — token rule violation. Should be var(--surface).
 [A] src/components/Hero.tsx:28 has emoji 🚀 inside <button> — cardinal sin #3.
+[A] STRUCTURE.md declares Marketing surface at app/(marketing)/ but that route group does not exist on disk. Either drop the surface row or create the folder.
 [B] CLAUDE.md "Tech stack" still says "Next.js" but BRIEF v1.4 locked "React + Vite". Wording is stale.
 [C] human/agenda.md uses "you" wording; agents/STATUS.md uses neutral wording. Two-audience rule — no fix.
 ```

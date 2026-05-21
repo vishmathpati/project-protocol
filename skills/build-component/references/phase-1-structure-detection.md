@@ -138,51 +138,34 @@ Save this as agents/STRUCTURE.md so future component builds skip detection?
   C — Skip the save, run one-off this time.
 ```
 
-- **A** → write `agents/STRUCTURE.md` and continue to Phase 2.
-- **B** → open an edit pass (offer to add a tier, rename a folder, change the convention), then write.
+- **A** → copy `templates/STRUCTURE.md` to `agents/STRUCTURE.md` then patch the detected values into it (see 1.6a). Continue to Phase 2.
+- **B** → copy + patch as in A, then open an edit pass with the user (add a tier, rename a folder, change the convention) before the final write.
 - **C** → keep the structure object in memory only. Future runs re-detect.
 
-### `agents/STRUCTURE.md` shape (template)
+### 1.6a — Copy the canonical template, then patch detected values
 
-```markdown
-# STRUCTURE.md — [Project Name]
-> Component layout, tiers, and convention for this project.
-> Read by `build-component` at Phase 1. Written once after first detection + user confirmation.
+The shape of `agents/STRUCTURE.md` is fixed — the plugin ships a canonical template at `templates/STRUCTURE.md` (sections: Surfaces present, Component locations, Stack per surface, Conventions detected, Cross-tier import rules, plus a commented WORKED EXAMPLE block). Phase 1 fills the placeholders, it does not invent the shape.
 
-## Tiers
+Copy the template first:
 
-| Tier | Folder | Import alias | Allowed to import from |
-|------|--------|--------------|------------------------|
-| Generic | src/components/ui | @/components/ui/* | (nothing tier-specific) |
-| Marketing | src/components/marketing | @/components/marketing/* | Generic only |
-| App | src/components/app | @/components/app/* | Generic only |
-
-## Convention
-
-- Primitive triplet: cva + forwardRef + cn
-- cn utility location: src/lib/utils.ts
-- Tailwind config: tailwind.config.ts
-- Token source: src/app/globals.css (CSS variables consumed by Tailwind via @theme inline)
-- Token canon: agents/DESIGN.md (do not edit tokens from build-component)
-
-## Surfaces
-
-- Marketing (web) → app/(marketing)/
-- App (web)       → app/(dashboard)/
-
-## Cross-tier rules
-
-- Marketing imports allowed from: Generic. Forbidden from: App.
-- App imports allowed from: Generic. Forbidden from: Marketing.
-- Generic imports allowed from: nothing tier-specific. Pure primitive layer.
-
-## CONTENT registry (optional, for Marketing tier)
-
-- agents/marketing/CONTENT.md — features, audiences, comparisons, testimonials.
-  If absent, marketing components fall back to props or ad-hoc copy.
+```bash
+cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/STRUCTURE.md" agents/STRUCTURE.md
 ```
 
-Fill the placeholders from detection results. Mark anything uncertain with `[VERIFY]`.
+If neither `CODEX_PLUGIN_ROOT` nor `CLAUDE_PLUGIN_ROOT` is set (some agents don't expose the env var): use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/STRUCTURE.md`.
+
+Once the copy is in place, patch the placeholders with detected values:
+
+- **Surfaces present** — flip `yes/no` for each row based on §1.5 detection. Fill the path column with the actual detected path (`app/(marketing)/`, `desktop/src/`, …). Fill the tech column from `package.json` (Next version, Tauri version, etc.).
+- **Component locations** — fill the path column for each tier (Generic / Marketing / App-web / App-desktop) from §1.2 detection. If a tier folder doesn't exist yet but the surface is present, record the **recommended** path and mark it `[VERIFY]` so the first write into it surfaces a "creating new folder" prompt.
+- **Stack per surface** — fill from `package.json` + `tsconfig.json` aliases. Drop rows for surfaces that don't apply.
+- **Conventions detected** — fill from §1.4 (style system, cn utility location, file-naming, icon library, forms, state). Anything ambiguous: `[VERIFY]`.
+- **Cross-tier import rules** — leave the template's rule set as-is (they're universal). Only edit if the project explicitly violates one of them (rare).
+- **WORKED EXAMPLE block** — delete the entire HTML-comment block at the bottom of the template before writing. The example is illustrative only and must not ship into the project's canon.
+
+Mark every patched-in value that came from inference (not direct read) with `[VERIFY]` so `audit` surfaces it later.
+
+Do not invent new sections. Do not strip sections from the template — if a section doesn't apply (e.g. no desktop surface), keep the section header and fill all rows with `no` / `—` / `n/a`. Future migrations into desktop will fill it in without touching the schema.
 
 ---
 

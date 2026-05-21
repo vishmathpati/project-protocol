@@ -5,6 +5,38 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [2.0.1] — 2026-05-21
+
+Patch release. Correctness fixes across hooks, installer, build script, skill content, and templates. No new features. Skill count 15 → 14 (the `project-protocol` reference-doc skill was removed — see Removed below).
+
+### Fixed
+- **`hooks/hooks.json` — WORKLOG.md path now tool-aware.** Cowork sessions write to `cowork/WORKLOG.md`, Claude Code and Codex sessions write to `agents/WORKLOG.md`. Detection via `${CLAUDE_PLUGIN_ROOT}` / `${CODEX_PLUGIN_ROOT}` env vars. Previously, hooks referenced an unqualified `WORKLOG.md` at cwd root — silently no-op'd on every protocol-conformant project (the three-folder layout never creates a root `WORKLOG.md`). The discipline engine now correctly writes a real-time audit trail on protocol-conformant projects.
+- **`hooks/hooks.json` — Stop / PreToolUse / SubagentStart / SubagentStop "cleared state" regex updated.** Previous regex `^# Worklog — cleared` did not match what `save-session` actually writes (`# Worklog — <tier>` on line 1, `> Cleared after each session.` on line 2). Regex now matches both the legacy heading and the current `save-session` output. Result: the Stop hook no longer fires false "unsaved work" warnings immediately after a clean `save-session`.
+- **`install.sh` — added `--cowork` flag** (and `INSTALL_FLAVOR=cowork` env var) so Cowork users can install the stripped Cowork zip via the curl one-liner. Default behavior unchanged (FULL build for Claude Code / Codex).
+- **`build.sh` — Cowork strip pass now relocates `templates/TOOLING.md`, `templates/STRUCTURE.md`, and `templates/CONTENT.md`** alongside the existing `FUNDAMENTALS.md` / `DESIGN.md` relocation. Previously, those three templates were absent from the Cowork build — Node projects via Cowork failed Phase 4 (`TOOLING.md` not found), and `build-component` / `marketing-brief` had no way to bootstrap their canonical files. Templates now ship into `skills/<consuming-skill>/references/` with paths patched at build time.
+- **`build.sh` — STAGE_FULL tmpdir now covered by trap cleanup.** Previously, a `set -e` exit mid-full-build leaked the tmpdir. Both stages (FULL and Cowork) are now cleaned regardless of failure path.
+- **`build-component` SKILL.md and phase-5 reference** — three stale "7 steps" references for `design-check` updated to "8 steps". This was missed when `design-check` Step 8 (auto-fix) shipped in v2.0.
+- **`build-component` Codex sidecar** — `short_description` trimmed from 223 chars to under 200 to satisfy Cowork's validator cap.
+- **`design-check`** — removed the "create component" trigger phrase to eliminate routing collision with `build-component`. Both skills still auto-chain in practice (`build-component` fires first, `design-check` fires post-write), but description-match arbitration is no longer ambiguous.
+- **`discipline` SKILL.md** — added a `Triggers — ...` clause to the description for consistency with other gate skills (`audit-before-close`, `verify-by-reading`, `design-check`, `edit-plugin`).
+- **`edit-plugin` SKILL.md** — removed a dead reference to a non-existent `commands/*` directory. The plugin has no `commands/` tree; the file set is `skills/`, `hooks/`, `templates/`, `.claude-plugin/`, `.codex-plugin/`.
+- **`audit` SKILL.md** — added a `STRUCTURE.md` drift check (declared surfaces vs. actual codebase folders). Surfaces declared in `agents/STRUCTURE.md` that have no corresponding folder, and folders present in the codebase that aren't declared in `STRUCTURE.md`, are reported as drift.
+- **`init-project` SKILL.md** — the output-layout block now lists `STRUCTURE.md` alongside the other `agents/`-tier files. Previously, `STRUCTURE.md` was referenced by `build-component` and `audit` but not surfaced in `init-project`'s own layout map.
+- **`hooks/session-start-context.md`** — the `STRUCTURE.md` required-read line is now qualified with "(if present — created by `build-component` on first invocation)" so the SessionStart context injection does not imply the file is mandatory on every project.
+- **`templates/TOOLING.md`** — added a one-line note that the author's `~/Arel OS/Projects/` example is illustrative; other users adapt the path prefix to their own project layout.
+- **`templates/STRUCTURE.md` and `templates/CONTENT.md`** — previously dead templates (no skill cp'd from them). `build-component`'s phase-1-structure-detection now cps `STRUCTURE.md` → `agents/STRUCTURE.md` as the initial template, and `marketing-brief`'s phase-2-content-registry cps `CONTENT.md` → `agents/marketing/CONTENT.md`. Both templates now serve their intended bootstrap role.
+
+### Removed
+- **`project-protocol` skill** — pure reference doc that duplicated `README.md` and the `init-project` SKILL.md. Its triggers (`project start`, `init project`, `session start`, `read protocol`) caused routing ambiguity with `init-project` and `session-recap`. Any unique content was merged into `README.md` and `init-project` before deletion. Skill count 15 → 14.
+
+### Changed
+- **`README.md`** — skill count updated 15 → 14. "Session lifecycle (the core 5)" heading updated to "(the core 4)" with the `project-protocol` bullet removed.
+- **Plugin manifests** — version bumped 2.0.0 → 2.0.1 in both `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`. Patch bump: correctness fixes only, no new features. Both manifest descriptions updated to reference 14 skills and to drop `project-protocol` from the listed skills.
+
+### Compatibility
+- Drop-in upgrade from v2.0.0. No file-format changes, no template-shape changes, no breaking changes to consumer projects. Existing projects pick up the corrected hook behaviour on next session start and the corrected Cowork build on next install.
+- Removal of the `project-protocol` skill is invisible to consumer projects (the skill was a reference doc, never wrote files). Users who relied on `/project-protocol` as a slash invocation should use `init-project` or `session-recap` instead, depending on intent.
+
 ## [2.0.0] — 2026-05-20
 
 ### Added

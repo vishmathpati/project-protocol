@@ -53,9 +53,42 @@ After confirmation, this is the FEATURES seed.
 
 ---
 
-## Tables in CONTENT.md
+## Copy the canonical template, then patch detected values
 
-CONTENT.md uses structured markdown tables. Each row is one fact. Tables are append-friendly — adding a feature is one new row.
+The shape of `agents/marketing/CONTENT.md` is fixed — the plugin ships a canonical template at `templates/CONTENT.md` (sections: FEATURES, AUDIENCES, COMPARISONS, TESTIMONIALS, FAQS, LEGAL_PAGES, plus the "How pages consume this file" and "Editing rules" appendices). Phase 2 fills the placeholders, it does not invent the shape.
+
+Copy the template first:
+
+```bash
+mkdir -p agents/marketing
+cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/CONTENT.md" agents/marketing/CONTENT.md
+```
+
+If neither `CODEX_PLUGIN_ROOT` nor `CLAUDE_PLUGIN_ROOT` is set (some agents don't expose the env var): use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/marketing/CONTENT.md`.
+
+Once the copy is in place, patch the detected/elicited values into the existing tables. The template ships with realistic example rows (short-links / analytics / partners, marketers / developers / product-teams, etc.) — **delete those example rows** and replace with rows derived from the FEATURES seed above plus the user's answers in Phase 1.
+
+What to patch per table:
+
+- **FEATURES** — one row per confirmed feature from the seed. `key` is the slug used by the code; `name` is the display label; `icon` must be a Lucide name (the template uses Pascal-case like `BarChart3` — match that style); `blurb` ≤ 120 chars per the template header; `page_slug` is the route; `audiences` is a comma-separated list of `key`s from the AUDIENCES table.
+- **AUDIENCES** — replace example rows with the audiences elicited in Phase 1. Each row needs `id`, `name`, `descriptor`, `fear`, `want` (single-sentence each).
+- **COMPARISONS** — drop the entire table if Phase 1 confirmed no comparison pages. Otherwise one row per competitor with `vs_competitor`, `our_strength`, `their_strength`, `page_slug`.
+- **TESTIMONIALS** — if Phase 1 said "real quotes available", fill with real attributions. Otherwise use the locked fictional-customer brand for `company` and plausible-but-fake names for `customer`. `quote` is verbatim.
+- **FAQS** — one row per question. Each row binds to a `page_slug`; same question across pages = duplicate the row with a different `page_slug`.
+- **LEGAL_PAGES** — keep the universal rows (`/terms`, `/privacy`, …) if the project will need them. Set `last_updated` to `[VERIFY]` so `audit` surfaces them later. Drop rows the project explicitly doesn't have.
+
+Hard rules for the patch:
+
+- Do not delete the file header (the `> Single source of truth …` blockquote) or the "How pages consume this file" / "Editing rules" appendices. They're contract, not example.
+- Do not invent features that don't trace to code or `agents/ROADMAP.md`.
+- Mark any auto-detected row that wasn't explicitly confirmed by the user with `[VERIFY]` in one of its cells.
+- Banned-words list applies to blurbs and FAQ answers — scan against `agents/FUNDAMENTALS.md` § banned words before writing.
+
+---
+
+## Table shapes (reference)
+
+Below is the canonical shape each section in the template uses. Use these when patching rows so you don't drift from the template's column order.
 
 ### FEATURES
 

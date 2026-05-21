@@ -30,6 +30,7 @@ project-root/
 │   ├── FUNDAMENTALS.md
 │   ├── TOOLING.md         ← Node projects only
 │   ├── DESIGN.md
+│   ├── STRUCTURE.md       ← created on first build-component run, then read by build-component / audit / design-check
 │   ├── DISCOVERIES.md
 │   ├── WORKLOG.md
 │   ├── CHANGELOG.md
@@ -109,6 +110,7 @@ Rule: fast/cheap model for extraction, reasoning model for judgment. Never the m
 - `agents/CHANGELOG.md` and `cowork/CHANGELOG.md` are never overwritten. Append-only.
 - All decisions made during init that warrant locking go into `cowork/BRIEF.md` (orchestration) or `agents/BRIEF.md` (product).
 - The three folders are non-negotiable — every file belongs to exactly one tier.
+- Root `CLAUDE.md` has a **300-line ceiling**. If it would exceed that, extract detail into a support file under `agents/docs/` and leave a one-line pointer in `CLAUDE.md`. Keep the always-loaded file lean.
 
 ---
 

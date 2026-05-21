@@ -1,6 +1,6 @@
 ---
 name: design-check
-description: Pre-action gate for any UI work. Reads DESIGN.md + FUNDAMENTALS.md, searches existing components for reuse, identifies tokens needed, halts on missing tokens, scans diff for raw hex/px/font values. Fires on — "create component", "edit UI", "change styles", "add page", any visual change.
+description: Pre-action gate for any UI work. Reads DESIGN.md + FUNDAMENTALS.md, searches existing components for reuse, identifies tokens needed, halts on missing tokens, scans diff for raw hex/px/font values. Fires on — "edit UI", "change styles", "add page", any visual change; also auto-chains after build-component finishes writing a new component.
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
@@ -12,10 +12,11 @@ The 8-step gate fired before any UI work. The skill walks the agent through a se
 
 ## When this fires
 
-- Creating or editing a component (`.tsx`, `.jsx`, `.vue`, `.svelte`, `.swift` with `View`).
+- Editing a component (`.tsx`, `.jsx`, `.vue`, `.svelte`, `.swift` with `View`).
 - Editing CSS / Tailwind / styles files.
 - Adding a new page or route with visible UI.
 - Adjusting layout, spacing, colors, typography anywhere.
+- Auto-chains after `build-component` finishes writing a new component (that skill owns the create path; this skill owns the post-write audit).
 - Slash command: `/design-check`.
 
 If the file does not produce visible UI (config, types, pure utility logic), this skill is a no-op.

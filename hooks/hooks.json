@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f WORKLOG.md ] && grep -q \"^# Worklog — cleared\" WORKLOG.md; then printf \"[project-protocol] WORKLOG.md is in cleared state — remember to append an entry for this change.\\n\" >&2; fi'"
+            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[project-protocol] %s is in cleared state — remember to append an entry for this change.\\n\" \"$WORKLOG\" >&2; fi'"
           }
         ]
       }
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f WORKLOG.md ] && [ -s WORKLOG.md ] && ! grep -q \"^# Worklog\" WORKLOG.md; then BACKUP=\"WORKLOG.backup-$(date +%Y%m%d-%H%M%S).md\"; cp WORKLOG.md \"$BACKUP\"; echo \"[project-protocol] PreCompact: WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- WORKLOG.md CONTENTS ---\"; cat WORKLOG.md; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: WORKLOG.md empty or cleared — no backup needed\"; fi'"
+            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -q \"^# Worklog\" \"$WORKLOG\"; then BACKUP=\"${WORKLOG%.md}.backup-$(date +%Y%m%d-%H%M%S).md\"; cp \"$WORKLOG\" \"$BACKUP\"; echo \"[project-protocol] PreCompact: $WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- $WORKLOG CONTENTS ---\"; cat \"$WORKLOG\"; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: $WORKLOG empty or cleared — no backup needed\"; fi'"
           }
         ]
       }
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f WORKLOG.md ] && ! grep -q \"^# Worklog — cleared\" WORKLOG.md; then printf \"[%s] subagent_start\\n\" \"$(date +%H:%M)\" >> WORKLOG.md; fi'"
+            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_start\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
           }
         ]
       }
@@ -72,7 +72,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f WORKLOG.md ] && ! grep -q \"^# Worklog — cleared\" WORKLOG.md; then printf \"[%s] subagent_stop\\n\" \"$(date +%H:%M)\" >> WORKLOG.md; fi'"
+            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_stop\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
           }
         ]
       }
@@ -83,7 +83,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f WORKLOG.md ] && [ -s WORKLOG.md ] && ! grep -q \"^# Worklog\" WORKLOG.md; then LINE_COUNT=$(wc -l < WORKLOG.md | tr -d \" \"); echo \"[project-protocol] WORKLOG.md has $LINE_COUNT lines of unsaved work. Run save-session before closing.\"; fi'"
+            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then LINE_COUNT=$(wc -l < \"$WORKLOG\" | tr -d \" \"); echo \"[project-protocol] $WORKLOG has $LINE_COUNT lines of unsaved work. Run save-session before closing.\"; fi'"
           }
         ]
       }

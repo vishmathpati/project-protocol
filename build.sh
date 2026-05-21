@@ -32,6 +32,13 @@ if [ -f "$OUTPUT_FULL" ] || [ -f "$OUTPUT_COWORK" ]; then
   exit 1
 fi
 
+# Stage dirs for both builds. Hoisted here so a single EXIT trap covers any
+# failure path (set -e mid-build, mid-zip, anywhere). Without this, an early
+# exit during the full build would leak STAGE_FULL.
+STAGE_FULL=$(mktemp -d)
+STAGE_COWORK=$(mktemp -d)
+trap "rm -rf '$STAGE_FULL' '$STAGE_COWORK'" EXIT
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Build 1 — FULL zip for Claude Code + Codex
 # Includes:
@@ -44,8 +51,6 @@ fi
 #   skills/<name>/references/        (if present)
 #   skills/<name>/examples/          (if present)
 # ──────────────────────────────────────────────────────────────────────────────
-
-STAGE_FULL=$(mktemp -d)
 
 mkdir -p "$STAGE_FULL/.claude-plugin" "$STAGE_FULL/.codex-plugin" "$STAGE_FULL/skills"
 cp .claude-plugin/plugin.json "$STAGE_FULL/.claude-plugin/"
@@ -64,7 +69,6 @@ fi
 cp -r skills/* "$STAGE_FULL/skills/"
 
 (cd "$STAGE_FULL" && zip -r "$OUTPUT_FULL" . -x "*.DS_Store" > /dev/null)
-rm -rf "$STAGE_FULL"
 
 echo "  ✅ Full build:   $OUTPUT_FULL"
 
@@ -81,13 +85,15 @@ echo "  ✅ Full build:   $OUTPUT_FULL"
 #                                     plugins ship hooks)
 #   templates/                       (not a documented top-level dir)
 #   skills/<name>/agents/            (Codex openai.yaml sidecars — not in spec)
-# FUNDAMENTALS.md is relocated into skills/init-project/references/ so the
-# init-project skill can still find it, and the staged SKILL.md is patched to
-# point at the new path.
+# templates/ is relocated into the relevant skill's references/ folder so each
+# skill can still find its template, and the staged SKILL.md / references/*.md
+# are sed-patched to point at the new path. Relocations:
+#   templates/FUNDAMENTALS.md → skills/init-project/references/
+#   templates/DESIGN.md       → skills/init-project/references/
+#   templates/TOOLING.md      → skills/init-project/references/
+#   templates/STRUCTURE.md    → skills/build-component/references/
+#   templates/CONTENT.md      → skills/marketing-brief/references/
 # ──────────────────────────────────────────────────────────────────────────────
-
-STAGE_COWORK=$(mktemp -d)
-trap "rm -rf '$STAGE_COWORK'" EXIT
 
 mkdir -p "$STAGE_COWORK/.claude-plugin" "$STAGE_COWORK/skills"
 cp .claude-plugin/plugin.json "$STAGE_COWORK/.claude-plugin/"
@@ -132,6 +138,70 @@ if [ -f templates/DESIGN.md ]; then
     sed -i.bak 's|templates/DESIGN.md|references/DESIGN.md|g' \
       "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md"
     rm -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md.bak"
+  fi
+fi
+
+# Relocate TOOLING.md into init-project/references and patch the path references.
+# Without this, Node projects via Cowork fail Phase 4 — the skill tries to cp
+# from ${CLAUDE_PLUGIN_ROOT}/templates/TOOLING.md, which doesn't exist in the
+# Cowork build because templates/ is stripped.
+if [ -f templates/TOOLING.md ]; then
+  mkdir -p "$STAGE_COWORK/skills/init-project/references"
+  cp templates/TOOLING.md "$STAGE_COWORK/skills/init-project/references/"
+  if [ -f "$STAGE_COWORK/skills/init-project/SKILL.md" ]; then
+    sed -i.bak 's|templates/TOOLING.md|references/TOOLING.md|g' \
+      "$STAGE_COWORK/skills/init-project/SKILL.md"
+    rm -f "$STAGE_COWORK/skills/init-project/SKILL.md.bak"
+  fi
+  if [ -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md" ]; then
+    sed -i.bak 's|templates/TOOLING.md|references/TOOLING.md|g' \
+      "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md"
+    rm -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md.bak"
+  fi
+  if [ -f "$STAGE_COWORK/skills/init-project/references/phase-0c-modernize.md" ]; then
+    sed -i.bak 's|templates/TOOLING.md|references/TOOLING.md|g' \
+      "$STAGE_COWORK/skills/init-project/references/phase-0c-modernize.md"
+    rm -f "$STAGE_COWORK/skills/init-project/references/phase-0c-modernize.md.bak"
+  fi
+fi
+
+# Relocate STRUCTURE.md into build-component/references. No current skill docs
+# reference it via the `templates/` prefix (build-component generates STRUCTURE.md
+# inline), but ship it alongside the skill so build-component can cp it if needed.
+# Defensive sed in case future references appear.
+if [ -f templates/STRUCTURE.md ]; then
+  mkdir -p "$STAGE_COWORK/skills/build-component/references"
+  cp templates/STRUCTURE.md "$STAGE_COWORK/skills/build-component/references/"
+  if [ -f "$STAGE_COWORK/skills/build-component/SKILL.md" ]; then
+    sed -i.bak 's|templates/STRUCTURE.md|references/STRUCTURE.md|g' \
+      "$STAGE_COWORK/skills/build-component/SKILL.md"
+    rm -f "$STAGE_COWORK/skills/build-component/SKILL.md.bak"
+  fi
+  if [ -d "$STAGE_COWORK/skills/build-component/references" ]; then
+    find "$STAGE_COWORK/skills/build-component/references" -type f -name '*.md' \
+      ! -name 'STRUCTURE.md' -exec sed -i.bak \
+      's|templates/STRUCTURE.md|references/STRUCTURE.md|g' {} \;
+    find "$STAGE_COWORK/skills/build-component/references" -type f -name '*.md.bak' -delete
+  fi
+fi
+
+# Relocate CONTENT.md into marketing-brief/references. Same reasoning as
+# STRUCTURE.md: nothing currently references it via the `templates/` prefix
+# (marketing-brief writes CONTENT.md from inlined shape), but ship it next to
+# the skill so the template scaffold is available. Defensive sed for the future.
+if [ -f templates/CONTENT.md ]; then
+  mkdir -p "$STAGE_COWORK/skills/marketing-brief/references"
+  cp templates/CONTENT.md "$STAGE_COWORK/skills/marketing-brief/references/"
+  if [ -f "$STAGE_COWORK/skills/marketing-brief/SKILL.md" ]; then
+    sed -i.bak 's|templates/CONTENT.md|references/CONTENT.md|g' \
+      "$STAGE_COWORK/skills/marketing-brief/SKILL.md"
+    rm -f "$STAGE_COWORK/skills/marketing-brief/SKILL.md.bak"
+  fi
+  if [ -d "$STAGE_COWORK/skills/marketing-brief/references" ]; then
+    find "$STAGE_COWORK/skills/marketing-brief/references" -type f -name '*.md' \
+      ! -name 'CONTENT.md' -exec sed -i.bak \
+      's|templates/CONTENT.md|references/CONTENT.md|g' {} \;
+    find "$STAGE_COWORK/skills/marketing-brief/references" -type f -name '*.md.bak' -delete
   fi
 fi
 

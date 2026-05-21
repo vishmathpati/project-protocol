@@ -1,6 +1,6 @@
 ---
 name: edit-plugin
-description: Mandatory discipline gate when editing this plugin's own source (skills, hooks, commands, manifest, templates, README, build scripts). Forces edit → commit → push → verify on every change. Triggers — "edit the plugin", "update the X skill", "change the X hook", "modify the protocol", "fix the plugin", "edit save-session", or any change to files under skills/, hooks/, commands/, templates/, .claude-plugin/, .codex-plugin/.
+description: Mandatory discipline gate when editing this plugin's own source (skills, hooks, manifest, templates, README, build scripts). Forces edit → commit → push → verify on every change. Triggers — "edit the plugin", "update the X skill", "change the X hook", "modify the protocol", "fix the plugin", "edit save-session", or any change to files under skills/, hooks/, templates/, .claude-plugin/, .codex-plugin/.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git:*,ls:*,cat:*,date:*,wc:*)
 ---
 
@@ -18,7 +18,6 @@ The problem it solves: an agent edits a skill, the user thanks them, the session
 - About to call `Edit` or `Write` on any file under:
   - `skills/<name>/SKILL.md` or `skills/<name>/agents/openai.yaml` or `skills/<name>/references/`
   - `hooks/hooks.json` or any `hooks/*.md`
-  - `commands/*` (if/when added)
   - `templates/*.md`
   - `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`
   - `README.md`, `CHANGELOG.md`, `build.sh`, `install.sh`

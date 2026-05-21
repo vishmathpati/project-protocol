@@ -38,15 +38,14 @@ claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 ## What you get
 
-15 skills + 8 hooks that turn every AI coding session into a disciplined operation.
+14 skills + 8 hooks that turn every AI coding session into a disciplined operation.
 
-### Session lifecycle (the core 5)
+### Session lifecycle (the core 4)
 
 - **`init-project`** — Bootstrap or audit a project. Creates the standard three-folder layout (`cowork/`, `agents/`, `human/`).
 - **`save-session`** — Close cleanly: WORKLOG → CHANGELOG, update STATUS, clear WORKLOG. Tier-aware.
 - **`session-recap`** — Mid-session snapshot: what's been done, what's still open.
 - **`add-context`** — Add extended context files (data contracts, domain reference, integrations).
-- **`project-protocol`** — Reference document defining the file set + session discipline.
 
 ### Discipline skills
 
@@ -110,6 +109,8 @@ AI agents forget everything between sessions. This plugin fixes that by keeping 
 `WORKLOG.md` is the discipline engine: every response that changes something appends one line. By session end, you have a full real-time audit trail. `save-session` distills it into `CHANGELOG.md` and `STATUS.md` so the next session starts from solid ground.
 
 The **discipline skills** add a second layer: gates that fire automatically when their description matches the conversation. They force the agent to verify before acting, read before answering, and audit before closing — the patterns that fail in untrained agent sessions.
+
+**Handoff between agents.** Cowork seeds the project with the always-loaded files (`CLAUDE.md`, `BRAND.md`, the first `BRIEF.md` version block signed `· Cowork`). Claude Code / Codex bootstrap the rest of the canon (`STATUS.md`, `ROADMAP.md`, `FUNDAMENTALS.md`, `DESIGN.md`, `DISCOVERIES.md`, `docs/INDEX.md`, worklogs, changelogs) via `init-project` on the first coding session. When the project returns to Cowork mid-flight, Cowork re-reads the canon, then appends a new `BRIEF.md` version block signed `· Cowork` before handing back. **One agent at a time** — either Claude Code or Codex is active on a project, never both simultaneously. Every significant write to BRIEF / STATUS / DISCOVERIES / CHANGELOG carries an agent label (`· Cowork` / `· Claude Code` / `· Codex`) so the next agent can see who decided what.
 
 ---
 

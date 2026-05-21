@@ -6,7 +6,7 @@ You are starting a coding session. This project follows the standard project pro
 
 1. **CLAUDE.md** — what this project is, tech stack, guardrails, coding rules
 2. **STATUS.md** — current state, known bugs, next actions
-3. **STRUCTURE.md** — structural map of the project: surfaces present, component locations per tier, conventions (if it exists)
+3. **STRUCTURE.md** — structural map of the project: surfaces present, component locations per tier, conventions (if present — created by `build-component` on first invocation)
 4. **BRAND.md** — product identity and what NOT to build (if it exists)
 5. **BRIEF.md** — every major decision made in Cowork and why, including rejected options (if it exists)
 6. **docs/INDEX.md** — project map + agent dependency index (if it exists)

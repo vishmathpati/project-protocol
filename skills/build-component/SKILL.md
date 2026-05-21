@@ -99,7 +99,7 @@ User says: *"I want a component like [Mantine Combobox / Chakra Drawer / MUI Ste
 - **`cva + forwardRef + cn` triplet applies only to new primitives (Generic + Strategy C).** Compositions and variant-extensions don't need it. Imposing the triplet on a composition is over-engineering and produces noise.
 - **STRUCTURE.md is written once, read forever.** First run writes it after user confirmation. Subsequent runs read it and skip detection.
 - **Convention is detected, not asked.** If `shadcn-ui` / `class-variance-authority` is in `package.json` → cva+forwardRef+cn. If `styled-components` → styled-components. If `*.module.css` files exist → CSS modules. If none detected → ask the user, default to vanilla CSS-with-tokens.
-- **`design-check` runs automatically after Phase 5.** Don't duplicate its 7 steps here — `build-component` is the path-of-build, `design-check` is the gate-of-correctness. They chain.
+- **`design-check` runs automatically after Phase 5.** Don't duplicate its 8 steps here — `build-component` is the path-of-build, `design-check` is the gate-of-correctness. They chain.
 - **Never modify `DESIGN.md` or `FUNDAMENTALS.md` from this skill.** Missing tokens route through `design-check` Step 4.
 
 ---
@@ -151,7 +151,7 @@ Next:
 
 - **`init-project`** — bootstraps the project layout and writes the canon files (`DESIGN.md`, `FUNDAMENTALS.md`, `STRUCTURE.md` if requested). `build-component` assumes those exist and writes components against them.
 - **`design-direction`** — sets brand-level direction and writes `BRAND.md` + `DESIGN.md` Overview. Upstream of any component work.
-- **`design-check`** — the 7-step UI gate. `build-component` is the path-of-build, `design-check` is the gate-of-correctness. `design-check` fires automatically after Phase 5.
+- **`design-check`** — the 8-step UI gate. `build-component` is the path-of-build, `design-check` is the gate-of-correctness. `design-check` fires automatically after Phase 5.
 - **`discussion-mode`** — pure conversation, no writes. If the user wants to talk through a component idea without committing, use that first, then `build-component` to actually ship.
 - **`audit`** — periodic consistency scan across canon. Will catch drift between `STRUCTURE.md` and the actual filesystem if it happens.
 
