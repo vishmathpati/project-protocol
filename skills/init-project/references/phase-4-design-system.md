@@ -20,13 +20,15 @@ A — Quick (default): 3 questions for BRAND.md, then A/B/C for DESIGN.md.
 
 B — Deep (design-direction skill): one free-text brand dump, then I extract
     the taste axes and propose 3 named directions with a moodboard. Produces
-    a much richer BRAND.md. Adds ~5 minutes.
+    a rich BRAND.md, the DESIGN.md Overview + brand-specific anti-patterns,
+    AND the DESIGN.md token frontmatter (colors, typography, spacing) with
+    an HTML preview for visual approval before write. Adds ~5–10 minutes.
 
 Pick A or B.
 ```
 
 - **A (default)** → continue with the existing BRAND.md flow below.
-- **B (deep)** → hand off to `design-direction`. That skill writes a populated BRAND.md and DESIGN.md Overview + brand-specific DO NOT additions, then returns control here. When it returns, the BRAND.md step below is skipped (already done) and the DESIGN.md step runs as path C (fresh generation) using the newly-populated BRAND.md as the brief.
+- **B (deep)** → hand off to `design-direction`. That skill writes BRAND.md, DESIGN.md Overview + brand-specific DO NOT additions, AND DESIGN.md token frontmatter (after user approves an HTML preview). When it returns, **both the BRAND.md step AND the DESIGN.md step below are skipped** — already complete. Phase 4 continues from FUNDAMENTALS.md / TOOLING.md / DISCOVERIES.md only.
 
 If `design-direction` is unavailable (older plugin version, or skill missing on disk): silently fall through to path A.
 
@@ -127,25 +129,39 @@ Most important file in Phase 4. The shape is fixed — `templates/DESIGN.md` is 
 
 DESIGN.md follows the [google-labs-code/design.md](https://github.com/google-labs-code/design.md) spec: YAML frontmatter (machine-readable tokens) + markdown body (human rationale).
 
+### Token shape (v2.1 — role-split + paired modes)
+
+The template's frontmatter is organised into seven top-level blocks. Fill each one — never collapse them back into a flat `colors:` map.
+
+- `font:` — three roles. `display` (MEMORY job, distinctive, has a `banned:` list that disallows Inter / Geist / Söhne / IBM Plex / SF Pro / Roboto / Space Grotesk / Open Sans / Public Sans / system-ui as a display face), `body` (WAYFINDING job, those Inter/Geist/Söhne fonts are acceptable here), `mono` (data / code).
+- `surface:` — material-named tokens, not indexed. `paper` (primary canvas), `ash` (raised surface like cards), `ink` (text / dark canvas), `hairline` (1 px borders).
+- `accent:` — `primary`, `primary_hover`, optional `secondary` (only for two-accent brands).
+- `status:` — `success`, `warning`, `error`. Semantic only.
+- `light_mode:` and `dark_mode:` — **two separate blocks**, each with its own `paper` / `ash` / `ink` / `hairline` plus a `character:` line describing the pairing intent. `dark_mode` also gets a `rule:` line (e.g. "never pure #000 — always 4–8% warm tint"). Both modes must share temperature and material story.
+- `spacing:`, `radius:`, `shadow:`, `components:` — unchanged in shape, but `components:` references now point at the new tokens (`{accent.primary}`, `{surface.paper}`, `{surface.ash}`, `{surface.ink}`, `{surface.hairline}`).
+
+When filling placeholders, name surfaces by **material** (cream, leather, parchment, slate) not by **index** (surface-1, surface-2). Name accents by **material** (brass, terracotta, oxblood, jewel-green) not by hue position. Index naming invites a flood of generic levels; material naming forces a story.
+
 ### Step 1 — Read the template
 
 Source: `${CLAUDE_PLUGIN_ROOT:-${CODEX_PLUGIN_ROOT}}/templates/DESIGN.md`.
 
-This file is the contract for what every project's DESIGN.md must contain — token categories, the accent-discipline rules, the DO NOT section, the Extension protocol, and the Agent prompt guide. Do not strip or shorten any section. Only fill placeholders.
+This file is the contract for what every project's DESIGN.md must contain — the role-split font block, material-named surfaces, paired light/dark blocks, accent-discipline rules, DO NOT section, Extension protocol, and Agent prompt guide. Do not strip or shorten any section. Only fill placeholders.
 
 If the plugin-root env var is unset: use the Read tool to fetch the template content from the plugin install path.
 
 ### Step 2 — Detect existing tokens in the project
 
-Read `agents/DESIGN.md` if it exists. Check for YAML frontmatter (starts with `---` and contains `colors:` or `name:` before the closing `---`).
+Read `agents/DESIGN.md` if it exists. Check for YAML frontmatter (starts with `---` and contains `name:` and a recognisable token block before the closing `---`).
 
-- Has frontmatter → already new format. Branch: "Existing DESIGN.md — fill gaps only".
-- No frontmatter → legacy format. Branch: "Legacy upgrade — re-shape into template".
+- Has frontmatter with `font:` + `surface:` + `light_mode:` + `dark_mode:` blocks → already v2.1 shape. Branch: "Existing DESIGN.md — fill gaps only".
+- Has frontmatter with the old flat `colors:` / `typography:` blocks → legacy v1 shape. Branch: "Legacy upgrade — re-shape into v2.1 template" (split fonts into display/body/mono, rename `bg`/`surface`/`surface-2`/`text`/`border` to `paper`/`ash`/`ink`/`hairline`, derive `light_mode` + `dark_mode` blocks).
+- No frontmatter → legacy markdown-only format. Branch: "Legacy upgrade — re-shape into v2.1 template".
 - Doesn't exist → scan codebase:
-  - `src/app/globals.css` / `app/globals.css` — CSS custom properties
+  - `src/app/globals.css` / `app/globals.css` — CSS custom properties (look for both `:root` and `.dark` blocks to populate the paired modes)
   - `tailwind.config.{js,ts}` — `theme.extend`
   - `src/styles/`, `tokens.css`, `design-tokens.ts`, `theme.ts`
-  - Swift: `DesignTokens.swift`, asset catalog colors, `Color` extensions
+  - Swift: `DesignTokens.swift`, asset catalog colors, `Color` extensions, light/dark appearance variants
 
 ### Step 3 — Ask the open question
 
@@ -177,14 +193,17 @@ Or type your own direction.
 
 ### Step 4 — Execute
 
-All paths produce the same output: the `templates/DESIGN.md` scaffold with placeholders replaced by real values.
+All paths produce the same output: the `templates/DESIGN.md` scaffold with placeholders replaced by real values, in the v2.1 token shape (role-split fonts, material-named surfaces, paired light/dark blocks).
 
-- **A (transfer):** Haiku sub-agent extracts CSS vars / Tailwind config / Swift tokens. Sonnet sub-agent maps them onto the template's frontmatter and body placeholders. Sections without source values stay as `[VERIFY]` placeholders.
-- **B (transfer + add):** extract as A, then ask "What to add or change?" Apply additions while preserving the template structure.
-- **C (fresh):** use `BRAND.md` + user description; Sonnet sub-agent generates token values for the template. Never skip a section — fill or `[VERIFY]`.
+- **A (transfer):** Haiku sub-agent extracts CSS vars / Tailwind config / Swift tokens, including both `:root` and `.dark` variants when present. Sonnet sub-agent maps them onto the template's frontmatter and body placeholders — splitting any single `font-family` into display/body/mono roles (asking the user if only one font is defined), renaming flat `bg`/`surface`/`text`/`border` tokens to material-named `paper`/`ash`/`ink`/`hairline`, and populating both `light_mode:` and `dark_mode:` blocks. Sections without source values stay as `[VERIFY]` placeholders.
+- **B (transfer + add):** extract as A, then ask "What to add or change?" Apply additions while preserving the template structure and the role-split / paired-mode shape.
+- **C (fresh):** use `BRAND.md` + user description; Sonnet sub-agent generates token values for the template. Pick a display face that is NOT in the `banned:` list, pick paired light/dark characters that share temperature, name accents by material. Never skip a section — fill or `[VERIFY]`.
 
 **Hard rules for any path:**
-- Do not delete sections from the template (Overview, Colors, Typography, Spacing, Radius, Shadow, Components, DO NOT, Extension protocol, Agent prompt guide).
+- Do not delete sections from the template (Overview, Colors, Typography, Light + Dark mode pairing, Spacing, Radius, Shadow, Components, DO NOT, Extension protocol, Agent prompt guide).
+- Do not collapse the role-split `font:` block back into a single font field. Display, body, and mono are three distinct roles.
+- Do not collapse `light_mode:` and `dark_mode:` into a single block. They are paired but separate.
+- Do not rename material-named surface tokens (`paper`, `ash`, `ink`, `hairline`) back to index names (`bg`, `surface-1`, `surface-2`).
 - Do not change the DO NOT section's universal items — only **add** brand-specific anti-patterns.
 - Do not edit the Extension protocol wording — it's enforced by the `design-check` skill.
 

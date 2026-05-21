@@ -5,6 +5,60 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [2.1.0] — 2026-05-22
+
+Minor release. `design-direction` now generates concrete tokens (colours, typography, spacing) and ships a self-contained HTML preview the user opens in their browser to visually approve before any write. Closes the v2.0.x gap where the skill produced rich brand prose but never updated the actual design tokens — projects ran `design-direction`, got beautiful BRAND.md updates, and looked identical afterwards because `DESIGN.md`'s token frontmatter stayed at defaults.
+
+### Added
+
+- **`design-direction` Phase 6.5 — token alignment + visual preview.** New phase inserted between Phase 6 (pick direction) and Phase 7 (write outputs). Reads existing `agents/DESIGN.md` token frontmatter, classifies MATCH / partial-MISMATCH / full-MISMATCH per category, generates concrete hex / font / spacing / radius values for mismatched categories using the locked direction's material reference + temperature + saturation, runs WCAG AA contrast validation on 8 load-bearing pairs (refuses to write a palette that fails), renders a self-contained HTML preview page, surfaces a `file://` link the user opens in their browser, then asks for approve / iterate / reject. Iteration loop translates plain-language corrections ("too orange", "display feels heavy", "dark mode is muddy") into token-level changes and re-previews. Soft 5-iteration limit triggers a step-back-to-Phase-6 meta-prompt. Files: `skills/design-direction/references/phase-6-5-token-alignment.md` (token logic), `skills/design-direction/references/phase-6-5-preview-html.md` (preview HTML spec + template + font-loading rules + iteration semantics).
+
+- **HTML preview page** — written to `agents/preview/<direction-slug>-<date>.html` on every Phase 6.5 run with token changes. Single self-contained file, no build step, ~400 lines including inline CSS. Loads Google Fonts via `<link>` when fonts are available; falls back to nearest Google cousin for Pangram / commercial fonts and notes the substitution in the footer. Renders 21 sections: top bar with light/dark toggle, surface swatches (paper/ash/ink/hairline), accent swatches, status swatches, WCAG contrast pairs panel with PASS/FAIL badges, display ramp (72/56/40/28 px), body ramp (18/16/14 px), mono code sample, letter-spacing test, spacing scale visualization (bars at 4/8/12/16/24/32/48/64), radius squares, all 12 components from DESIGN.md's component list (buttons / form / card / dialog / table / tabs / badges / toast) styled with the proposed tokens, and a real-content hero section that surfaces typography pairing fights. Display headlines and body paragraphs are brand-fitting prose drawn from the locked archetype, not lorem ipsum.
+
+- **Archetype → palette + typography heuristic tables in Phase 6.5.** Two 12-row tables in `phase-6-5-token-alignment.md`: (1) archetype → paper temperature, ink temperature, accent character, OKLCH chroma ceiling (Sage 0.12, Magician 0.18, Caregiver 0.10, Rebel 0.25, Creator 0.20, Hero 0.18, Explorer 0.14, Innocent 0.10, Lover 0.12, Jester 0.22, Ruler 0.16, Everyman 0.14); (2) archetype → display / body / mono font picks, biased toward Google Fonts (Source Serif 4, Fraunces, Inter, Geist, JetBrains Mono, Recursive) with commercial fonts (Tiempos, Lyon, Recoleta) flagged with cost notes for the user to opt into.
+
+- **Surface tier detection (new Phase 6.5 step 1).** Classifies project as `dashboard` / `marketing` / `both` from `agents/BRAND.md` Product.Surfaces field. Drives type scale ratio (dashboard 1.125, marketing 1.25, editorial 1.333), display-font banning strictness (strict on marketing, relaxed on dashboard-only), and whether to generate a categorical chart palette.
+
+- **Cultural anchor + script detection (new Phase 6.5 step 2).** Detects Indic / Arabic / Hebrew brand context from `agents/BRAND.md` Cultural anchor field. Pairs Latin body font with the matching script font (Devanagari / Gujarati / Gurmukhi → Mukta or Hind; Tamil → Noto Sans Tamil; Bengali → Noto Sans Bengali; Arabic → Noto Sans Arabic). Skill refuses to ship a Latin-only stack for an Indic-market brand.
+
+- **WCAG contrast validation gate.** New Phase 6.5 substep computes WCAG ratios for 8 load-bearing pairs (ink/paper in both modes, ink/ash in both modes, paper-on-accent for CTAs, accent-on-paper for links, hairline visibility, status.error/paper) using the standard relative-luminance formula. Hard rule: refuse to write a palette that fails AA. Auto-suggests a fix (darken ink, shift accent hue, increase chroma) and re-validates before re-previewing.
+
+- **Dark-mode generation rules.** Explicit rules added to Phase 6.5 step 6: don't invert; desaturate accent chroma by 20–35% for dark mode; shift accent lightness up 5–10% so it doesn't recede; hairline becomes lighter than paper on dark canvas (highlights, not depressions); never `#000`, always 4–8% temperature tint.
+
+- **Categorical chart palette generator.** When surface tier includes dashboard AND the project has data viz needs, Phase 6.5 emits an 8-stop categorical palette in OKLCH at constant L=60% (light) / L=70% (dark) and C=0.15. Hues spaced at 30 / 60 / 120 / 180 / 210 / 270 / 300 / 340 for perceptual evenness. Skipped entirely when no dashboard surface.
+
+- **`design-direction` Phase 5 — anti-convergence rules (v2.1).** Earlier session work, shipped in this release. Each of the three proposed directions now carries concrete hex codes per material role, dark/light pairing, type pairing with named families, and is forced to be meaningfully different from the other two via material-first thinking (parchment vs leather vs stone vs velvet) and category-diversity rules. Eliminates the v1 drift toward "three flavours of Inter + neutral grey + soft shadow."
+
+- **Phase 2 — three research-backed axes added.** Earlier session work. v1's 9 axes → v2.1's 10 axes: dropped `surface_mix` and `tempo` (derived from other axes), added `trust_stakes` (Cardamone 2025), `category_maturity` (Neumeier Zag), `distinctive_asset` (Byron Sharp). Phase 3 diagnostic prose updated to surface all three new axes for user confirmation.
+
+- **`type_scale:` block in DESIGN.md template.** New optional frontmatter block: base size + modular ratio + named step list (xs / sm / md / lg / xl / 2xl–5xl / display) + hero_max cap. Phase 6.5 picks ratio per surface (dashboard 1.125, marketing 1.25, editorial 1.333).
+
+- **`chart_palette:` block in DESIGN.md template.** New optional frontmatter block: 8 OKLCH-stepped hues per mode for categorical data viz. Present only when generated.
+
+- **Per-surface override blocks in DESIGN.md template.** Optional `dashboard:` and `marketing:` blocks for projects that need meaningfully different palettes per surface. Most projects leave blank — top-level tokens apply to everything.
+
+### Changed
+
+- **`design-direction/SKILL.md` — full reconciliation with references.** Previously contradictory: SKILL.md said "Token frontmatter is read-only here" and ended with a handoff prompt to `init-project` Phase 4 path C; references already encoded token-writing behaviour. Now consistent. Phase list updated 7 → 8 phases (1–7 plus 6.5). "What it produces" expanded from 3 to 5 outputs (added token frontmatter + preview HTML). "Compatibility" block rewrites the token-edit rule to "via Phase 6.5 preview-then-approve, never silent." Phase 7 body rewritten — writes whatever Phase 6.5 approved, no handoff. Hard rule line 181 replaced: "Token frontmatter is written by Phase 6.5 + 7 only after explicit user approval via the HTML preview. Never write tokens silently; never skip the preview when changes are proposed." Sub-agent routing table adds Phase 6.5 row at reasoning tier. Output shape replaces the old regenerate-prompt with a clean wrote-list + `npx @google/design.md lint` next-step.
+
+- **`design-direction/references/phase-7-write-outputs.md`** — deleted the "After writing — the optional handoff" section that asked "Want me to regenerate token frontmatter? hands off to init-project Phase 4 path C". Replaced with "After writing — clean exit" listing what was written (conditional on Phase 6.5 returning approved values) and pointing at the lint sync step. Hard rule line 18 already correctly stated "Token frontmatter is read-only UNLESS Phase 6.5 returned new token values" — preserved unchanged.
+
+- **`init-project/references/phase-4-design-system.md` lines 9–32** — the "Optional handoff to design-direction (deep flow)" block updated. Path B description now mentions "DESIGN.md token frontmatter with an HTML preview for visual approval." When path B returns control, BOTH the BRAND.md step AND the DESIGN.md step in Phase 4 are skipped — `design-direction` owns them. Phase 4 continues from FUNDAMENTALS.md / TOOLING.md / DISCOVERIES.md only.
+
+- **`templates/DESIGN.md`** — added the `type_scale:`, `chart_palette:`, `dashboard:`, `marketing:` blocks listed under Added. Body section grows a "Size scale" subsection in Typography pointing at the new `type_scale:` block with surface-ratio guidance.
+
+- **Plugin manifests** — version bumped 2.0.1 → 2.1.0 in both `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`. Minor bump: behavioural expansion of `design-direction` (now writes tokens + renders preview) plus Phase 2/5 quality upgrades from earlier session work, no breaking changes.
+
+### Compatibility
+
+- **Existing projects on v2.0.x** — drop-in upgrade. The `design-direction` skill on existing initialized projects will detect the existing token shape and offer the alignment diff + preview only when the locked direction actually mismatches current tokens. Projects whose tokens already match the new direction get an "all MATCH — no token changes needed" report (silent re-confirmation, no preview). Pre-v2.1 projects without `type_scale:` or `chart_palette:` blocks get them added only on the next `design-direction` run that approves token changes — additive, never destructive.
+
+- **`agents/preview/` directory** — new folder, only created when Phase 6.5 actually renders a preview. Each direction-level approval writes a new file; iteration writes a new `-v2`, `-v3` file alongside (never overwrites). Recommended to add `agents/preview/` to `.gitignore` — previews are throwaway approval surfaces, not canon. Phase 6.5 does the `.gitignore` add automatically on first preview generation if the line isn't present.
+
+- **`init-project` Phase 4 path B handoff** — backwards-compatible. Projects bootstrapping via the deep flow now skip both BRAND.md and DESIGN.md steps in Phase 4 (previously skipped only BRAND.md and ran path C for DESIGN.md). The path C generator is no longer invoked from the path B handoff — `design-direction` owns DESIGN.md fully. Path A (quick flow) unchanged.
+
+- **CSS-side architecture unchanged.** The `light_mode:` / `dark_mode:` paired blocks, material naming (`paper` / `ash` / `ink` / `hairline`), `oklch(from var(--token) calc(l - 0.08) c h)` derivations, and `npx @google/design.md lint` sync layer are all unchanged. v2.1 just fixes the upstream brain that picks the values feeding into them.
+
 ## [2.0.1] — 2026-05-21
 
 Patch release. Correctness fixes across hooks, installer, build script, skill content, and templates. No new features. Skill count 15 → 14 (the `project-protocol` reference-doc skill was removed — see Removed below).

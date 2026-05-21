@@ -3,9 +3,11 @@
 The skill finishes by writing:
 
 1. `agents/BRAND.md` — full, rich.
-2. `agents/DESIGN.md` — Overview section + brand-specific DO NOT block. Token frontmatter is **not** touched.
+2. `agents/DESIGN.md` — Overview section + brand-specific DO NOT block, **plus token frontmatter when Phase 6.5 returned new token values with user approval**.
 
-Then surfaces the optional token-regeneration handoff to `init-project` Phase 4.
+Phase 7 receives the alignment result from Phase 6.5 and writes accordingly.
+The optional token-regeneration handoff from previous versions is removed —
+token alignment is now Phase 6.5's job, not an end-of-skill afterthought.
 
 ---
 
@@ -13,7 +15,7 @@ Then surfaces the optional token-regeneration handoff to `init-project` Phase 4.
 
 1. **Never silently overwrite populated content.** Read each target file first. If a section contains user-written content (anything beyond `[VERIFY]` placeholders), show the diff to the user and ask before applying.
 2. **Universal anti-patterns in DESIGN.md are sacred.** The DO NOT section's existing items (no indigo, no two-stop gradients, no emoji-as-icons, etc.) are never deleted. Only the bottom `[Add brand-specific anti-patterns here]` placeholder is replaced.
-3. **Token frontmatter in DESIGN.md is read-only here.** This skill does not touch `colors:`, `typography:`, `spacing:`, `radius:`, `shadow:`, or `components:` in the YAML frontmatter.
+3. **Token frontmatter is read-only UNLESS Phase 6.5 returned new token values with user approval.** In that case, write the full token block — including role-split fonts (`display`/`body`/`mono`), material surfaces (`paper`/`ash`/`ink`), and separate `light_mode` + `dark_mode` blocks — using the values from Phase 6.5's `new_token_values`. Never regenerate tokens without that explicit Phase 6.5 handoff.
 4. **No invented details.** Every fact in BRAND.md must trace to the dump or a confirmed correction.
 
 ---
@@ -139,7 +141,7 @@ If the placeholder has already been replaced (the user added brand-specific item
 
 ---
 
-## After writing — the optional handoff
+## After writing — clean exit
 
 Output:
 
@@ -148,18 +150,18 @@ Output:
 ✅ Wrote agents/BRAND.md (full).
 ✅ Wrote agents/DESIGN.md Overview.
 ✅ Added <N> brand-specific anti-patterns to agents/DESIGN.md.
+{{if Phase 6.5 returned approved token values}}
+✅ Wrote agents/DESIGN.md token frontmatter (colors, typography, spacing, radius, light_mode, dark_mode).
+✅ Preview: agents/preview/<direction-slug>-<date>.html
+{{end}}
 
-Token frontmatter (colors, typography, spacing, radius) was not regenerated.
-The existing tokens may still be valid, or they may need to be re-derived from
-the locked direction.
+Next step:
+  npx @google/design.md lint agents/DESIGN.md
+    — syncs DESIGN.md → global.css (or DesignTokens.swift for Swift projects)
 
-Want me to regenerate the token frontmatter now?
-- "yes" → hand off to init-project Phase 4 path C (fresh generation) with the
-  new BRAND.md as the brief. Existing custom tokens preserved where they fit.
-- "no" → done. The next UI work will use the existing tokens; design-check
-  will flag any token misses against the new Overview.
+  Then start UI work. The design-check skill will fire on any visual change
+  and enforce the new tokens.
 ```
 
-If the user says yes → invoke `init-project` Phase 4 path C ("Generate a completely fresh design system"). The sub-agent now has a far richer brief — BRAND.md is populated, the Overview reads coherently, the refusal list is concrete. Token generation accuracy goes up sharply.
-
-If no → end skill cleanly. Update `cowork/WORKLOG.md` and `agents/WORKLOG.md` (per project-protocol session discipline) with a one-line entry: "design-direction: locked direction '<name>'".
+Update WORKLOG (per project-protocol session discipline) with a one-line entry:
+"design-direction: locked direction '<name>'{{if tokens written}}, regenerated DESIGN.md tokens with user-approved preview{{end}}."
