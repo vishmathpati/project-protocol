@@ -139,6 +139,12 @@ if [ -f templates/DESIGN.md ]; then
       "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md"
     rm -f "$STAGE_COWORK/skills/init-project/references/phase-4-design-system.md.bak"
   fi
+  # phase-0c-modernize also references templates/DESIGN.md
+  if [ -f "$STAGE_COWORK/skills/init-project/references/phase-0c-modernize.md" ]; then
+    sed -i.bak 's|templates/DESIGN.md|references/DESIGN.md|g' \
+      "$STAGE_COWORK/skills/init-project/references/phase-0c-modernize.md"
+    rm -f "$STAGE_COWORK/skills/init-project/references/phase-0c-modernize.md.bak"
+  fi
 fi
 
 # Relocate TOOLING.md into init-project/references and patch the path references.
