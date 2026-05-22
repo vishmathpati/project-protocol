@@ -4,6 +4,19 @@ Propose 3–5 real sites that satisfy the locked diagnostic. The user reads thes
 
 ---
 
+## Purpose — read this before doing anything else
+
+The moodboard is a **trust-ceiling check, not a template.** It proves the audience can handle this level of design ambition — it does NOT define what kind of ambition this brand should reach for. The brand's distinctive asset must sit OUTSIDE pure homage to these sites.
+
+- **What the moodboard IS:** permission to be ambitious. The audience already accepts this much design rigour, so we know we won't lose them by reaching.
+- **What the moodboard is NOT:** a menu of styles to remix or pick from. If Phase 5 treats these sites as ingredients, the brand ends up generic.
+
+### Hard rule — no percentage-mix directions
+
+Do not propose directions in Phase 5 that read as "mostly site X + a bit of site Y". If a Phase 5 direction can be summarized as a percentage mix of moodboard sites, it has failed. The moodboard sets a *trust ceiling*; directions must invent new distinctive territory under that ceiling.
+
+---
+
 ## What to output
 
 For each reference:
@@ -71,8 +84,11 @@ The agent picks 3–5 from this candidate pool based on the locked diagnostic. P
 ## Sample output (matching a locked diagnostic: high trust + daily-seconds + content-light + Indian-casual + Magician + look-unlike Myntra)
 
 ```
-References — sites that fit the locked diagnostic. Open each, then we'll talk
-directions.
+References — 3 to 5 sites your audience already trusts. These prove the
+audience accepts design-conscious work; they're your trust ceiling, not your
+template. In the next step I'll propose 3 directions, and at least one will
+sit OUTSIDE this envelope — because copying these sites means you can't own
+anything distinctive.
 
   • Stitch Fix (stitchfix.com) — editorial, photography-led, Magician archetype
     expressed through transformation imagery. Content-light layout, premium feel.
@@ -87,7 +103,7 @@ directions.
   • Vogue India (vogue.in) — editorial Indian fashion. Reference for type
     hierarchy and photography treatment in the Indian market.
 
-Anchor on these for taste, then pick from the 3 directions below.
+Read these to calibrate the ceiling, then we'll go to directions.
 ```
 
 ---
@@ -97,3 +113,7 @@ Anchor on these for taste, then pick from the 3 directions below.
 - **Do not invent URLs.** Every URL must be a real site you're confident exists. If unsure, drop it.
 - **Do not link to design-system documentation pages** (e.g., material.io, polaris.shopify.com). Link to the actual brand surface — that's what's being benchmarked.
 - **One-line why each.** Two lines max if needed. Not paragraphs.
+
+---
+
+Phase 5 enforces this with a "mandated departure" rule — see `phase-5-three-directions.md`.

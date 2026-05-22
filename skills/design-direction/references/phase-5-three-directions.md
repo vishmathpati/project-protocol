@@ -40,7 +40,22 @@ Direction <N> — "<evocative name>"
   Reference: <one URL to model layout after>
 
   Why it fits: <one or two lines connecting back to locked diagnostic axes>
+
+  Borrows from moodboard: <list which moodboard sites and what specifically — e.g.,
+                          "Stitch Fix warm cream + serif headline rhythm; Vogue India
+                          editorial photography hierarchy"> | "nothing literal"
+
+  Departs from moodboard: <list what this direction deliberately does NOT do — e.g.,
+                          "Stripe's cool restraint (this runs warmer)"; "Pinto's
+                          editorial density (this is sparer)">
+
+  Distinctive asset:      <one sentence — the visual thing nobody else in the
+                          category owns that this direction would let the brand
+                          own. e.g., "cream paper + oxblood ink + Migra display
+                          — none of the 5 reference sites pair these.">
 ```
+
+The third line (`Distinctive asset`) is the load-bearing one — it forces the agent to articulate what makes this direction *ownable*, not just *visible*. For the mandated outside-envelope direction (see Rule 7), `Borrows from moodboard:` should literally read "nothing literal" or "trust ceiling only — proves audience accepts ambition, no surface inheritance."
 
 Use evocative names with material vocabulary, not technical labels:
 
@@ -149,6 +164,39 @@ Each direction's first line is material vocabulary, not adjectives.
 
 Hex codes attach LAST, inside the light/dark token blocks. The character/material is the proposal; hex is a value.
 
+### Rule 7 — Mandated departure (at least one direction outside the moodboard envelope)
+
+Of the 3 directions:
+
+- Up to 2 may sit **INSIDE** the moodboard envelope — borrowing material, palette intent, or type pairing from the 3–5 reference sites.
+- At least 1 MUST sit **OUTSIDE** the moodboard envelope — different material, different temperature, different category code than anything in the moodboard. This is the direction that gives the brand a chance to own a distinctive asset (per Byron Sharp).
+
+The user can still pick a safe (inside-envelope) direction — but they must be given the choice. A Phase 5 output of 3 inside-envelope directions has failed.
+
+If the moodboard already spans the visual space well (e.g., includes both editorial-warm and clinical-cool), the "outside" direction must go somewhere even further — into territory the moodboard sites collectively avoid (e.g., cultural-anchor-specific palettes, traditional craft references, brutalist anti-design, etc.).
+
+### Anti-moodboard-convergence
+
+In addition to the inter-direction rules above, the 3 directions must collectively
+ensure moodboard distance:
+
+- **Pairwise material distance from moodboard.** No direction may share ALL of
+  (material vocabulary + temperature + saturation tier) with any single moodboard
+  site. If Direction A is "warm cream + serif" and Stitch Fix is in the moodboard,
+  A must differentiate on at least one other axis (e.g., the accent material —
+  "oxblood" rather than Stitch Fix's "blush coral").
+
+- **Category-code distance.** If the moodboard is dominated by one category code
+  (e.g., 4 of 5 sites are "premium fintech minimalism"), at least one direction
+  must explicitly break that code — different decoration density, different type
+  hierarchy, different photo treatment, different motion temperament.
+
+- **Mandated outside-envelope direction.** As above — exactly one of the 3
+  directions must have "Borrows from moodboard: nothing literal." This is the
+  agent's chance to bring in cultural-anchor-specific or category-rare territory
+  (Indian textile palettes, Japanese ma, brutalist anti-design, archival craft,
+  etc.) that the moodboard's safety-first selection deliberately omitted.
+
 ---
 
 ## Section 3 — Worked example output
@@ -189,6 +237,13 @@ Direction 1 — "Editorial Cream"
   category-maturity=code-fluid (lifestyle/editorial). Material story
   (parchment+leather) matches the "premium but not corporate" emotional brief.
 
+  Borrows from moodboard: Aesop's warm parchment paper + serif headline rhythm;
+                          Harper's Bazaar India editorial type hierarchy.
+  Departs from moodboard: Aesop's near-monochrome restraint (this carries an
+                          oxblood ink + brass accent, not a single neutral).
+  Distinctive asset:      cream parchment + oxblood ink + Migra display — none of
+                          the moodboard sites pair these three.
+
 Direction 2 — "Sage Concrete"
   Material:    sage cream + stone grey + terracotta accent
   Temperature: neutral
@@ -219,6 +274,14 @@ Direction 2 — "Sage Concrete"
   Why it fits: archetype=Sage/Creator, category-maturity=code-fluid, trust-stakes=high.
   Neutral temperature reads as "considered, not warm-and-fuzzy." Stone material
   signals durability without going corporate-cold.
+
+  Borrows from moodboard: Kontrapunkt's tight grid + sage-cream neutrality; Klim's
+                          studio-architectural type-in-context discipline.
+  Departs from moodboard: Aesop's warm parchment (this is cooler, more clinical);
+                          any moodboard editorial-density (this is sparer).
+  Distinctive asset:      sage cream + terracotta accent + Tobias transitional
+                          serif — the "architect's notebook" voice; nobody else
+                          in the moodboard pairs sage with terracotta.
 
 Direction 3 — "Mughal Velvet"
   Material:    ivory paper + deep burgundy velvet + gold accent
@@ -251,8 +314,71 @@ Direction 3 — "Mughal Velvet"
   The burgundy dark mode IS the distinctive asset — nobody else proposes burgundy
   as a UI background; it'll be remembered. Maximalism is the differentiator.
 
+  Borrows from moodboard: nothing literal — trust ceiling only (the moodboard
+                          proves the audience accepts editorial ambition, but no
+                          surface inheritance from any single site).
+  Departs from moodboard: every moodboard site — none carry jewel-saturation
+                          burgundy, Indian Type Foundry display, or maximalist
+                          decoration density.
+  Distinctive asset:      burgundy-as-UI-background + Kohinoor Latin display +
+                          gold leaf accent — nobody in the category owns this
+                          combination; it would be remembered after one exposure.
+  [MANDATED OUTSIDE-ENVELOPE direction — satisfies Rule 7.]
+
 Pick one — or pick a hybrid (e.g., "Direction 1 type, Direction 3 palette").
 ```
+
+### Section 3b — Snapfinder-style worked example (showing the new structure end-to-end)
+
+Same template, applied to a fictional Snapfinder-like brand (modern Indian fashion / find-the-look product). The moodboard for this brief contains Stitch Fix, Stripe, Klarna, Pinto, and Vogue India.
+
+```
+Direction A — "Editorial Cream"  (inside-envelope, safe)
+  Material:    warm cream + oxblood ink + brass accent
+  Temperature: warm
+  Saturation:  muted
+
+  Borrows from moodboard: Stitch Fix's warm cream + serif headline rhythm; Vogue
+                          India's editorial photo hierarchy.
+  Departs from moodboard: Stripe's cool restraint (this runs warmer); Klarna's
+                          flat-illustration accent system (this uses photography).
+  Distinctive asset:      cream paper + oxblood ink + Migra display — none of
+                          the 5 moodboard sites pair these three.
+
+Direction B — "Premium Tech"  (inside-envelope, opposite pole)
+  Material:    cool ivory + slate ink + one hot accent
+  Temperature: cool
+  Saturation:  muted (with one jewel accent)
+
+  Borrows from moodboard: Stripe's cool ivory + tight grid; Klarna's single-accent
+                          moment.
+  Departs from moodboard: Pinto's editorial density (this is sparer); Vogue India's
+                          photography weight (this leads with type).
+  Distinctive asset:      the "you-found-it" moment carries the brand — one hot
+                          accent on a near-neutral system; the product moment IS
+                          the brand expression.
+
+Direction C — "Bazaar Modern"  (MANDATED OUTSIDE-ENVELOPE — Rule 7)
+  Material:    Khadi paper + indigo + turmeric + brick accent
+  Temperature: warm
+  Saturation:  jewel
+
+  Inspired by: traditional Indian textile palettes (indigo + turmeric + brick),
+               Khadi paper texture, Devanagari + Latin display pairings.
+
+  Borrows from moodboard: nothing literal — trust ceiling only (the moodboard
+                          proves the audience accepts ambitious editorial
+                          execution; no surface inheritance from any site).
+  Departs from moodboard: every moodboard site — none of Stitch Fix, Stripe,
+                          Klarna, Pinto, or Vogue India carry traditional
+                          Indian craft references.
+  Distinctive asset:      nobody in the category (Myntra, Ajio, Nykaa) owns
+                          "modern Indian fashion infrastructure" visually —
+                          indigo + turmeric + Khadi texture + Devanagari-Latin
+                          display pairing would let Snapfinder own it.
+```
+
+Notice: A and B both sit inside the moodboard envelope (the user gets a real safe choice), but C goes somewhere none of the reference sites went. The user picks — but they're picking between *inside-envelope* and *ownable*, not between three remixes of the same moodboard.
 
 ---
 
@@ -265,6 +391,9 @@ Pick one — or pick a hybrid (e.g., "Direction 1 type, Direction 3 palette").
 - **Font category diversity enforced** (Rule 2). 3 directions = 3 different display categories. No collisions.
 - **Palette character diversity enforced** (Rule 3). 4 axes: temperature, saturation, material, lightness. No two directions share more than 2 axes.
 - **Material-first language** (Rule 6). First line is material vocabulary, hex codes attach last.
+- **Mandated departure enforced** (Rule 7). At least 1 of 3 directions MUST sit outside the moodboard envelope ("Borrows from moodboard: nothing literal"). 3 inside-envelope directions = Phase 5 has failed.
+- **Anti-moodboard-convergence enforced.** No direction shares all of (material + temperature + saturation) with any single moodboard site. If the moodboard is dominated by one category code, at least one direction breaks the code.
+- **Every direction block declares Borrows / Departs / Distinctive asset.** Distinctive asset is load-bearing — it names the ownable visual thing.
 - **Light mode never pure `#FFF`. Dark mode never pure `#000`.** Tint 4-8% toward brand temperature.
 - **Live reference search if available** (Rule 5). Don't lean on training-data muscle memory.
 - **All references in BRAND.md refusal list respected.** If a direction would require violating a refusal, drop it.

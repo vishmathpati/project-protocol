@@ -5,6 +5,45 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [2.1.1] — 2026-05-22
+
+Patch release. Two refinements to `design-direction` after first real-world v2.1.0 run on Snapfinder surfaced (a) the moodboard outweighing the brand's own distinctive asset, and (b) the preview HTML rendering decontextualized components instead of the actual product surface. Both fixes are additive and backwards-compatible — no schema changes, no breaking changes.
+
+### Added
+
+- **Mandated outside-envelope direction in Phase 5.** At least one of the three proposed directions must now sit OUTSIDE the moodboard envelope — different material, different temperature, different category code than anything in the moodboard. Forces the agent to invent distinctive territory rather than remix reference sites. Up to two of the three may stay inside the envelope (safe picks); the user always sees at least one distinctive bet so the pick is conscious, not defaulted. New "Anti-moodboard-convergence" sub-section in `phase-5-three-directions.md` defines pairwise material distance + category-code distance + mandated-outside rules. Includes a Snapfinder-style worked example showing Editorial Cream / Premium Tech (inside) + Bazaar Modern (outside, traditional Indian textile palettes) so the agent has a concrete reference for what "outside the envelope" looks like.
+
+- **Borrow / depart / distinctive-asset structure per direction.** Every direction block in Phase 5 now carries three required lines: `Borrows from moodboard:` (what it inherits — anchor in trust), `Departs from moodboard:` (what it deliberately doesn't do — distance from category default), `Distinctive asset:` (one sentence — the ownable visual thing nobody else in the category has). The third line is the load-bearing one — it forces articulation of what makes the direction *ownable*, not just *visible*. The mandated outside-envelope direction reads `Borrows from moodboard: nothing literal — trust ceiling only.`
+
+- **Section 0 — surface layout (tier-aware) in preview HTML.** New section added at the TOP of every preview page, before the 21 component sections. Renders the project's actual product surface using the proposed tokens — not isolated components. Tier-aware:
+  - `dashboard` tier → renders a full dashboard mockup: sidebar (logo + 5 nav items + new-button + user card), topbar (breadcrumb + search + bell + avatar), main content with page header, 4 KPI tiles with sparklines and trend deltas, a revenue-trend chart card with filter pills and dual-line SVG, a 5-row activity table with status badges.
+  - `marketing` tier → renders a full marketing landing mockup: nav with brand + product/pricing/customers/docs links + sign-in + CTA, expanded hero (consumes the prior standalone Section 20), customer-logo trust bar, 6-tile features grid with icon swatches, 3-card testimonial row with avatar attributions, 3-tier pricing grid with featured-card styling, 4-column footer with brand mark and copyright.
+  - `both` tier → renders both layouts stacked top-to-bottom with a visible "MARKETING PREVIEW" divider between them.
+
+  Standalone Section 20 ("Real-content example — hero") is now SKIPPED when tier is `marketing` or `both` (hero lives inside the marketing mockup) and when tier is `dashboard` (no marketing surface). It only renders as a legacy fallback when tier is unknown. All Section 0 rendering uses the same tokens as the component catalogue below — change a hex in Phase 6.5, both the layout view and the component swatches update together.
+
+- **Section 0 substitution placeholders.** `{{project_initial}}` (uppercase first letter for logo box), `{{project_slug}}` (lowercased no-spaces for email placeholders), `{{feature_1_title}}…{{feature_6_title}}` (six brand-fitting feature titles per archetype), `{{feature_1_body}}…{{feature_6_body}}` (one-sentence bodies, ~80–120 chars each), `{{testimonial_1_quote}}…{{testimonial_3_quote}}` (realistic testimonial quotes, ~80–140 chars, specific verbs and named outcomes — not "changed my life" generic). Phase 6.5 generates these from `agents/BRAND.md` Product + Audience + archetype, with archetype-fitting fallbacks.
+
+### Changed
+
+- **`phase-4-moodboard.md` reframed.** Moodboard's job is now explicit: "trust-ceiling check, not a template." Added an IS / IS NOT pair clarifying that the moodboard is *permission to be ambitious* (audience already accepts this much), NOT *a menu of styles to remix*. New hard rule: "Do not propose Phase 5 directions that read as a percentage mix of moodboard sites — if a direction can be summarized as 'mostly site X + a bit of site Y', it has failed." Updated the user-facing sample prompt at moodboard-presentation time so the framing carries through to the user, not just the agent. Cross-references the new Phase 5 mandated-departure rule.
+
+- **`phase-5-three-directions.md` — anti-moodboard-convergence sub-section.** Parallel to the existing inter-direction anti-convergence rules (which force the 3 directions to differ from each other), this adds rules that force collective distance FROM the moodboard. Pairwise: no direction may match ALL of (material + temperature + saturation tier) with any single moodboard site. Category-code: if the moodboard is dominated by one category code (e.g., 4 of 5 are premium fintech minimalism), at least one direction must break that code. Mandated: exactly one direction has `Borrows from moodboard: nothing literal.`
+
+- **`phase-6-5-preview-html.md` — Section 0 spec + HTML/CSS templates.** Comprehensive spec for the dashboard and marketing layout blocks, including the full HTML markup with `{{placeholder}}` substitutions, the matching inline CSS (organized under "/* Section 0 — Dashboard layout */" and "/* Section 0 — Marketing layout */" comments), and a "Tier-based conditional rendering" rules block in the substitution section.
+
+- **`phase-6-5-token-alignment.md` — "Generate the HTML preview" step updated.** Now explicitly mentions both (a) the project's actual surface layout (Section 0) AND (b) the component catalogue. Branches rendering on the surface tier detected in step 1. The "layout view is the load-bearing section" framing carries through so the agent doesn't treat Section 0 as optional polish.
+
+- **Plugin manifests** — version bumped 2.1.0 → 2.1.1 in both `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`. Patch bump: refinements to v2.1.0 behaviour, no schema changes, no new files.
+
+### Compatibility
+
+- **Drop-in upgrade from v2.1.0.** No file shape changes — `agents/BRAND.md`, `agents/DESIGN.md`, `agents/preview/*.html` all retain their v2.1.0 shape. Projects on v2.1.0 pick up the new direction-block structure (borrow/depart/distinctive-asset lines) on the next `design-direction` run and the new Section 0 layout view on the next Phase 6.5 preview render — both additive, never destructive.
+
+- **No effect on already-locked directions.** Projects that already ran `design-direction` and have a locked direction in `agents/BRAND.md` are untouched until the next re-anchor run. The mandated-outside rule applies to NEW direction proposals only.
+
+- **CSS-side architecture unchanged.** Material naming (paper/ash/ink/hairline), OKLCH derivations, `light-dark()` function, `npx @google/design.md lint` sync layer — all unchanged. Section 0 uses the same CSS variables as the component catalogue, so any token edit propagates to both views automatically.
+
 ## [2.1.0] — 2026-05-22
 
 Minor release. `design-direction` now generates concrete tokens (colours, typography, spacing) and ships a self-contained HTML preview the user opens in their browser to visually approve before any write. Closes the v2.0.x gap where the skill produced rich brand prose but never updated the actual design tokens — projects ran `design-direction`, got beautiful BRAND.md updates, and looked identical afterwards because `DESIGN.md`'s token frontmatter stayed at defaults.

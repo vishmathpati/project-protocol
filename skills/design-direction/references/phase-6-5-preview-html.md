@@ -34,6 +34,35 @@ One single `<html>` page, no build step, no JS framework, ~400 lines including
 inline CSS. Loads any required Google Fonts via `<link>`. Renders the
 following sections in order:
 
+### 0. Surface layout (tier-aware)
+
+Section 0 is the most important section. It renders the project's actual
+product surface — not isolated components — so the user can judge "does my
+product look good" before approving tokens. The 21 sections that follow are
+for token-level inspection (swatches, ramps, single components); Section 0
+is for the gestalt judgement.
+
+Phase 6.5 picked a surface tier in step 1 (`dashboard` / `marketing` /
+`both`). Section 0 renders the matching layout:
+
+- **dashboard tier** → dashboard mockup ONLY (sidebar + topbar + content)
+- **marketing tier** → marketing landing mockup ONLY (hero already exists, expanded)
+- **both tiers** → both layouts stacked top-to-bottom with a clear section
+  break and label ("DASHBOARD PREVIEW" / "MARKETING PREVIEW")
+
+The existing hero section (current Section 20) is now consumed BY the
+marketing layout — when marketing tier is rendered, remove the duplicate
+standalone Hero from later in the page. When dashboard-only, keep the
+existing Hero out entirely (no fake marketing hero for a dashboard-only
+product).
+
+The dashboard mockup contains: left sidebar (brand, nav, +New button, user
+chip) + topbar (breadcrumb, search, notifications, avatar) + content area
+(page head, 4 KPI tiles, revenue trend chart card, recent-activity table
+card). The marketing mockup contains: top nav + hero (the one that was
+standalone Section 20, now embedded here) + logo bar + 6-up features grid +
+3-up testimonials + 3-tier pricing + multi-column footer.
+
 ### 1. Top bar
 - Project name (left)
 - Direction name + one-line character description (centre)
@@ -161,6 +190,18 @@ A single section ~600 px tall containing:
 
 This is the section where pairing fights become visible — display + body
 together, accent in two roles, paper + ink contrast carrying real text.
+
+**Section 20 is now CONDITIONAL.** Section 0 (surface layout) supersedes it
+in most cases:
+
+- tier == `marketing` or `both` → SKIP Section 20 entirely. The hero lives
+  inside the Section 0 marketing layout; rendering it again here would
+  duplicate it.
+- tier == `dashboard` → SKIP Section 20 entirely. A dashboard-only product
+  has no marketing hero; faking one misleads the approval surface.
+- tier unknown / unset (legacy fallback) → render Section 20 as the
+  standalone hero, same as before. This keeps the preview working when
+  Phase 6.5 step 1 hasn't been run.
 
 ### 21. Footer
 Plain prose, in body font at 16 px, 60% opacity:
@@ -422,6 +463,124 @@ Keep it self-contained — no external CSS, no JS framework, no build step.
   /* Footer */
   footer { margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--hairline); opacity: 0.7; font-size: 16px; }
   footer strong { color: var(--ink); }
+  /* Section 0 — Dashboard layout */
+  .surface-preview { margin-top: 32px; padding-top: 32px; border-top: 1px solid var(--hairline); }
+  .dash-shell {
+    display: grid; grid-template-columns: 240px 1fr;
+    height: 760px;
+    border: 1px solid var(--hairline); border-radius: var(--radius-md);
+    overflow: hidden; background: var(--paper);
+  }
+  .dash-sidebar {
+    background: var(--ash); border-right: 1px solid var(--hairline);
+    display: flex; flex-direction: column; padding: 20px 16px; gap: 8px;
+  }
+  .dash-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+  .dash-logo {
+    width: 32px; height: 32px; border-radius: var(--radius-sm);
+    background: var(--accent-primary); color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 16px;
+  }
+  .dash-name { font-family: var(--font-body); font-weight: 600; font-size: 15px; }
+  .dash-nav { display: flex; flex-direction: column; gap: 2px; }
+  .dash-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--ink); opacity: 0.7;
+    font-family: var(--font-body); font-size: 14px;
+  }
+  .dash-nav-item .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+  .dash-nav-item.active { background: color-mix(in oklch, var(--accent-primary) 12%, transparent); color: var(--ink); opacity: 1; }
+  .dash-new { margin-top: 16px; }
+  .dash-user { margin-top: auto; display: flex; align-items: center; gap: 10px; padding-top: 16px; border-top: 1px solid var(--hairline); }
+  .dash-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent-primary); color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-body); font-weight: 600; font-size: 12px;
+  }
+  .dash-avatar.small { width: 28px; height: 28px; font-size: 11px; }
+  .dash-user-meta { font-size: 12px; }
+  .dash-user-name { font-weight: 600; }
+  .dash-user-sub { opacity: 0.6; }
+  .dash-main { display: flex; flex-direction: column; overflow: hidden; }
+  .dash-topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 24px; border-bottom: 1px solid var(--hairline);
+    background: var(--paper);
+  }
+  .dash-crumb { font-family: var(--font-body); font-size: 14px; }
+  .dash-crumb .sep { opacity: 0.4; margin: 0 6px; }
+  .dash-search {
+    flex: 1; max-width: 360px; margin-left: 16px;
+    padding: 8px 12px;
+    background: var(--ash); border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body); font-size: 13px; color: var(--ink);
+  }
+  .dash-topright { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .dash-bell { font-size: 16px; opacity: 0.7; cursor: pointer; }
+  .dash-content { padding: 24px; overflow-y: auto; }
+  .dash-page-head { margin-bottom: 20px; }
+  .dash-h1 { font-family: var(--font-body); font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .dash-sub { font-size: 14px; opacity: 0.7; }
+  .dash-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .dash-kpi { background: var(--ash); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 14px; }
+  .kpi-label { font-size: 12px; opacity: 0.7; margin-bottom: 8px; }
+  .kpi-value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .kpi-trend { font-size: 12px; }
+  .kpi-trend.up { color: var(--status-success); }
+  .kpi-trend.down { color: var(--status-error); }
+  .dash-chart-card, .dash-table-card { background: var(--ash); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; }
+  .dash-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .dash-card-title { font-family: var(--font-body); font-size: 14px; font-weight: 600; }
+  .dash-card-filters { display: flex; gap: 6px; }
+  .dash-pill { font-size: 12px; padding: 4px 10px; border: 1px solid var(--hairline); border-radius: 999px; opacity: 0.7; cursor: pointer; }
+  .dash-pill.active { background: var(--ink); color: var(--paper); border-color: var(--ink); opacity: 1; }
+  .dash-chart { width: 100%; height: 180px; }
+  .dash-chart-legend { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; opacity: 0.7; }
+  .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  /* Section 0 — Marketing layout */
+  .mkt-shell { border: 1px solid var(--hairline); border-radius: var(--radius-md); overflow: hidden; }
+  .mkt-nav { display: flex; align-items: center; gap: 24px; padding: 18px 28px; border-bottom: 1px solid var(--hairline); background: var(--paper); }
+  .mkt-brand { display: flex; align-items: center; gap: 10px; }
+  .mkt-nav-links { display: flex; gap: 20px; }
+  .mkt-nav-links a { text-decoration: none; color: var(--ink); font-size: 14px; opacity: 0.8; }
+  .mkt-nav-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .mkt-nav-login { text-decoration: none; color: var(--ink); font-size: 14px; opacity: 0.8; }
+  .mkt-hero { padding: 96px 48px; border-bottom: 1px solid var(--hairline); }
+  .mkt-logos { padding: 32px 48px; border-bottom: 1px solid var(--hairline); text-align: center; }
+  .mkt-logos-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 16px; }
+  .mkt-logo-row { display: flex; justify-content: center; gap: 48px; font-family: var(--font-display); font-weight: 600; font-size: 18px; opacity: 0.55; }
+  .mkt-features { padding: 80px 48px; border-bottom: 1px solid var(--hairline); }
+  .mkt-section-title { font-family: var(--font-display); font-size: 40px; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 48px; max-width: 18ch; }
+  .mkt-feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .mkt-feature h3 { font-family: var(--font-body); font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .mkt-feature p { font-size: 15px; opacity: 0.8; line-height: 1.5; }
+  .mkt-feature-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); background: color-mix(in oklch, var(--accent-primary) 18%, transparent); margin-bottom: 14px; }
+  .mkt-testimonials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 64px 48px; border-bottom: 1px solid var(--hairline); }
+  .mkt-testimonial { background: var(--ash); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 24px; }
+  .mkt-quote { font-family: var(--font-body); font-size: 17px; line-height: 1.5; margin-bottom: 20px; }
+  .mkt-attribution { display: flex; align-items: center; gap: 10px; }
+  .mkt-name { font-size: 13px; font-weight: 600; }
+  .mkt-role { font-size: 12px; opacity: 0.6; }
+  .mkt-pricing { padding: 80px 48px; border-bottom: 1px solid var(--hairline); text-align: center; }
+  .mkt-pricing .mkt-section-title { margin-left: auto; margin-right: auto; }
+  .mkt-price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; }
+  .mkt-price-card { background: var(--ash); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 28px; display: flex; flex-direction: column; gap: 12px; }
+  .mkt-price-card.featured { border-color: var(--accent-primary); }
+  .mkt-price-card h3 { font-family: var(--font-body); font-size: 18px; font-weight: 600; }
+  .mkt-price { font-family: var(--font-display); font-size: 40px; line-height: 1; letter-spacing: -0.02em; }
+  .mkt-price span { font-size: 14px; opacity: 0.6; font-family: var(--font-body); }
+  .mkt-price-sub { font-size: 13px; opacity: 0.7; }
+  .mkt-price-card ul { list-style: none; padding: 0; margin: 12px 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+  .mkt-price-card ul li::before { content: "·"; margin-right: 8px; opacity: 0.6; }
+  .mkt-footer { padding: 56px 48px 32px; background: var(--ash); }
+  .mkt-footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-bottom: 40px; }
+  .mkt-footer h4 { font-family: var(--font-body); font-size: 13px; font-weight: 600; margin-bottom: 12px; opacity: 0.7; }
+  .mkt-footer a { display: block; text-decoration: none; color: var(--ink); font-size: 14px; opacity: 0.7; margin-bottom: 6px; }
+  .mkt-footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--hairline); font-size: 13px; opacity: 0.7; }
 </style>
 </head>
 <body>
@@ -431,6 +590,203 @@ Keep it self-contained — no external CSS, no JS framework, no build step.
     <div class="direction">{{direction_name}} — {{character}}</div>
     <button class="toggle" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">Toggle theme</button>
   </div>
+
+  <!-- Section 0 — Surface layout — DASHBOARD tier -->
+  <!-- Render this block when tier == "dashboard" or "both". -->
+  <section class="surface-preview surface-dashboard">
+    <h2>Dashboard preview — your product surface with these tokens</h2>
+    <div class="dash-shell">
+      <aside class="dash-sidebar">
+        <div class="dash-brand">
+          <div class="dash-logo">{{project_initial}}</div>
+          <div class="dash-name">{{project_name}}</div>
+        </div>
+        <nav class="dash-nav">
+          <a class="dash-nav-item active" href="#"><span class="dot"></span> Overview</a>
+          <a class="dash-nav-item" href="#"><span class="dot"></span> Inbox</a>
+          <a class="dash-nav-item" href="#"><span class="dot"></span> Projects</a>
+          <a class="dash-nav-item" href="#"><span class="dot"></span> Reports</a>
+          <a class="dash-nav-item" href="#"><span class="dot"></span> Settings</a>
+        </nav>
+        <button class="dash-new btn btn-default">+ New</button>
+        <div class="dash-user">
+          <div class="dash-avatar">SC</div>
+          <div class="dash-user-meta">
+            <div class="dash-user-name">Sofia Chen</div>
+            <div class="dash-user-sub">sofia@{{project_slug}}.com</div>
+          </div>
+        </div>
+      </aside>
+      <div class="dash-main">
+        <header class="dash-topbar">
+          <div class="dash-crumb">{{project_name}} <span class="sep">/</span> Overview</div>
+          <input class="dash-search" type="text" placeholder="Search anything…" />
+          <div class="dash-topright">
+            <span class="dash-bell">⌃</span>
+            <div class="dash-avatar small">SC</div>
+          </div>
+        </header>
+        <div class="dash-content">
+          <div class="dash-page-head">
+            <h1 class="dash-h1">Overview</h1>
+            <p class="dash-sub">Week of May 17 — three deals closed, one in review.</p>
+          </div>
+          <div class="dash-kpis">
+            <div class="dash-kpi"><div class="kpi-label">Monthly recurring</div><div class="kpi-value">$48,210</div><div class="kpi-trend up">+12.4% vs last month</div></div>
+            <div class="dash-kpi"><div class="kpi-label">Active accounts</div><div class="kpi-value">1,284</div><div class="kpi-trend up">+38 this week</div></div>
+            <div class="dash-kpi"><div class="kpi-label">Trial conversions</div><div class="kpi-value">34%</div><div class="kpi-trend down">−2.1% vs last week</div></div>
+            <div class="dash-kpi"><div class="kpi-label">NPS</div><div class="kpi-value">62</div><div class="kpi-trend up">+4</div></div>
+          </div>
+          <div class="dash-chart-card">
+            <div class="dash-card-head">
+              <h3 class="dash-card-title">Revenue trend</h3>
+              <div class="dash-card-filters">
+                <span class="dash-pill active">30d</span>
+                <span class="dash-pill">90d</span>
+                <span class="dash-pill">12m</span>
+              </div>
+            </div>
+            <svg class="dash-chart" viewBox="0 0 600 180" preserveAspectRatio="none">
+              <polyline points="0,140 50,130 100,120 150,110 200,90 250,95 300,75 350,60 400,55 450,45 500,40 550,30 600,20" fill="none" stroke="var(--accent-primary)" stroke-width="2" />
+              <polyline points="0,160 50,155 100,158 150,150 200,145 250,140 300,135 350,130 400,125 450,118 500,115 550,108 600,100" fill="none" stroke="var(--hairline)" stroke-width="2" stroke-dasharray="4 4" />
+            </svg>
+            <div class="dash-chart-legend">
+              <span><span class="legend-dot" style="background: var(--accent-primary)"></span> This period</span>
+              <span><span class="legend-dot" style="background: var(--hairline)"></span> Previous period</span>
+            </div>
+          </div>
+          <div class="dash-table-card">
+            <div class="dash-card-head"><h3 class="dash-card-title">Recent activity</h3></div>
+            <table class="data">
+              <thead><tr><th>Account</th><th>Owner</th><th>Stage</th><th class="num">Value</th><th>Updated</th></tr></thead>
+              <tbody>
+                <tr><td>Acme Co.</td><td>Sofia Chen</td><td><span class="badge badge-success">Closed</span></td><td class="num">12,480</td><td>2h ago</td></tr>
+                <tr><td>Northwind</td><td>Arjun Mehta</td><td><span class="badge badge-warning">In review</span></td><td class="num">8,200</td><td>5h ago</td></tr>
+                <tr><td>Globex</td><td>Lila Pereira</td><td><span class="badge badge-success">Closed</span></td><td class="num">15,900</td><td>Yesterday</td></tr>
+                <tr><td>Initech</td><td>David Kim</td><td><span class="badge badge-default">Lead</span></td><td class="num">3,400</td><td>2d ago</td></tr>
+                <tr><td>Soylent</td><td>Aanya Rao</td><td><span class="badge badge-error">Stalled</span></td><td class="num">22,000</td><td>4d ago</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 0 — Surface layout — MARKETING tier -->
+  <!-- Render this block when tier == "marketing" or "both". -->
+  <section class="surface-preview surface-marketing">
+    <h2>Marketing preview — your landing page with these tokens</h2>
+    <div class="mkt-shell">
+      <!-- Marketing nav -->
+      <nav class="mkt-nav">
+        <div class="mkt-brand">
+          <div class="dash-logo">{{project_initial}}</div>
+          <div class="dash-name">{{project_name}}</div>
+        </div>
+        <div class="mkt-nav-links">
+          <a href="#">Product</a><a href="#">Pricing</a><a href="#">Customers</a><a href="#">Docs</a>
+        </div>
+        <div class="mkt-nav-actions">
+          <a href="#" class="mkt-nav-login">Sign in</a>
+          <button class="btn btn-default">{{hero_primary_cta}}</button>
+        </div>
+      </nav>
+
+      <!-- Hero (the one that was previously standalone Section 20) -->
+      <section class="mkt-hero">
+        <div class="eyebrow">INTRODUCING</div>
+        <h1>{{hero_headline}}</h1>
+        <p>{{hero_subhead}}</p>
+        <div class="actions">
+          <button class="btn btn-default">{{hero_primary_cta}}</button>
+          <button class="btn btn-ghost">{{hero_secondary_cta}}</button>
+        </div>
+      </section>
+
+      <!-- Logo bar -->
+      <section class="mkt-logos">
+        <p class="mkt-logos-label">TRUSTED BY TEAMS AT</p>
+        <div class="mkt-logo-row">
+          <span>Acme Co.</span><span>Northwind</span><span>Globex</span><span>Initech</span><span>Soylent</span>
+        </div>
+      </section>
+
+      <!-- Features grid -->
+      <section class="mkt-features">
+        <h2 class="mkt-section-title">Everything you need, nothing you don't</h2>
+        <div class="mkt-feature-grid">
+          <div class="mkt-feature"><div class="mkt-feature-icon"></div><h3>{{feature_1_title}}</h3><p>{{feature_1_body}}</p></div>
+          <div class="mkt-feature"><div class="mkt-feature-icon"></div><h3>{{feature_2_title}}</h3><p>{{feature_2_body}}</p></div>
+          <div class="mkt-feature"><div class="mkt-feature-icon"></div><h3>{{feature_3_title}}</h3><p>{{feature_3_body}}</p></div>
+          <div class="mkt-feature"><div class="mkt-feature-icon"></div><h3>{{feature_4_title}}</h3><p>{{feature_4_body}}</p></div>
+          <div class="mkt-feature"><div class="mkt-feature-icon"></div><h3>{{feature_5_title}}</h3><p>{{feature_5_body}}</p></div>
+          <div class="mkt-feature"><div class="mkt-feature-icon"></div><h3>{{feature_6_title}}</h3><p>{{feature_6_body}}</p></div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section class="mkt-testimonials">
+        <div class="mkt-testimonial">
+          <p class="mkt-quote">"{{testimonial_1_quote}}"</p>
+          <div class="mkt-attribution">
+            <div class="dash-avatar">SC</div>
+            <div><div class="mkt-name">Sofia Chen</div><div class="mkt-role">Head of Ops, Acme Co.</div></div>
+          </div>
+        </div>
+        <div class="mkt-testimonial">
+          <p class="mkt-quote">"{{testimonial_2_quote}}"</p>
+          <div class="mkt-attribution">
+            <div class="dash-avatar">AM</div>
+            <div><div class="mkt-name">Arjun Mehta</div><div class="mkt-role">Founder, Northwind</div></div>
+          </div>
+        </div>
+        <div class="mkt-testimonial">
+          <p class="mkt-quote">"{{testimonial_3_quote}}"</p>
+          <div class="mkt-attribution">
+            <div class="dash-avatar">LP</div>
+            <div><div class="mkt-name">Lila Pereira</div><div class="mkt-role">PM, Globex</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing -->
+      <section class="mkt-pricing">
+        <h2 class="mkt-section-title">Simple pricing</h2>
+        <div class="mkt-price-grid">
+          <div class="mkt-price-card">
+            <h3>Starter</h3><div class="mkt-price">$0</div><p class="mkt-price-sub">For individuals trying it out</p>
+            <ul><li>Up to 3 projects</li><li>Community support</li><li>1 GB storage</li></ul>
+            <button class="btn btn-secondary">Start free</button>
+          </div>
+          <div class="mkt-price-card featured">
+            <h3>Pro</h3><div class="mkt-price">$24<span>/mo</span></div><p class="mkt-price-sub">For working teams</p>
+            <ul><li>Unlimited projects</li><li>Priority support</li><li>50 GB storage</li><li>Advanced exports</li></ul>
+            <button class="btn btn-default">{{hero_primary_cta}}</button>
+          </div>
+          <div class="mkt-price-card">
+            <h3>Enterprise</h3><div class="mkt-price">Talk to us</div><p class="mkt-price-sub">For larger organisations</p>
+            <ul><li>Everything in Pro</li><li>SSO + audit log</li><li>Custom SLA</li><li>Dedicated CSM</li></ul>
+            <button class="btn btn-secondary">Contact sales</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mkt-footer">
+        <div class="mkt-footer-grid">
+          <div><h4>Product</h4><a href="#">Features</a><a href="#">Pricing</a><a href="#">Changelog</a></div>
+          <div><h4>Resources</h4><a href="#">Docs</a><a href="#">Guides</a><a href="#">Status</a></div>
+          <div><h4>Company</h4><a href="#">About</a><a href="#">Customers</a><a href="#">Careers</a></div>
+          <div><h4>Legal</h4><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Security</a></div>
+        </div>
+        <div class="mkt-footer-bottom">
+          <div class="dash-brand"><div class="dash-logo">{{project_initial}}</div><div class="dash-name">{{project_name}}</div></div>
+          <div class="mkt-copy">© 2026 {{project_name}}. All rights reserved.</div>
+        </div>
+      </footer>
+    </div>
+  </section>
 
   <section>
     <h2>Surface roles</h2>
@@ -717,6 +1073,67 @@ the brand&apos;s tone. Use audience + problem from `agents/BRAND.md`.
 
 **`{{hero_secondary_cta}}`** — softer secondary CTA (e.g., "Take a tour",
 "Read the docs", "Talk to us").
+
+### Section 0 substitutions (surface layout)
+
+**`{{project_initial}}`** — first letter of `project_name`, uppercase. Used
+in the logo box on both dashboard and marketing layouts. E.g., "Snapfinder"
+→ `S`.
+
+**`{{project_slug}}`** — lowercased, no spaces, no punctuation. Used in the
+dashboard sidebar email placeholder (`sofia@{{project_slug}}.com`). E.g.,
+"Snapfinder" → `snapfinder`, "Acme Co." → `acmeco`.
+
+**`{{feature_1_title}}` … `{{feature_6_title}}`** — six short feature
+titles (3–4 words each), brand-fitting. Use the project's actual feature
+list from `agents/BRAND.md` / brief if available. Otherwise generate
+brand-fitting placeholders matching the locked archetype. Examples:
+
+- Sage → "Source-linked answers" / "Side-by-side comparison" / "Cite-by-default"
+- Magician → "See the hidden pattern" / "Surface what you missed" / "Reveal the why"
+- Caregiver → "Quiet check-ins" / "Holds the details" / "Nothing slips"
+- Hero → "Win the quarter" / "Beat the deadline" / "Ship under pressure"
+- Creator → "Bring it to life" / "Endless variations" / "Start with a sketch"
+- Explorer → "Off the beaten path" / "Find your route" / "Discover what's next"
+- Innocent → "Honest pricing" / "No dark patterns" / "Simple by design"
+- Lover → "Made for the moment" / "Sensory detail" / "A close fit"
+- Jester → "More fun, less friction" / "Surprise built in" / "Yes, really"
+- Rebel → "Break the script" / "Refuse the default" / "Loud on purpose"
+- Ruler → "Set the standard" / "Authority, quiet" / "Built to last"
+- Everyman → "Right where you are" / "Built for everyone" / "It just works"
+
+**`{{feature_1_body}}` … `{{feature_6_body}}`** — one-sentence body per
+feature (~80–120 chars). Brand-fitting tone. Match the archetype voice
+established in BRAND.md / DESIGN.md.
+
+**`{{testimonial_1_quote}}` / `{{testimonial_2_quote}}` /
+`{{testimonial_3_quote}}`** — short realistic testimonial quotes (~80–140
+chars each), brand-fitting in tone. NOT generic ("changed my life", "10x
+productivity"). Specific verbs, named outcomes. Example for a Sage
+analytics tool: `"Cut our weekly metrics prep from four hours to twenty
+minutes — and the citations let me defend every number in the meeting."`
+
+### Tier-based conditional rendering
+
+The dashboard layout block and marketing layout block are conditionally rendered
+based on the surface tier detected in Phase 6.5 step 1:
+
+- tier == "dashboard"  → render dashboard block only. Skip marketing block. Skip
+                         the existing standalone "real-content example — hero"
+                         (current Section 20) — there's no marketing surface, no
+                         hero.
+- tier == "marketing"  → render marketing block only. Skip dashboard block. The
+                         marketing block CONTAINS the hero, so the existing
+                         standalone Section 20 must also be skipped to avoid
+                         duplication.
+- tier == "both"       → render BOTH blocks, dashboard first, with a visible
+                         section divider labelled "MARKETING PREVIEW" between
+                         them. Skip the standalone Section 20 hero (it's now
+                         inside the marketing block).
+
+When tier is unknown or unset (legacy projects that haven't run the updated
+Phase 6.5 step 1), fall back to the original behaviour: skip Section 0
+entirely and render the standalone Section 20 hero as before.
 
 ---
 

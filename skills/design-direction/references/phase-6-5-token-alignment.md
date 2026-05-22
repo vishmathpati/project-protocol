@@ -185,13 +185,27 @@ The skill must not write a palette that fails WCAG AA. Hard rule.
 ### Generate the HTML preview
 
 Before showing the text diff, write a self-contained HTML preview page that
-renders the proposed tokens applied to real components. The user opens this
-file in their browser as the actual approval surface.
+renders the proposed tokens applied to BOTH (a) the project's actual surface
+layout (dashboard or marketing or both), and (b) the individual component
+catalogue below.
 
-→ See `references/phase-6-5-preview-html.md` for the full spec — what
-  sections the page must contain (color swatches, contrast pairs panel, type
-  ramps, components, hero section), the literal HTML template with
-  placeholders, font-loading rules (Google Fonts only — substitute with
+The layout view is the load-bearing section — it's what tells the user whether
+their PRODUCT looks good, not just whether the tokens are individually pretty.
+Use the surface tier detected in step 1 to pick which layout(s) to render:
+
+- tier == "dashboard"  → render the dashboard mockup ONLY. Skip the marketing
+                         mockup. Skip the standalone hero (Section 20 in the
+                         component catalogue) — dashboards don't ship with one.
+- tier == "marketing"  → render the marketing landing mockup ONLY. The hero
+                         lives inside that mockup. Skip the standalone Section
+                         20 hero to avoid duplication.
+- tier == "both"       → render dashboard FIRST, then a visible section divider
+                         labelled "MARKETING PREVIEW", then the marketing
+                         mockup. Skip the standalone Section 20 hero.
+
+→ See `references/phase-6-5-preview-html.md` for the full spec — Section 0
+  (surface layouts), the 21 component sections, the literal HTML template
+  with placeholders, font-loading rules (Google Fonts only — substitute with
   notice for everything else), file path conventions
   (`agents/preview/<slug>-<date>.html`), and the iteration loop semantics.
 
