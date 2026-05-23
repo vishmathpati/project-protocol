@@ -38,7 +38,7 @@ claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 ## What you get
 
-14 skills + 8 hooks that turn every AI coding session into a disciplined operation.
+15 skills + 8 hooks that turn every AI coding session into a disciplined operation.
 
 ### Session lifecycle (the core 4)
 
@@ -61,6 +61,7 @@ Auto-fire on description match, also invokable via slash command.
 - **`design-direction`** *(new in v1.5)* — Deep brand-direction diagnostic. Takes a raw brand dump, silently extracts 9 taste axes (trust, frequency, density, culture, archetype, tribe, surface, tempo, refusals), proposes 3 named directions with a moodboard, and writes a rich `BRAND.md` + `DESIGN.md` Overview + brand-specific refusal list. Sits one layer upstream of `init-project` Phase 4 — or runs standalone on already-initiated projects to re-anchor brand.
 - **`build-component`** *(new in v2.0)* — Per-component build skill. Reads `agents/STRUCTURE.md` and the relevant canon, scans for reusable existing components, proposes a strategy (compose existing primitives, extend, or build new primitive), generates the component, then fires `design-check`. Tier-aware (Generic / Marketing / App), surface-aware (hides Marketing tier on dashboard-only projects), supports adopt-external and recreate-from-inspiration sub-modes.
 - **`marketing-brief`** *(new in v2.0)* — One-time deep marketing-site brief. Reads existing canon, builds an `agents/marketing/CONTENT.md` content registry (FEATURES, AUDIENCES, COMPARISONS, TESTIMONIALS, FAQS, LEGAL_PAGES), proposes a sitemap, writes per-page briefs, copy, media manifest, and layout sketches. Auto-skips on dashboard-only / internal-tool projects.
+- **`build-page`** *(new in v2.2)* — Compositional sibling to `build-component`. For whole pages (marketing or dashboard), not atomic components. Layout-first, code-last: 6 phases that discuss section architecture → hierarchy → asset manifest → component selection BEFORE any write, then delegates net-new components to `build-component` inline (one focused conversation per component, not a 400-line page-wide code drop) and wires the final page in a single approval. Copy is inlined directly from `agents/marketing/copy/<slug>.md` — no intermediate `marketing-content.ts` or runtime mirror file ever created. Marketing pages enforce RSC + `generateMetadata` for SEO; dashboard pages get loading/empty/error-state discipline in Phase 4.
 
 ### Hooks (8 total)
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Build Page"
+  short_description: "6-phase layout-first compositional page build (marketing or dashboard). Reads brief → proposes architecture → hierarchy → asset manifest → component selection (delegates net-new to build-component) → wires the final page. No file writes before Phase 6. No content-mirror file ever created — copy inlined directly from agents/marketing/copy/<slug>.md."
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

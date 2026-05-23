@@ -5,6 +5,52 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [2.2.0] — 2026-05-23
+
+Minor release. New `build-page` skill — the compositional sibling to `build-component`. Closes the gap revealed by the v2.1.x Snapfinder runs where `build-component` was being used for whole-page work and producing 400-line code drops with no layout conversation, no hierarchy debate, no asset planning, and no reuse audit — just a code dump and an approve/edit/restart button. `build-page` separates the architectural conversation from the code generation so the user makes one decision per phase, in chat, before seeing any code.
+
+### Added
+
+- **`build-page` skill** — 15th skill in the plugin. Compositional page builder for marketing pages (homepage, pricing, features, customers, comparisons, about, legal) and dashboard pages (overview, settings, team, analytics, billing). Triggers — "build the homepage", "build the pricing page", "compose page X", "wire up the X page", "build the dashboard overview page", "/build-page". Sits between `marketing-brief` (planning) and `build-component` (atomic execution) in the skill chain: `init-project` → `design-direction` → `build-component` (per atomic piece) → `marketing-brief` (once, end of project) → **`build-page`** (per page) → `design-check` (auto, post-write) → `audit` (periodic).
+
+- **6-phase layout-first, code-last flow.** No file writes before Phase 6. Each phase ends with an explicit approval gate in chat:
+  - Phase 1 — Read the brief (full canon read for the page's tier; halts on missing canon).
+  - Phase 2 — Layout architecture (numbered section list with rhythm tags `calm` / `loud` for marketing, density tags `scan` / `focus` / `meta` for dashboard).
+  - Phase 3 — Hierarchy (per-section primary / secondary / tertiary).
+  - Phase 4 — Asset manifest (per-section visual treatment + micro-interactions, cross-referenced against `MEDIA.md`; dashboard pages additionally declare loading / empty / error / partial states for every data-bound section).
+  - Phase 5 — Component selection (per-section reuse / adapt / build-new strategy table; build-new entries execute sequentially via inline `build-component` calls — one focused conversation per net-new component, not bundled).
+  - Phase 6 — Wire-up (compose all components into the final page file; copy inlined directly from `agents/marketing/copy/<slug>.md` or dashboard brief; mandatory canon-pointer comment at file top).
+
+- **Two sub-modes — marketing-page and dashboard-page.** Detected from `STRUCTURE.md` declared surfaces + user wording + slug location. Same 6 phases, different inputs and emphases:
+  - Marketing sub-mode enforces React Server Component default (no top-level `"use client"`), mandatory `generateMetadata` export for SEO, full `agents/marketing/*` canon read, and the persuasion-arc section ordering (claim → trust → how → surface → moment → social-proof → answer → ask).
+  - Dashboard sub-mode requires a page brief (halts and asks user to type one if missing), client-component-friendly Phase 6, tool-shaped section ordering (header → KPIs → primary work area → secondary → meta), and strict reuse bias (most dashboard pages should be 90%+ composition of existing primitives).
+
+- **Hard rule: no intermediate content-mirror file.** `build-page` will NEVER create `lib/marketing-content.ts`, `data/copy.ts`, `lib/content.ts`, or any equivalent runtime mirror of `CONTENT.md`. The canonical markdown is the source; copy is inlined directly in the page JSX; the agent is the propagation mechanism when canon changes. Existing mirror files in projects are left alone — Phase 6 inlines copy without touching them and notes them as orphaned in the output for follow-up cleanup. Closes the third-source-of-truth drift bug that ad-hoc `build-component` page builds were introducing.
+
+- **Reference files (8)** — `references/phase-1-read-brief.md`, `references/phase-2-layout-architecture.md`, `references/phase-3-hierarchy.md`, `references/phase-4-asset-manifest.md`, `references/phase-5-component-selection.md`, `references/phase-6-wire-up.md`, `references/sub-mode-marketing-page.md`, `references/sub-mode-dashboard-page.md`. Progressive disclosure — each opened only when entering its phase to keep orchestration context lean.
+
+- **Codex sidecar** — `skills/build-page/agents/openai.yaml` with display name, short description, brand color `#475569` matching the build-component/design-check tier, implicit invocation enabled.
+
+### Changed
+
+- **`build-component` skill "Difference from related skills" section** updated to reference `build-page` — atomic component requests still go directly to `build-component`, but page-scale composition routes through `build-page` which calls `build-component` inline per net-new component. Clarifies the conductor / player relationship.
+
+- **`marketing-brief` skill "Difference from related skills" section** updated to reference `build-page` — `marketing-brief` plans the marketing-site canon once; `build-page` is now the per-page execution skill that reads those plans. The "Next step" output also points to `build-page` (not `build-component`) for marketing-page work.
+
+- **README** — skill count bumped 14 → 15, build-page added to the "Discipline skills" list with a one-paragraph explanation of the layout-first / code-last model and the no-mirror-file rule.
+
+- **Plugin manifests** — version bumped 2.1.1 → 2.2.0 in both `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`. Minor bump: new skill is additive; existing skills, hooks, and canon files are untouched.
+
+### Compatibility
+
+- **Drop-in upgrade from v2.1.x.** No file shape changes — `CLAUDE.md`, `BRAND.md`, `DESIGN.md`, `FUNDAMENTALS.md`, `STRUCTURE.md`, all `agents/marketing/*` files retain their existing shape. Existing components are untouched.
+
+- **Existing `marketing-content.ts` / `lib/content.ts` mirror files in projects are left alone.** `build-page` Phase 6 inlines copy directly and notes the orphaned mirror in its output. Migration to "no mirror" is opt-in per page; nothing forces a rewrite.
+
+- **`build-component` continues to work standalone** for atomic component requests. The user invokes `build-component` directly for one-off components; `build-page` calls it inline during Phase 5. Both paths are first-class.
+
+- **Hooks unchanged.** `design-check` continues to fire automatically after `build-page` Phase 6's write (via the existing post-write hook chain).
+
 ## [2.1.1] — 2026-05-22
 
 Patch release. Two refinements to `design-direction` after first real-world v2.1.0 run on Snapfinder surfaced (a) the moodboard outweighing the brand's own distinctive asset, and (b) the preview HTML rendering decontextualized components instead of the actual product surface. Both fixes are additive and backwards-compatible — no schema changes, no breaking changes.

@@ -151,8 +151,9 @@ Next:
 
 - **`init-project`** — bootstraps the project layout and writes the canon files (`DESIGN.md`, `FUNDAMENTALS.md`, `STRUCTURE.md` if requested). `build-component` assumes those exist and writes components against them.
 - **`design-direction`** — sets brand-level direction and writes `BRAND.md` + `DESIGN.md` Overview. Upstream of any component work.
+- **`build-page`** *(new in v2.2)* — the compositional sibling. Where `build-component` writes ONE atomic thing (a button, a tile, a hero block), `build-page` orchestrates a WHOLE page: section architecture, hierarchy, asset manifest, reuse audit — and calls `build-component` inline whenever a section needs a net-new primitive. Use `build-component` directly for atomic component requests. Use `build-page` for "build the homepage / pricing page / dashboard overview". They chain: `build-page` is the conductor, `build-component` is the player.
 - **`design-check`** — the 8-step UI gate. `build-component` is the path-of-build, `design-check` is the gate-of-correctness. `design-check` fires automatically after Phase 5.
 - **`discussion-mode`** — pure conversation, no writes. If the user wants to talk through a component idea without committing, use that first, then `build-component` to actually ship.
 - **`audit`** — periodic consistency scan across canon. Will catch drift between `STRUCTURE.md` and the actual filesystem if it happens.
 
-All five chain: `init-project` → `design-direction` (optional) → `build-component` → `design-check` (auto) → `audit` (periodic).
+The chain: `init-project` → `design-direction` (optional) → `build-component` (per atomic piece) → `marketing-brief` (once, end of project) → `build-page` (per page) → `design-check` (auto) → `audit` (periodic).
