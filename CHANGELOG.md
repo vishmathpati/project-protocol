@@ -5,6 +5,55 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [2.3.0] — 2026-05-23
+
+Minor release. `build-page` redesign — the v2.2.0 shape was a 6-phase pipeline pretending to be a conversation, racing toward approval gates instead of staying open across a long iterative session. v2.3.0 throws that out and rebuilds the skill as a normal-shaped plugin skill that happens to have a longer-than-usual session, following the same protocols every other skill uses (WORKLOG entries on decisions, BRIEF appends on locks, INDEX update on new routes, no state files, no scratch folders, no special mode machinery). Reference files cut from 8 → 2.
+
+### Why the redesign
+
+The v2.2.0 model was wrong in three structural ways:
+
+1. **It was a pipeline pretending to be a conversation.** Six phases, each ending in an approval gate the skill raced toward. That's the opposite of how a homepage actually gets built — you sit in it, iterate, throw references at the agent, change your mind. v2.2.0 made that feel like fighting the gates.
+
+2. **It invented mid-session state machinery that no other skill in the plugin needs.** Proposed scratch folders, state files, tool-palette restrictions, defer-lists for other skills. None of that exists for `design-direction`, `marketing-brief`, or any other long-running skill — they rely on the conversation transcript + canon files + WORKLOG. The same pattern works fine for page builds.
+
+3. **It didn't talk to the rest of the plugin.** Zero references to WORKLOG, BRIEF, STATUS, CHANGELOG, INDEX, or the cleared-state PreToolUse hook. Would have false-positive-warned on every first Edit, missed every CHANGELOG entry, and left INDEX.md unmaintained. The skill was invisible to its own ecosystem.
+
+### Changed
+
+- **`build-page` SKILL.md fully rewritten** (~350 lines) — flat protocol shape, no phase numbering, no formal gates. Single "what fires this" section, single "what it produces" section, single "protocol" section that walks the agent through the long conversation, single "hard rules" section. Reads like every other skill in the plugin.
+  - On invocation: asks "which page?" if not in the user's message, reads the full canon for the tier, appends a session-open line to WORKLOG (which disarms the cleared-state PreToolUse hook for the rest of the session), surfaces a starting analysis, proposes a starting plan as a numbered section list, then iterates freely with the user — no 5-iteration cap, no formal gates.
+  - When the user locks the plan, appends a BRIEF block per the cardinal "lock-before-cascade" rule from `agents/CLAUDE.md`, then works through sections sequentially.
+  - For each section: surfaces content, proposes strategies (reuse / adapt / compose / build new / adopt external), accepts external references when the user drops them, calls `build-component` inline for net-new primitives, appends a WORKLOG line on close.
+  - When all sections have real component paths, writes the actual page file (RSC + `generateMetadata` for marketing, client component for dashboard), inlines copy directly from `copy/<slug>.md` with a top-of-file canon-pointer comment, updates `agents/docs/INDEX.md` inline, and lets `design-check` chain automatically.
+  - Closing: prints the end-of-skill summary. The session ends when the user closes the chat or types "save". No special handoff — STATUS.md Next Actions + WORKLOG carry the breadcrumbs.
+
+- **Reference files cut 8 → 2.** Old `phase-1-read-brief.md` through `phase-6-wire-up.md` plus `sub-mode-marketing-page.md` and `sub-mode-dashboard-page.md` are deleted. The phase-based content was wrong shape; what remains is folded into the SKILL.md body or into the two new references:
+  - `references/conversational-shape.md` — how the long session stays productive without inventing new machinery. Documents WORKLOG cadence (one line per decision, canonical prefix vocabulary), BRIEF append rules, INDEX update rules, save-session interaction (suspended-state breadcrumbs in STATUS Next Actions), and explicitly what does NOT happen (no scratch folder, no state file, no iteration history files, no tool palette restriction, no multi-page tracking, no defer-list).
+  - `references/per-section-workflow.md` — the conversation shape for one section: enter, surface content, propose strategies, accept external references with full cross-check protocol against DESIGN.md + BRAND.md + section content (verdict: adopt / adapt / reject), hand off to `build-component` for net-new, close section, move on.
+
+- **External reference adoption is now a documented sub-section of per-section-workflow**, not a separate sub-mode. The pattern: fetch (WebFetch first, escalate to Chrome MCP if the page is client-rendered), identify the visual pattern, cross-check tokens against DESIGN.md, cross-check voice against BRAND.md archetype + tempo + refusal list, cross-check content fit, give a one-word verdict (adopt / adapt / reject) with reasoning, then hand off to `build-component`'s existing `adopt-external` sub-mode if accepted.
+
+- **`build-component` and `marketing-brief` cross-references unchanged from v2.2.0** — both already reference `build-page` correctly in their "Difference from related skills" sections. The conductor/player relationship and the marketing-brief → build-page handoff in marketing-brief's "Next step" output both still read correctly under the v2.3.0 shape.
+
+- **Codex sidecar (`skills/build-page/agents/openai.yaml`)** — short description updated to reflect the long-iterative-conversation model instead of the 6-phase pipeline.
+
+- **README** — build-page paragraph rewritten. Skill count stays at 15.
+
+- **Plugin manifests** — version bumped 2.2.0 → 2.3.0 in both `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`. Minor bump: same skill, redesigned shape, no new files in the plugin's own surface (the skill's internal file count went 11 → 5 due to reference consolidation).
+
+### Compatibility
+
+- **Drop-in upgrade from v2.2.0.** No file shape changes in user projects. No canon file changes. Existing components untouched. Existing `marketing-content.ts` / `lib/content.ts` mirror files in user projects continue to be left alone (hard rule preserved from v2.2.0); build-page Phase 6 wire-up still inlines copy directly and notes the orphaned mirror in the output.
+
+- **WORKLOG / BRIEF / INDEX / STATUS interaction is now correct.** v2.2.0 was silently violating the WORKLOG discipline declared in `hooks/session-start-context.md`. v2.3.0 follows it. Projects upgrading from v2.2.0 will see better save-session behavior immediately (proper CHANGELOG categorization, proper BRIEF version blocks, proper STATUS Next Actions when a build-page session is suspended).
+
+- **`build-component` continues to work standalone** for atomic component requests. The user invokes it directly for one-off components; `build-page` calls it inline during per-section work. Both paths are first-class.
+
+- **Hooks unchanged.** The cleared-state PreToolUse warning, the SubagentStart/Stop appenders, the PreCompact / PostCompact context injectors, the Stop hook's save-session reminder — all unchanged. `build-page` now plays nicely with all of them.
+
+- **No interaction protocol with `discussion-mode`, `discipline`, `audit-before-close`, or `verify-by-reading`.** v2.2.0 (and the failed v2.3.0 draft) proposed an explicit defer-list. v2.3.0 drops that — other skills' triggers work normally. If the user invokes `/audit` mid-build, audit runs and returns; build-page picks up from the conversation. The agent stays oriented across that the same way it would for any other skill.
+
 ## [2.2.0] — 2026-05-23
 
 Minor release. New `build-page` skill — the compositional sibling to `build-component`. Closes the gap revealed by the v2.1.x Snapfinder runs where `build-component` was being used for whole-page work and producing 400-line code drops with no layout conversation, no hierarchy debate, no asset planning, and no reuse audit — just a code dump and an approve/edit/restart button. `build-page` separates the architectural conversation from the code generation so the user makes one decision per phase, in chat, before seeing any code.

@@ -1,14 +1,16 @@
 ---
 name: build-page
-description: Compose a whole page (marketing or dashboard) from already-locked content + design system. Layout-first, code-last — discusses architecture, hierarchy, assets, and component reuse BEFORE any write, then delegates atomic-component creation to build-component and wires the final page in a single approval. Triggers — "build the homepage", "build the pricing page", "compose page X", "wire up the X page", "build the dashboard overview page", "build the settings page", "/build-page".
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*,find:*,cat:*,grep:*,test:*,mkdir:*), AskUserQuestion, Task, Skill
+description: Compose a whole page (marketing or dashboard) by reading the already-locked brief + canon and working with the user through a long iterative conversation — analyze, propose, iterate, decide section by section, call build-component for net-new primitives, write the actual page file. Use when the user says "build the homepage", "build the pricing page", "build the about page", "compose page X", "wire up the X page", "build the dashboard overview page", "build the settings page", or invokes "/build-page".
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*,find:*,cat:*,grep:*,test:*,mkdir:*), AskUserQuestion, Task, Skill, WebFetch
 ---
 
 # Build Page
 
-The compositional sibling to `build-component`. Where `build-component` writes one atomic thing (a button, a tile, a hero block) and gates it through `design-check`, `build-page` orchestrates an entire page — architecture, section rhythm, hierarchy, asset manifest, component selection — and only generates code at the very end, after every architectural question has been answered in chat.
+The compositional sibling to `build-component`. Where `build-component` writes one atomic thing (a button, a card, a hero block), `build-page` composes a whole page — section by section, in a long iterative conversation — working from the marketing brief or dashboard spec that already exists in canon. Calls `build-component` as a subroutine whenever a section needs a net-new primitive. Writes the actual page file when the conversation gets there.
 
-It exists because pages are not big components. A page is a *composition*: which sections, in what order, with what rhythm, drawn from which canonical content, anchored by which visuals, built from which existing components (and which net-new ones), and finally wired together in a layout. Forcing that work through `build-component`'s atomic gate produces a 400-line code drop the user cannot meaningfully review — no layout conversation, no asset planning, no reuse audit, no hierarchy debate. This skill is the layout-first, code-last alternative.
+A single page build can span 30–50 turns. That is normal and intended. The session is long because pages deserve discussion: the user iterates on the architecture, throws external references at the agent ("here's a hero I like from Stripe"), changes their mind about sections, settles on components one at a time. The skill's job is to stay productive across that conversation, not to race toward an exit.
+
+Everything else about this skill is the same as every other skill in the plugin. WORKLOG entries on decisions. BRIEF blocks at meaningful locks. INDEX.md updates inline when a new route ships. `design-check` chains automatically after the page file is written. No state files. No scratch folders. No special mode machinery. The canon and WORKLOG carry whatever the next session needs.
 
 ---
 
@@ -16,180 +18,164 @@ It exists because pages are not big components. A page is a *composition*: which
 
 - "Build the homepage", "build the pricing page", "build the about page", "compose page X", "wire up the X page", "build the marketing homepage".
 - "Build the dashboard overview page", "build the settings page", "build the team page", "build the analytics page".
-- Slash command: `/build-page`.
+- Slash command: `/build-page` (optionally with a slug: `/build-page home`).
 
 ### Does NOT fire for
 
 - A single component request ("build a button", "I need a KPI tile", "make a hero block") → `build-component`.
-- A tiny edit to an existing page ("change the H1 copy", "swap the screenshot") → direct edit + `design-check` as post-gate.
-- The first-ever bootstrap of a project (`CLAUDE.md`, `BRAND.md`, `DESIGN.md` don't exist) → `init-project` → `design-direction` → `marketing-brief` (if marketing surface) first.
+- A tiny edit to an existing page ("change the H1 copy", "swap the screenshot") → direct edit + `design-check` as the post-gate.
+- The first-ever bootstrap of a project (no `CLAUDE.md` / `BRAND.md` / `DESIGN.md`) → `init-project` → `design-direction` → `marketing-brief` (if marketing surface) first.
 
 ### Skip conditions
 
-- User says "skip build-page", "just write the page file", "no gate, draft only" → drops into a single-shot build-component-style flow with one approval at the end.
+- User says "skip build-page", "just write the page file", "no gate, draft only" → single-shot mode: read canon, generate the whole page, show one preview, write on approve. Use only when the user is unblocking themselves.
 
 ---
 
 ## What it produces
 
-One page file written to the location dictated by `agents/STRUCTURE.md`, plus zero-to-many net-new component files written by inline `build-component` calls during Phase 5. Copy is inlined directly in the page's JSX (sourced from `agents/marketing/CONTENT.md` + `agents/marketing/copy/<slug>.md` for marketing pages, or from the relevant brief for dashboard pages). **No intermediate content mirror file is ever created.**
+One real page file at the location dictated by `agents/STRUCTURE.md` (typically `src/app/(marketing)/<slug>/page.tsx` for marketing or `src/app/(dashboard)/<slug>/page.tsx` for dashboard, but read STRUCTURE.md — don't assume). Plus zero-to-many net-new component files written by inline `build-component` calls during the per-section work. Plus an INDEX.md entry for the new route.
 
-The page file imports only from layers it is allowed to import from per `STRUCTURE.md`'s cross-tier rules. After Phase 6 writes the page, `design-check` fires automatically as the post-write gate.
-
-Nothing else is touched. `DESIGN.md` / `FUNDAMENTALS.md` / `STRUCTURE.md` / `agents/marketing/*` are read-only here.
+Copy is inlined directly in the page JSX, sourced verbatim from `agents/marketing/copy/<slug>.md` (marketing) or the dashboard brief. **No intermediate content mirror file is ever created** — not `lib/marketing-content.ts`, not `data/copy.ts`, nothing.
 
 ---
 
 ## Required canon
 
-Before Phase 1 can run, these must exist:
+Before this skill can do useful work, these must exist:
 
 - `agents/CLAUDE.md`, `agents/BRAND.md`, `agents/DESIGN.md`, `agents/FUNDAMENTALS.md`, `agents/STRUCTURE.md`.
 - For **marketing pages**: `agents/marketing/CONTENT.md`, `agents/marketing/SITEMAP.md`, `agents/marketing/briefs/<slug>.md`, `agents/marketing/copy/<slug>.md`, `agents/marketing/MEDIA.md`, `agents/marketing/layouts/<slug>.md`.
-- For **dashboard pages**: at minimum a brief or spec describing what the page is for. If absent, the skill halts and asks the user to write one (one-paragraph intent + KPI list is enough; this is not a full marketing-brief).
+- For **dashboard pages**: a brief (a row in `agents/ROADMAP.md`, a file at `agents/specs/<slug>.md`, or a one-paragraph spec the user types inline).
 
-If marketing canon is missing for a marketing-tier page, the skill halts with: *"Marketing canon missing for `<slug>`. Run `marketing-brief` first (or add the missing files), then re-invoke `build-page`."*
+If marketing canon is missing for a marketing-tier page → halt: *"Marketing canon missing for `<slug>`. Run `marketing-brief` first (or add the missing files), then re-invoke."*
 
----
-
-## The 6 phases
-
-Walk in order. Each phase has a reference doc — open only when entering that phase (progressive disclosure keeps context lean).
-
-**No file writes before Phase 6.** Phases 1–5 happen entirely in chat. Each phase ends with a single-sentence approval gate (`approve / push back / restart`). If the user pushes back, that phase repeats; the skill does not advance to the next phase until approval is explicit.
-
-### Phase 1 — Read the brief
-
-Detect the page's tier (marketing or dashboard) from the user's request + `STRUCTURE.md` declared surfaces. Read the canon for that tier:
-
-- **Marketing tier** → `CONTENT.md`, `SITEMAP.md` (find the row for this slug), `briefs/<slug>.md`, `copy/<slug>.md`, `layouts/<slug>.md`, `MEDIA.md`. Also read `BRAND.md` and `DESIGN.md` Overview.
-- **Dashboard tier** → the page brief (or the relevant section of `ROADMAP.md`), `STRUCTURE.md` for the app folder's component inventory, `DESIGN.md`, `FUNDAMENTALS.md`.
-
-Surface a one-paragraph synthesis back to the user — *"This page is for X audience, single intent Y, primary CTA Z, with these content blocks already specified in the brief: …"* — and wait for *"yes, that's right"* before Phase 2.
-
-→ See `references/phase-1-read-brief.md`.
-
-### Phase 2 — Layout architecture
-
-Propose the page's section list — count, order, rhythm — drawn from the brief's content blocks. Show it as a vertical outline in chat, not as code. Example shape:
-
-```
-1. Hero        — claim + primary CTA + visual anchor (image)
-2. Trust strip — 3 short claims, dense
-3. How it works — 3-step narrative, calm
-4. Features    — workflow-stage grid (Capture / Deliver / Approve / Run-studio)
-5. Moment 1    — Selfie Search story, image-left
-6. Moment 2    — Camera coverage, three-column
-7. Moment 3    — Run-the-studio, image-right
-8. FAQ         — 8 questions, accordion
-9. Final CTA   — single ask, centered
-```
-
-Annotate the rhythm (which sections are calm vs loud, where the eye rests, where it accelerates). User approves the section list, the order, and the rhythm — or pushes back. Approval is required before Phase 3.
-
-→ See `references/phase-2-layout-architecture.md`.
-
-### Phase 3 — Hierarchy
-
-For each approved section, propose what's primary, secondary, and tertiary within that section — where the eye lands first, what's the load-bearing claim, what's supporting. One short paragraph per section. Example:
-
-```
-§1 Hero — primary: H1 claim ("The operating system for event-photography businesses"). Secondary: one-line subhead. Tertiary: pair of CTAs (Start free / See how it works). Visual anchor sits beside text at lg+, below at md and under.
-```
-
-User approves the hierarchy per section — or pushes back on specific sections. Approval is required before Phase 4.
-
-→ See `references/phase-3-hierarchy.md`.
-
-### Phase 4 — Asset manifest
-
-Per section, declare the visual treatment: image / screenshot / illustration / animation / micro-interaction / icon-only / no-visual. For marketing pages, cross-reference `MEDIA.md` (which already declared per-section anchors during `marketing-brief`) and propose any deltas. For dashboard pages, declare any data-viz / chart / mock-data requirements.
-
-Also surface micro-interactions the page wants: hover states beyond defaults, scroll-linked reveals, accordion behavior, sticky elements, scroll-snap, etc. Be conservative — propose only interactions that earn their keep against the brand's `tempo` axis from `BRAND.md`.
-
-Output is a markdown table in chat — section / visual type / asset id (matches MEDIA.md) / interaction notes. User approves or trims. Approval is required before Phase 5.
-
-→ See `references/phase-4-asset-manifest.md`.
-
-### Phase 5 — Component selection
-
-Per section, decide one of three strategies:
-
-- **Reuse** — an existing component in the project matches exactly. Cite its path.
-- **Adapt** — an existing component is close but needs one new variant or prop. Cite the path + describe the delta.
-- **Build new** — no existing component fits. Delegate to `build-component` inline (auto-invoked), build the component end-to-end in its own scoped sub-flow, then return to `build-page` with the new component's path in hand.
-
-Show the per-section decisions as a table in chat — section / strategy / component path / notes. User approves the table. **The build-new entries are then executed sequentially**, one `build-component` call per row, each with its own preview + approval inside `build-component`'s Phase 5. The user is not asked to approve the whole page's worth of components in one giant code drop — each net-new component gets its own focused conversation.
-
-Once every section has a real component path (whether reused, adapted, or freshly built), Phase 5 is done. Approval is required before Phase 6.
-
-→ See `references/phase-5-component-selection.md`.
-
-### Phase 6 — Wire-up
-
-Compose all the components into the final page file. Copy is inlined directly in the JSX, sourced from `agents/marketing/copy/<slug>.md` (marketing) or the page brief (dashboard). At the top of the file, leave a single-line comment pointing back to the canonical source so future agents know where the truth lives:
-
-```tsx
-// Copy mirrors agents/marketing/copy/home.md — when that file changes,
-// propagate the update here. Do NOT inline new copy without updating the
-// canon first.
-```
-
-Show the full proposed page file to the user. They approve, edit, or restart. On approve, write to the location from `STRUCTURE.md`. After write, `design-check` fires automatically as the post-write gate.
-
-→ See `references/phase-6-wire-up.md`.
+If a dashboard page has no brief → halt and ask the user to type a one-paragraph spec inline. Do not invent the spec.
 
 ---
 
-## Sub-modes
+## The protocol
 
-Same 6 phases, but the inputs and emphases differ.
+When this skill fires:
 
-### Marketing page
+1. **Ask which page** (if not in the user's message). Use AskUserQuestion with options drawn from `agents/marketing/SITEMAP.md` rows (for marketing tier) or from existing dashboard routes (for dashboard tier).
 
-Default for any page under `STRUCTURE.md`'s `marketing` / `landing` / `web` surface. Reads the full `agents/marketing/*` canon. Emphasis in Phase 2 is on persuasion rhythm — calm/loud, claim/proof/social-proof/ask. Phase 4 leans heavily on `MEDIA.md`'s pre-declared anchors. Phase 6 enforces RSC + `generateMetadata` for SEO (no `"use client"` on the page-level component; client behavior moves to small child components like `<AuthRedirect />`).
+2. **Detect tier** from the slug location in STRUCTURE.md + user wording. Confirm once if ambiguous.
 
-→ See `references/sub-mode-marketing-page.md`.
+3. **Read everything for that page.** Full canon for the tier — see "Required canon" above. Sub-delegate the read to a fast Task agent so the orchestration context stays lean.
 
-### Dashboard page
+4. **Append the session-open line to WORKLOG.** Single line in the canonical format:
+   ```
+   [HH:MM] decided: build-page started for /<slug> (<tier>)
+   ```
+   This serves two purposes: it disarms the cleared-state PreToolUse hook warning that would otherwise fire on the first Edit/Write later in the session, and it gives `save-session` something to consume even if the build doesn't complete this session.
 
-For any page under `STRUCTURE.md`'s `dashboard` / `app` / `admin` surface. Inputs are narrower (no marketing canon required, but a page brief is mandatory — even a one-paragraph spec). Emphasis in Phase 2 is on information density and scan paths (Z-pattern, F-pattern, sidebar-anchored). Phase 4 leans on data shape — what's the loading state, the empty state, the error state, the partial-data state. Phase 6 is client-component-friendly (most dashboard pages need interactivity).
+5. **Surface a starting analysis** — one paragraph in chat. Template:
+   ```
+   Page: <name> · /<slug> · tier: <marketing | dashboard>
+   For: <audience>
+   Intent: <single intent from brief>
+   Primary CTA: <button label → href>
 
-→ See `references/sub-mode-dashboard-page.md`.
+   Content blocks already locked in the brief:
+     1. <section name> — <one-line intent>
+     2. <section name> — <one-line intent>
+     …
+
+   Visual anchors from MEDIA.md (marketing only):
+     §1 hero → <anchor>
+     …
+
+   Existing components that look reusable for this page:
+     <component name> @ <path>
+     …
+   ```
+   Wait for "yes, that's right" or a correction before proposing a starting plan.
+
+6. **Propose a starting plan** — numbered section list with rhythm tags. NOT as code, NOT as JSX, just a vertical outline:
+   ```
+   1. Hero        — claim + primary CTA + visual anchor       · loud
+   2. Trust strip — 3 short claims, answer trust early        · calm
+   3. How it works — 3-step narrative                         · calm
+   4. Features   — workflow-stage grid (Capture / Deliver…)   · loud
+   …
+   ```
+   Marketing pages use calm/loud rhythm tags. Dashboard pages use scan/focus/meta density tags.
+
+7. **Iterate freely with the user.** No phase gates. No 5-iteration cap. The conversation goes as long as it needs to. Push-back examples: *"drop §6"*, *"swap §5 and §6"*, *"split §4 into two sections"*, *"add a logo wall after the hero"*. Revise the plan, re-show it, ask again.
+
+8. **When the user locks the plan, append a BRIEF block.** This is the cardinal "lock-before-cascade" rule. Format per `save-session` Step 6:
+   ```markdown
+   ---
+
+   ## v1.X — YYYY-MM-DD HH:MM · Claude Code
+
+   build-page locked architecture for /<slug>:
+   <N> sections — <one-line rhythm summary>
+   Strategy will be drawn from these existing components: <list>
+   Net-new components anticipated: <count, names>
+   ```
+   Also append a WORKLOG line: `[HH:MM] decided: build-page plan locked for /<slug> — N sections`.
+
+9. **Per-section work** — see `references/per-section-workflow.md`. For each section, in order: surface content, propose components, accept external references if dropped, decide strategy (reuse / adapt / build new), call `build-component` for build-new entries, append a WORKLOG line on close. Sequential, one section at a time, even if two are independent.
+
+10. **When all sections have real component paths**, do the wire-up. Write the actual page file:
+    - **Marketing tier**: React Server Component, `export const metadata` for SEO, no top-level `"use client"`. Client behavior in small child components.
+    - **Dashboard tier**: client component is fine; loading / empty / error / partial state branches per data hook.
+    - **Copy inlined directly** from `copy/<slug>.md` or the dashboard brief.
+    - **Top-of-file canon-pointer comment** as the sync contract:
+      ```tsx
+      // Copy mirrors agents/marketing/copy/<slug>.md — when that file changes,
+      // propagate the update here. Do NOT inline new copy without updating
+      // the canon first.
+      ```
+    - **No `lib/marketing-content.ts` mirror.** Ever.
+
+11. **Update `agents/docs/INDEX.md` inline** — add the new page route to the index in the appropriate section. This satisfies the `save-session` Step 4 contract so the next save doesn't plant a reminder.
+
+12. **`design-check` fires automatically** after the page file is written (hook-driven). Let it run its 8 steps. Surface any flagged tokens, banned words, or cross-tier violations to the user. Fix in place where mechanical; ask where it's a judgment call.
+
+13. **Closing.** Print the end-of-skill summary (see "Output shape" below). The session ends when the user closes the chat or types "save" / "save session". No special handoff machinery — STATUS.md Next Actions + WORKLOG carry whatever a future session needs.
+
+---
+
+## External references
+
+When the user drops a URL, pasted component code, or a screenshot during section work — see `references/per-section-workflow.md`, section "External reference adoption". Short version: fetch / parse, analyze the visual pattern + tokens it uses, cross-check against DESIGN.md (do our tokens cover it?) + BRAND.md (does the voice fit our archetype?) + the section's content (does the layout serve what we're saying?), recommend adopt / adapt / reject, and hand off to `build-component`'s existing `adopt-external` sub-mode if accepted.
 
 ---
 
 ## Hard rules
 
-- **No file writes before Phase 6.** Phases 1–5 happen entirely in chat. Any urge to write a "plan file" or "scratch doc" mid-flow is wrong — the chat conversation IS the plan, and the page file IS the final artifact.
-- **No intermediate content mirror file.** Copy is inlined directly in the page JSX, sourced from `agents/marketing/copy/<slug>.md`. Do NOT create `marketing-content.ts`, `lib/copy.ts`, `data/content.ts`, or any similar runtime mirror. The canonical markdown is the source; the agent propagates changes when the user asks.
-- **Cross-tier imports are blocked** (inherited from `build-component`). Marketing pages never import from `app/`. App pages never import from `marketing/`. Cross-tier needs go to Generic + wrapper.
-- **One approval per phase.** Each phase ends with an explicit gate. Skipping ahead is forbidden — even if the user seems to imply approval, ask once.
-- **Phase 5 build-new calls run sequentially, not in parallel.** Each net-new component gets its own focused conversation inside `build-component`. Bundling them produces the exact code-dump pathology this skill exists to prevent.
-- **Marketing pages are RSC + `generateMetadata` by default.** The page-level component is a Server Component. Client behavior (auth redirects, search inputs, modal triggers) lives in small child components. No top-level `"use client"` on marketing pages.
-- **Inline copy carries a canon-pointer comment.** Phase 6 always writes the `// Copy mirrors agents/marketing/copy/<slug>.md …` comment at the top of the file. This is the sync contract.
-- **`design-check` fires automatically after Phase 6.** Don't duplicate its 8 steps here. `build-page` is the path-of-compose; `design-check` is the gate-of-correctness for what got composed.
-- **Never modify canon from this skill.** No edits to `DESIGN.md`, `FUNDAMENTALS.md`, `STRUCTURE.md`, `BRAND.md`, or any `agents/marketing/*` file. If canon needs to change, the user is told to update the canon first, then re-invoke `build-page`.
-- **Skip the marketing-content.ts pattern entirely.** If the project already has a `lib/marketing-content.ts` (or similar) from earlier ad-hoc work, do not write to it. Phase 6 inlines copy directly in the page and leaves the mirror file alone. A follow-up cleanup pass (separate skill or manual edit) can retire the mirror once all pages migrate.
+- **No content mirror file.** Copy is inlined in the page JSX, sourced verbatim from `copy/<slug>.md` or the dashboard brief. NEVER create `lib/marketing-content.ts`, `data/copy.ts`, `lib/content.ts`, or any equivalent runtime mirror. If the project already has one from earlier ad-hoc work, leave it alone — note it as orphaned in the output for follow-up cleanup.
+- **Marketing pages are RSC + `generateMetadata` by default.** No top-level `"use client"`. Client behavior in small child components imported into the RSC tree.
+- **Cross-tier imports are blocked** (inherited from `build-component`). Marketing pages never import from `app/`. App pages never import from `marketing/`. Cross-tier needs route through Generic + wrapper.
+- **`build-component` is invoked for net-new components only**, not for atomic edits to the page itself. Wire-up is done directly by this skill.
+- **Per-section work is sequential.** One section at a time. Even when two sections are independent, do them in order — that's the conversation shape that keeps the user oriented.
+- **Lock-before-cascade.** Plan-lock writes a BRIEF block BEFORE any per-section work begins. (Cardinal rule from `agents/CLAUDE.md`.)
+- **One decision per WORKLOG line.** Canonical prefix vocabulary: `decided: / fixed: / tried_failed: / found_bug:`. No multi-line entries. Timestamp `[HH:MM]` at the start of every line.
+- **Never modify canon from this skill.** No edits to `DESIGN.md`, `STRUCTURE.md`, `BRAND.md`, `FUNDAMENTALS.md`, or any file in `agents/marketing/`. If canon needs to change, halt and tell the user: they update canon, we resume.
+- **The conversation is the state.** No state file. No scratch folder. If the session is interrupted, WORKLOG entries + STATUS Next Actions are the only resume mechanism — same as every other skill in the plugin.
+- **`design-check` chains automatically after wire-up.** Don't duplicate its 8 steps here.
+- **Skip the marketing-content.ts pattern entirely.** Phase rule worth repeating: if it already exists, do not write to it.
 
 ---
 
 ## Sub-agent routing
 
-Heavy reasoning steps delegate to Task tool sub-agents to keep orchestration context lean:
+Heavy reasoning steps delegate to Task tool sub-agents to keep the orchestration context lean:
 
 | Step | Tier | Why |
 |------|------|-----|
-| Phase 1 canon-read + synthesis | fast | Pure extraction |
-| Phase 2 layout architecture proposal | reasoning | Judgment on section order + rhythm |
-| Phase 3 hierarchy proposal | reasoning | Judgment on emphasis per section |
-| Phase 4 asset manifest proposal | reasoning | Judgment on visual treatment + interactions |
-| Phase 5 reuse scan (glob + read-similar) | fast | Pattern matching |
-| Phase 5 strategy proposal per section | reasoning | Reuse / adapt / build judgment |
-| Phase 5 inline build-component calls | (delegated) | build-component handles its own routing |
-| Phase 6 wire-up code generation | reasoning | Composition + token discipline |
+| Canon read + initial analysis | fast | Pure extraction |
+| Reuse scan (glob + read-similar) | fast | Pattern matching |
+| Plan proposal | reasoning | Judgment on section order + rhythm |
+| Per-section component strategy | reasoning | Reuse / adapt / build judgment |
+| External reference analysis | reasoning | Map foreign values to project tokens; voice fit |
+| Wire-up code generation | reasoning | Composition + token discipline |
+| Inline `build-component` calls | (delegated) | `build-component` handles its own routing |
 
-Never the most expensive model. Reasoning tier (Sonnet) is the ceiling.
+Reasoning tier (Sonnet) is the ceiling. Never the most expensive model.
 
 ---
 
@@ -200,46 +186,39 @@ build-page — summary
 
 Built: <page slug> (<tier>)
 Sections: <N>
-Strategies: <N reused, N adapted, N built new>
-Location: <file path written>
+Strategies: <N reused, N adapted, N built new via build-component>
+File written: <absolute path>
 
 Components used:
-  - <component 1> from <path>  [reused]
-  - <component 2> from <path>  [adapted — added variant `compact`]
-  - <component 3> from <path>  [built new via build-component]
-  - <component 4> from <path>  [built new via build-component]
+  - <component 1> @ <path>  [reused]
+  - <component 2> @ <path>  [adapted — <delta>]
+  - <component 3> @ <path>  [built new via build-component]
+  …
 
-Copy sourced from: <agents/marketing/copy/<slug>.md | dashboard brief>
+Copy source: agents/marketing/copy/<slug>.md (or dashboard brief)
 Canon-pointer comment: written at file top.
+INDEX.md updated: yes
+WORKLOG appends: <N>
+BRIEF blocks appended: <N>
 
-Tokens used:
-  - <token 1>, <token 2>, <token 3>, …
+design-check just ran — <findings or "clean">.
 
 Next:
-  → design-check will run automatically against the written page file.
-  → If any net-new components had missing tokens, those remain pending until
-    you confirm in design-check Step 4.
+  → Save the session with /save-session when ready.
+  → If any net-new components had missing tokens, those remain pending
+    until you confirm in design-check Step 4.
 ```
 
 ---
 
 ## Difference from related skills
 
-- **`marketing-brief`** — the planning pass that locks the marketing-site canon (CONTENT, SITEMAP, briefs, copy, MEDIA, layouts) ONCE near the end of a project. `build-page` is the execution pass that turns those plans into real pages. `build-page` is invoked per page; `marketing-brief` is invoked once for the whole site.
-- **`build-component`** — atomic. One component, one file, one approval gate. `build-page` orchestrates composition and calls `build-component` inline whenever Phase 5 decides "build new" for a section. They chain: `build-page` is the conductor, `build-component` is the player. Atomic component requests from the user still go directly to `build-component`.
-- **`design-direction`** — locks brand identity (`BRAND.md` + `DESIGN.md` Overview + refusal list) ONCE at the start. Upstream of every page build.
-- **`design-check`** — UI write-time gate. Fires automatically after `build-page`'s Phase 6 (and after every inline `build-component` call inside Phase 5).
-- **`discussion-mode`** — pure conversation, no writes. If the user wants to talk through a page idea without committing to architecture, use that first, then `build-page` to actually compose.
+- **`marketing-brief`** — the planning pass that locks the marketing-site canon (CONTENT, SITEMAP, briefs, copy, MEDIA, layouts) ONCE near the end of a project. `build-page` is the execution pass that turns those plans into real pages — invoked per page, ongoing.
+- **`build-component`** — atomic. One component at a time. `build-page` calls it inline whenever a section needs a net-new primitive. Atomic component requests from the user still go directly to `build-component`. They chain: `build-page` is the conductor, `build-component` is the player.
+- **`design-direction`** — locks brand identity ONCE at the start. Upstream of every page build.
+- **`design-check`** — UI write-time gate. Fires automatically after this skill's wire-up (and after each inline `build-component` call).
+- **`discussion-mode`** — pure conversation, no writes. If the user wants to think about a page WITHOUT committing to architecture, use that first, then `build-page` to actually compose.
 - **`init-project`** — bootstraps the three-folder layout. `build-page` assumes init-project + design-direction + (for marketing pages) marketing-brief have already run.
+- **`save-session`** — closes the session cleanly. Consumes the WORKLOG entries this skill wrote. If a build-page session ends mid-flow, save-session writes a `Resume /build-page <slug>` line to STATUS Next Actions automatically (because WORKLOG will show an open `decided: build-page started` line with no matching `decided: build-page complete` line).
 
-Chain: `init-project` → `design-direction` → `build-component` (per atomic piece, ongoing) → `marketing-brief` (once, end of project) → **`build-page`** (per page, ongoing) → `design-check` (auto, after each write) → `audit` (periodic).
-
----
-
-## Why it exists
-
-A page is not a big component. Forcing page-scale work through `build-component`'s atomic gate produces a code drop the user cannot meaningfully review: no layout conversation, no hierarchy debate, no asset plan, no reuse audit — just 400 lines of TSX and an "approve / edit / restart" button. The architectural decisions get buried inside the code and either get rubber-stamped or rejected wholesale.
-
-`build-page` separates the architectural conversation from the code generation. The user makes one decision per phase, in chat, against a clear proposal — section count, then hierarchy, then assets, then component selection — and only sees code after every architectural question has been answered. The final wire-up is a single approval gate on a file that just composes already-decided pieces.
-
-This also fixes the canonical-truth problem. With `build-component` swallowing whole pages, agents started inventing intermediate mirror files (`marketing-content.ts` etc.) to hold the copy that didn't fit cleanly in the JSX. Those mirrors became a third source of truth and drifted from `CONTENT.md`. `build-page` kills the mirror entirely: copy is inlined in the JSX, sourced from `agents/marketing/copy/<slug>.md`, and a comment at the top of the page file documents the canon-pointer for future agents. The propagation mechanism when canon changes is just *"agent, update the affected pages"* — no codegen, no build step, no drift.
+Chain: `init-project` → `design-direction` → `build-component` (per atomic piece) → `marketing-brief` (once, end of project) → **`build-page`** (per page) → `design-check` (auto) → `audit` (periodic).

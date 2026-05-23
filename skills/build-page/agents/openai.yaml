@@ -1,6 +1,6 @@
 interface:
   display_name: "Build Page"
-  short_description: "6-phase layout-first compositional page build (marketing or dashboard). Reads brief → proposes architecture → hierarchy → asset manifest → component selection (delegates net-new to build-component) → wires the final page. No file writes before Phase 6. No content-mirror file ever created — copy inlined directly from agents/marketing/copy/<slug>.md."
+  short_description: "Compose a whole page (marketing or dashboard) in a long iterative conversation. Reads the brief and canon, proposes a starting plan, iterates with the user, works section by section, calls build-component for net-new primitives, writes the actual page file. Copy is inlined directly from agents/marketing/copy/<slug>.md — no content-mirror file ever created."
   brand_color: "#475569"
 
 policy:
