@@ -5,6 +5,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [2.4.0] — 2026-05-24
+
+Patch release. Closes a long-standing gap in the design-system gate: agents kept hardcoding hex / px / font values in UI files because the always-loaded root `CLAUDE.md` template said nothing about tokens or `design-check`. The rules existed only in `DESIGN.md`, `FUNDAMENTALS.md`, and the `design-check` skill — files the agent only opens if it independently decides to. Even an obedient agent reading root `CLAUDE.md` cover-to-cover got zero signal that hardcoding was forbidden.
+
+### Changed
+
+- **Root `CLAUDE.md` template (`skills/init-project/references/phase-3-three-folder-create.md`)** — added Non-negotiable rule #8: "UI work uses the design system. No hardcoded values, ever." Names the file extensions (`.tsx` / `.jsx` / `.vue` / `.svelte` / `.swift` / styles), points to `DESIGN.md` and `FUNDAMENTALS.md` as required reading, requires `design-check` before and after the edit, lists the forbidden patterns (raw hex, raw px, raw `font-family`, emoji-as-icon, cardinal sins), and tells the agent to halt and propose token additions instead of improvising.
+- Every project initialized by `init-project` from this version on will get the rule in its root `CLAUDE.md`. Existing projects need a manual backfill — copy rule 8 into their root `CLAUDE.md` under "Non-negotiable rules".
+
+### Why
+
+`design-check` is a skill — reactive, agent must choose to invoke. The trigger keywords ("edit UI", "change styles", "add page") miss the way users actually phrase UI work ("fix this bug", "tweak the hero"). The hooks layer has no PostToolUse scan for raw values. So the gate is self-policed by the agent's discipline, and the bulk of day-to-day work — `Edit` on existing components — bypasses `design-check` entirely. Putting the rule in the always-loaded file is the cheapest leverage: from now on the agent knows the rule before it reads any other canon. Hooks-level enforcement (a PostToolUse diff scan) remains the next-leverage move and is tracked separately.
+
 ## [2.3.0] — 2026-05-23
 
 Minor release. `build-page` redesign — the v2.2.0 shape was a 6-phase pipeline pretending to be a conversation, racing toward approval gates instead of staying open across a long iterative session. v2.3.0 throws that out and rebuilds the skill as a normal-shaped plugin skill that happens to have a longer-than-usual session, following the same protocols every other skill uses (WORKLOG entries on decisions, BRIEF appends on locks, INDEX update on new routes, no state files, no scratch folders, no special mode machinery). Reference files cut from 8 → 2.

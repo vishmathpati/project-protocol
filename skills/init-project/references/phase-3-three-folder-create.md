@@ -39,6 +39,7 @@ mkdir -p cowork agents human agents/docs/detail
 5. Commit + push before leaving any chat. Pull main before starting one.
 6. One tool active at a time.
 7. **If Node project:** read `agents/TOOLING.md` before any package, install, or dev-server work. Use `bun` only — never `npm`, `pnpm`, or `yarn`.
+8. **UI work uses the design system. No hardcoded values, ever.** Before editing any `.tsx` / `.jsx` / `.vue` / `.svelte` / `.swift` / styles file: read `agents/DESIGN.md` for tokens and `agents/FUNDAMENTALS.md` for the Token Rule. Run the `design-check` skill before writing and again after. Raw hex, raw px, raw `font-family` strings, emoji-as-icon, and other cardinal sins from `FUNDAMENTALS.md` in component files are violations — not preferences. If a needed token doesn't exist in `DESIGN.md`: stop and propose adding it. Do not improvise.
 
 ## Folder map
 
