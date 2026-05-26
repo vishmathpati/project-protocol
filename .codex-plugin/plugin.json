@@ -1,7 +1,7 @@
 {
   "name": "project-protocol",
   "version": "2.5.0",
-  "description": "Project session discipline plugin: three-folder layout (cowork/agents/human) + root CLAUDE.md as the always-loaded brain (skill index, hooks index, situation router, non-negotiable rules). 16 skills (incl. migrate-project version-delta applier, build-page, build-component, marketing-brief, design-direction, design-check w/ auto-fix, edit-plugin), 9 hook events (incl. PostToolUse design-scan + design-check dispatcher, SessionStart drift-detector). Per-release migration manifests under migrations/. Three-layer architecture: Rules (CLAUDE.md) / Enforcement (hooks) / Workflow (skills). agentskills.io-conformant — Claude Code + Codex.",
+  "description": "Project session discipline plugin. Three-folder layout (cowork, agents, human) with root CLAUDE.md as the always-loaded brain. 16 skills including migrate-project, build-page, build-component, marketing-brief, design-direction, design-check with auto-fix, and edit-plugin self-discipline gate. 9 hook events including PostToolUse design-scan and SessionStart drift-detector. Per-release migration manifests. Compatible with Claude Code and Codex.",
   "author": {
     "name": "Vish Mathpati"
   }
