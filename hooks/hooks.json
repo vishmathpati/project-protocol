@@ -9,6 +9,15 @@
             "command": "bash -c 'PLUGIN_ROOT=\"${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}\"; FILE=\"$PLUGIN_ROOT/hooks/session-start-context.md\"; if [ -n \"$PLUGIN_ROOT\" ] && [ -f \"$FILE\" ]; then cat \"$FILE\"; else printf \"# Project Protocol — Session Start\\n\\nRead CLAUDE.md + STATUS.md before touching any code.\\nRun save-session before closing.\\nAppend to WORKLOG.md after every change.\\n\"; fi'"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'PLUGIN_ROOT=\"${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}\"; if [ -z \"$PLUGIN_ROOT\" ]; then exit 0; fi; PLUGIN_VERSION=$(python3 -c \"import sys,json; print(json.load(open(\\\"$PLUGIN_ROOT/.claude-plugin/plugin.json\\\"))[\\\"version\\\"])\" 2>/dev/null); if [ -z \"$PLUGIN_VERSION\" ]; then exit 0; fi; PROJECT_VERSION=$(cat agents/.plugin-version 2>/dev/null || echo \"pre-2.5.0\"); if [ -z \"$PROJECT_VERSION\" ]; then PROJECT_VERSION=\"pre-2.5.0\"; fi; SKIP=$(cat agents/.plugin-version-skip 2>/dev/null); if [ \"$SKIP\" = \"$PLUGIN_VERSION\" ]; then exit 0; fi; if [ \"$PROJECT_VERSION\" = \"$PLUGIN_VERSION\" ]; then exit 0; fi; MANIFESTS=$(ls \"$PLUGIN_ROOT/migrations/\" 2>/dev/null | sort -V | while IFS= read -r f; do V=\"${f%.md}\"; V=\"${V#v}\"; if python3 -c \"import sys; from packaging.version import Version; sys.exit(0 if Version(\\\"$V\\\") > Version(\\\"${PROJECT_VERSION#pre-}\\\".replace(\\\"2.5.0\\\",\\\"2.5.0\\\")) and Version(\\\"$V\\\") <= Version(\\\"$PLUGIN_VERSION\\\") else 1)\" 2>/dev/null; then printf \"%s \" \"$f\"; fi; done 2>/dev/null); if [ -z \"$MANIFESTS\" ]; then MANIFESTS=\"(check migrations/ in plugin root)\"; fi; printf \"\\n████████████████████████████████████████████\\n⚠  Plugin drift detected.\\n   Project recorded version : %s\\n   Current plugin version   : %s\\n   Missing migrations       : %s\\n\\n   Run /migrate-project to apply pending deltas.\\n   Or write %s into agents/.plugin-version-skip to defer\\n   (skip resets on next plugin update).\\n████████████████████████████████████████████\\n\" \"$PROJECT_VERSION\" \"$PLUGIN_VERSION\" \"$MANIFESTS\" \"$PLUGIN_VERSION\" >&2'"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

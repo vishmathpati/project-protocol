@@ -1,0 +1,7 @@
+interface:
+  display_name: "Migrate Project"
+  short_description: "Apply version-by-version plugin migration deltas to bring a project's protocol files up to the current plugin version"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

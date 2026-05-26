@@ -27,7 +27,7 @@ The problem it solves: an agent edits a skill, the user thanks them, the session
 
 ---
 
-## The 7 steps
+## The 8 steps
 
 ### 1. Confirm location
 
@@ -65,7 +65,30 @@ Stage every file you actually changed. Do not bulk-add. Do not stage unrelated d
 git add <each file you edited>
 ```
 
-### 5. Commit with a structured message
+### 5. Manifest discipline (version bumps only)
+
+If this edit bumps the plugin version — i.e., it changes the `"version"` field in `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json` — the commit MUST also include a `migrations/vX.Y.Z.md` manifest file documenting all project-side deltas introduced in this release.
+
+**Check before committing:**
+
+```bash
+ls migrations/vX.Y.Z.md 2>/dev/null || echo "MISSING"
+```
+
+If the manifest file is absent: **HALT**. Do not commit. Tell the user:
+
+> Version bump without migration manifest. Add `migrations/vX.Y.Z.md` before committing. See `migrations/v2.5.0.md` for the expected schema.
+
+If no project-side deltas exist for this release (pure internal refactoring with no changes to project templates, rules, or canonical files), create the manifest anyway with:
+
+```markdown
+# Migration — vX.Y.Z
+(no project-side deltas — internal plugin changes only)
+```
+
+This keeps the manifest chain unbroken for `migrate-project` to walk.
+
+### 6. Commit with a structured message
 
 ```bash
 git commit -m "plugin(<area>): <short summary>
@@ -83,7 +106,7 @@ git commit -m "plugin(<area>): <short summary>
 
 If the edit changes user-facing behavior of an installed skill, also bump the version in **both** `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` and add a `### Changed` / `### Added` / `### Fixed` line to `CHANGELOG.md` under `## [Unreleased]`. The plugin version + changelog edits go into the **same commit** as the source change.
 
-### 6. Push to GitHub
+### 7. Push to GitHub
 
 ```bash
 git push origin <current-branch>
@@ -93,7 +116,7 @@ If the current branch is not `main` (you're on a worktree branch): push the bran
 
 If push fails (auth, non-fast-forward, network): **STOP** and report the exact error. Do not leave the user thinking the change shipped when it didn't.
 
-### 7. Report + activation instructions
+### 8. Report + activation instructions
 
 Confirm to the user with this template:
 
@@ -104,9 +127,14 @@ Confirm to the user with this template:
 ✅ GitHub now has the change.
 
 To activate locally:
-  • Hot-copy (no version bump): copy <file> to the installed plugin path
-    ~/Library/Application Support/Claude/.../rpm/plugin_<id>/skills/<name>/
-    and restart the session.
+  • Hot-copy (no version bump): copy <file> to the installed plugin path.
+    Resolve the path from $CLAUDE_PLUGIN_ROOT (Claude Code) or
+    $CODEX_PLUGIN_ROOT (Codex) — both point to the installed plugin root.
+    If neither env var is set, find the path manually:
+      macOS:  ~/Library/Application Support/Claude/
+      Linux:  ~/.config/Claude/
+    Look for rpm/plugin_<id>/skills/<name>/ under that root.
+    Copy the changed file there and restart the session.
   • Clean install (with version bump): run ./build.sh, then reinstall the new .zip
     from dist/ via Cowork or `claude plugin install`.
 ```
