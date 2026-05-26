@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[project-protocol] %s is in cleared state — remember to append an entry for this change.\\n\" \"$WORKLOG\" >&2; fi'"
+            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[project-protocol] %s is in cleared state — remember to append an entry for this change.\\n\" \"$WORKLOG\" >&2; fi'"
           }
         ]
       }
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -q \"^# Worklog\" \"$WORKLOG\"; then BACKUP=\"${WORKLOG%.md}.backup-$(date +%Y%m%d-%H%M%S).md\"; cp \"$WORKLOG\" \"$BACKUP\"; echo \"[project-protocol] PreCompact: $WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- $WORKLOG CONTENTS ---\"; cat \"$WORKLOG\"; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: $WORKLOG empty or cleared — no backup needed\"; fi'"
+            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -q \"^# Worklog\" \"$WORKLOG\"; then BACKUP=\"${WORKLOG%.md}.backup-$(date +%Y%m%d-%H%M%S).md\"; cp \"$WORKLOG\" \"$BACKUP\"; echo \"[project-protocol] PreCompact: $WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- $WORKLOG CONTENTS ---\"; cat \"$WORKLOG\"; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: $WORKLOG empty or cleared — no backup needed\"; fi'"
           }
         ]
       }
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_start\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
+            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_start\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
           }
         ]
       }
@@ -72,7 +72,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_stop\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
+            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_stop\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
           }
         ]
       }
@@ -83,7 +83,27 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then WORKLOG=\"agents/WORKLOG.md\"; else WORKLOG=\"cowork/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then LINE_COUNT=$(wc -l < \"$WORKLOG\" | tr -d \" \"); echo \"[project-protocol] $WORKLOG has $LINE_COUNT lines of unsaved work. Run save-session before closing.\"; fi'"
+            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then LINE_COUNT=$(wc -l < \"$WORKLOG\" | tr -d \" \"); echo \"[project-protocol] $WORKLOG has $LINE_COUNT lines of unsaved work. Run save-session before closing.\"; fi'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILE=\"${TOOL_INPUT_FILE_PATH:-${TOOL_INPUT_PATH:-}}\"; if [ -z \"$FILE\" ]; then exit 0; fi; case \"$FILE\" in */node_modules/*|*/.git/*|*/dist/*|*/build/*|*/.next/*) exit 0 ;; esac; case \"$FILE\" in */globals.css|*/tokens.css|*/DesignTokens.swift) exit 0 ;; esac; MATCH=0; case \"$FILE\" in *.tsx|*.jsx|*.vue|*.svelte|*.swift) MATCH=1 ;; esac; case \"$FILE\" in */global*.css|*/token*.css|*/style*) MATCH=1 ;; esac; case \"$FILE\" in */tailwind.config.js|*/tailwind.config.ts|*/tailwind.config.cjs|*/tailwind.config.mjs) MATCH=1 ;; esac; case \"$FILE\" in */styles/*) MATCH=1 ;; esac; if [ \"$MATCH\" != \"1\" ]; then exit 0; fi; VIOLATIONS=\"\"; if [ -f \"$FILE\" ]; then while IFS= read -r LINE || [ -n \"$LINE\" ]; do LINENO=$((LINENO+1)); case \"$LINE\" in *\"--\"*) ;; *) if printf \"%s\" \"$LINE\" | grep -qE \"#[0-9a-fA-F]{3,8}\"; then VIOLATIONS=\"$VIOLATIONS\\n[project-protocol design-scan] $FILE:$LINENO — raw-hex: $(printf \"%s\" \"$LINE\" | grep -oE \"#[0-9a-fA-F]{3,8}\" | head -1)\"; fi ;; esac; if printf \"%s\" \"$LINE\" | grep -qE \"[^0-9]([1-9][0-9]+|[1-9])px\" && ! printf \"%s\" \"$LINE\" | grep -q \"0px\"; then case \"$FILE\" in *.tsx|*.jsx|*.vue|*.svelte|*.swift) VIOLATIONS=\"$VIOLATIONS\\n[project-protocol design-scan] $FILE:$LINENO — raw-px: $(printf \"%s\" \"$LINE\" | grep -oE \"[0-9]+px\" | head -1)\" ;; esac; fi; if printf \"%s\" \"$LINE\" | grep -q \"font-family:\"; then VIOLATIONS=\"$VIOLATIONS\\n[project-protocol design-scan] $FILE:$LINENO — raw-font-family\"; fi; if printf \"%s\" \"$LINE\" | grep -qE \"<(select|input|button|dialog|textarea)[ >]\"; then if find . -maxdepth 5 -name package.json -not -path \"*/node_modules/*\" 2>/dev/null | xargs grep -l \"\\\"shadcn\\\"\" 2>/dev/null | grep -q .; then VIOLATIONS=\"$VIOLATIONS\\n[project-protocol design-scan] $FILE:$LINENO — native-element-when-shadcn-exists\"; fi; fi; if printf \"%s\" \"$LINE\" | grep -qE \"<(div|span) onClick\"; then VIOLATIONS=\"$VIOLATIONS\\n[project-protocol design-scan] $FILE:$LINENO — clickable-div-or-span (use Button)\"; fi; if printf \"%s\" \"$LINE\" | grep -q \"outline: none\"; then VIOLATIONS=\"$VIOLATIONS\\n[project-protocol design-scan] $FILE:$LINENO — outline-none (add :focus-visible rule)\"; fi; done < \"$FILE\"; fi; if [ -n \"$VIOLATIONS\" ]; then printf \"%b\\n\" \"$VIOLATIONS\" >&2; fi'"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILE=\"${TOOL_INPUT_FILE_PATH:-${TOOL_INPUT_PATH:-}}\"; if [ -z \"$FILE\" ]; then exit 0; fi; case \"$FILE\" in */node_modules/*|*/.git/*|*/dist/*|*/build/*|*/.next/*) exit 0 ;; esac; MATCH=0; STRUCTURE=\"agents/STRUCTURE.md\"; if [ -f \"$STRUCTURE\" ]; then if grep -q \"components/ui\\|components/primitives\\|components/blocks\\|Views/\\|src/components\" \"$STRUCTURE\"; then case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; else case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; if [ \"$MATCH\" = \"1\" ]; then printf \"[project-protocol] design-check dispatcher: file written to %s. Run /design-check on this file before continuing.\\n\" \"$FILE\" >&2; fi'"
           }
         ]
       }

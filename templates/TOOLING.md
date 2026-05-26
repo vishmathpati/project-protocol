@@ -1,18 +1,17 @@
-# TOOLING.md — Node Tooling Standards
-> Global. Locked 2026-05-15. Same content on every Node project.
+# TOOLING.md — Node Tooling Convention
+> Project-local. Generated at init time from the project's chosen package manager.
 > Skip this file in Swift / Python / non-Node projects.
 
-> **Note:** This file uses the author's personal layout (`~/Arel OS/Projects/`) as the working example. Adapt to your own machine — replace the path prefix with your actual projects root. The rules and conventions below apply universally.
+**Package manager:** {bun|pnpm|npm|yarn}
+**Lockfile:** {bun.lock|pnpm-lock.yaml|package-lock.json|yarn.lock}
 
 ---
 
-## Package manager — bun
+## Package manager
 
-All Node projects use **bun** (v1.3.14+) as the package manager.
+This project uses **{bun|pnpm|npm|yarn}** as its package manager.
 
-**Never** run `pnpm install`, `npm install`, or `yarn install` in any project under `~/Arel OS/Projects/`. The `packageManager` field in `package.json` enforces this.
-
-If you find yourself reaching for `pnpm` or `npm`, **STOP**. Use `bun`.
+**Never** run a different package manager's install command in this project. The `packageManager` field in `package.json` enforces this. If you find yourself reaching for the wrong one, **STOP** and use the one declared above.
 
 ---
 
@@ -27,7 +26,7 @@ If you find yourself reaching for `pnpm` or `npm`, **STOP**. Use `bun`.
 ## Required files in every Node project
 
 - `package.json` with:
-  - `packageManager: "bun@<version>"`
+  - `packageManager: "{manager}@<version>"`
   - `engines.node: ">=22.0.0"`
 - `.nvmrc` containing `24`
 - `.npmrc` containing `engine-strict=true`
@@ -38,10 +37,10 @@ If you find yourself reaching for `pnpm` or `npm`, **STOP**. Use `bun`.
 
 - `experimental.serverComponentsHmrCache: true` in `next.config.ts`
 - Wipe `.next/dev` if it exceeds 1 GB
-- Only **one** `next dev` running at a time across all projects
+- Only **one** `next dev` running at a time per project
 
 ---
 
 ## When this file changes
 
-Never edited per-project. It is a global standard — overwritten verbatim from the plugin template on every `init-project` run. To change the standard, update `templates/TOOLING.md` in the plugin and rebuild.
+Never edited by hand per-project. Regenerated from the plugin template with the chosen package manager filled in. To change the package manager, re-run `init-project` and choose a different manager at the package-manager prompt.

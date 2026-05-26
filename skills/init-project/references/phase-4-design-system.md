@@ -107,19 +107,60 @@ If the plugin-root env var is unset (some agents don't expose it): use the Read 
 
 **Detect:** Node project if a `package.json` exists at the project root. If not Node (Swift, Python, plain repo): skip this section silently — do not create `agents/TOOLING.md`.
 
-**If Node and `agents/TOOLING.md` exists:** silently overwrite from the plugin template. Same rule as `FUNDAMENTALS.md` — this is a global locked standard, not per-project.
+### Step 4a — Detect or ask package manager
 
-**If Node and missing:** copy verbatim from the plugin template at `${CLAUDE_PLUGIN_ROOT}/templates/TOOLING.md` to `agents/TOOLING.md`.
+**On first init (no `agents/TOOLING.md` exists):**
+
+1. Scan for lockfiles at the project root:
+   ```bash
+   ls bun.lock pnpm-lock.yaml package-lock.json yarn.lock 2>/dev/null
+   ```
+2. **Exactly one detected:** propose it as the canonical manager. Ask via `AskUserQuestion`:
+   ```
+   Detected lockfile: {lockfile}. Use {manager} as this project's package manager?
+   [Y] Yes, use {manager}  [N] Choose a different one
+   ```
+   One-key confirm (Y is default). If N, fall through to "none detected" flow.
+3. **Multiple detected:** ask which is canonical:
+   ```
+   Multiple lockfiles detected: {list}. Which is the canonical package manager for this project?
+   A — bun  B — pnpm  C — npm  D — yarn
+   ```
+4. **None detected:** ask from scratch:
+   ```
+   No lockfile detected. Which package manager does this project use?
+   A — bun (recommended)  B — pnpm  C — npm  D — yarn
+   ```
+
+**On re-init (`agents/TOOLING.md` already exists):**
+
+1. Read the `**Package manager:**` line from `agents/TOOLING.md` to get the current choice.
+2. Re-run the lockfile scan above to detect the current lockfile.
+3. Ask via `AskUserQuestion`:
+   ```
+   agents/TOOLING.md records {current-manager} as the package manager.
+   Lockfile detected: {detected or "none"}.
+   Continue with {current-manager} or switch?
+   [Y] Continue with {current-manager}  [N] Switch to {detected or "choose"}
+   ```
+   Default is Y (keep current). If switching, follow the first-init flow above.
+
+### Step 4b — Render and write TOOLING.md
+
+Once the package manager is confirmed, read the plugin template from `${CLAUDE_PLUGIN_ROOT:-${CODEX_PLUGIN_ROOT}}/templates/TOOLING.md` (or use Read tool if env var unset), replace every `{bun|pnpm|npm|yarn}` placeholder with the chosen manager, replace `{bun.lock|pnpm-lock.yaml|package-lock.json|yarn.lock}` with the corresponding lockfile name, replace `{manager}` with the chosen manager name, then write to `agents/TOOLING.md`.
 
 ```bash
-if [ -f package.json ]; then
-  cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TOOLING.md" agents/TOOLING.md
-fi
+# Example for bun selection — sed replacements match the placeholder patterns
+MANAGER="bun"; LOCKFILE="bun.lock"
+sed -e "s/{bun|pnpm|npm|yarn}/$MANAGER/g" \
+    -e "s/{bun.lock|pnpm-lock.yaml|package-lock.json|yarn.lock}/$LOCKFILE/g" \
+    -e "s/{manager}/$MANAGER/g" \
+    "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TOOLING.md" > agents/TOOLING.md
 ```
 
-If the plugin-root env var is unset: use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/TOOLING.md`. Do not modify per project.
+If the plugin-root env var is unset: use the Read tool to fetch the template, apply substitutions in the Write content, then Write to `agents/TOOLING.md`.
 
-When copied, also confirm the project's actual `package.json` / `.nvmrc` / `.npmrc` match the standard. If they drift, surface the mismatch as a `[VERIFY]` item at Phase 7 — do not auto-fix.
+When written, confirm the project's actual `package.json` / `.nvmrc` / `.npmrc` match the declared manager. If they drift, surface as a `[VERIFY]` item at Phase 7 — do not auto-fix.
 
 ---
 

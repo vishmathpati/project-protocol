@@ -23,14 +23,16 @@ project-root/
 │   ├── WORKLOG.md
 │   └── CHANGELOG.md
 ├── agents/                ← project canon tier (Codex / Claude Code read here)
+│   ├── .session-type      ← written at Phase 3a; one of: cowork, claude-code, codex
 │   ├── STATUS.md
 │   ├── BRIEF.md
 │   ├── ROADMAP.md
 │   ├── BRAND.md
 │   ├── FUNDAMENTALS.md
-│   ├── TOOLING.md         ← Node projects only
+│   ├── TOOLING.md         ← Node projects only; package manager rendered at Phase 4a
 │   ├── DESIGN.md
-│   ├── STRUCTURE.md       ← created on first build-component run, then read by build-component / audit / design-check
+│   ├── SITUATIONS.md      ← situation router; written at Phase 3b
+│   ├── STRUCTURE.md       ← created on first build-component run, or during Phase 0c modernize
 │   ├── DISCOVERIES.md
 │   ├── WORKLOG.md
 │   ├── CHANGELOG.md
@@ -106,7 +108,7 @@ Rule: fast/cheap model for extraction, reasoning model for judgment. Never the m
 
 - Never silently overwrite an existing file. Read first, ask before replacing.
 - `agents/FUNDAMENTALS.md` is one exception — global standard, always copied from plugin template `templates/FUNDAMENTALS.md`.
-- `agents/TOOLING.md` is the other exception — global Node-tooling standard, always copied verbatim from `templates/TOOLING.md` **only into Node projects** (detected via `package.json` at project root). Skipped silently for Swift / Python / non-Node projects.
+- `agents/TOOLING.md` — generated for Node projects only (detected via `package.json` at project root). On first init, rendered from `templates/TOOLING.md` with the package manager the user chooses (or confirms from detected lockfile) during Phase 4a. On re-init, re-generated with confirmed manager. Skipped silently for Swift / Python / non-Node projects.
 - `agents/CHANGELOG.md` and `cowork/CHANGELOG.md` are never overwritten. Append-only.
 - All decisions made during init that warrant locking go into `cowork/BRIEF.md` (orchestration) or `agents/BRIEF.md` (product).
 - The three folders are non-negotiable — every file belongs to exactly one tier.
