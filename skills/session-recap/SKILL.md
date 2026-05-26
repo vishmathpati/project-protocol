@@ -1,7 +1,7 @@
 ---
 name: session-recap
 description: Mid-session snapshot. Reads WORKLOG.md + STATUS.md and reports current state. Not a save. Triggers — "recap", "where are we", "what have we done", "catch me up".
-allowed-tools: Read, Glob, Bash(ls:*,date:*,git:*,pwd:*)
+allowed-tools: Read, Glob, Bash(ls:*, pwd:*, date:*, git status:*, git worktree:*, git log:*)
 ---
 
 # Session Recap
@@ -21,11 +21,9 @@ Read in order:
    - If the cwd contains `.claude/worktrees/`, warn: this is a **Claude Code worktree** — local uncommitted changes from the main checkout are not present here.
    - In either worktree case, state the main checkout path (strip the worktree suffix) so the user knows where the real files live.
    - If there are uncommitted changes, summarize them briefly.
-2. `WORKLOG.md` — real-time log of this session's events.
-3. `STATUS.md` — the project's health at session start.
-4. `BRIEF.md` — latest locked decisions, especially the newest version block.
-5. Most recent file in `sessions/` if the directory exists.
-   - If `sessions/` is missing, do not treat that as a problem unless this project explicitly requires session files.
+2. Root `CLAUDE.md` — overall project orientation: current tier, active skills, rules.
+3. `agents/STATUS.md` (or `cowork/STATUS.md` in Cowork) — project health, blockers, last-known state.
+4. Tail of `agents/WORKLOG.md` (or `cowork/WORKLOG.md` in Cowork) — real-time log of this session's events. Read the last 50 lines; do not read the entire file.
 
 ---
 

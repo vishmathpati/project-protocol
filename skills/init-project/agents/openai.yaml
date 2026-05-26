@@ -1,6 +1,6 @@
 interface:
   display_name: "Init Project"
-  short_description: "Bootstrap or audit a project with the standard protocol"
+  short_description: "Bootstrap, audit, or upgrade a project with the three-folder protocol. Runs in five modes: fresh (empty repo), empty (no src yet), audit (already initialized), migration (legacy flat layout), or modernize (partial/stale protocol). Writes CLAUDE.md, BRIEF.md, STATUS.md, WORKLOG.md, STRUCTURE.md, DESIGN.md, BRAND.md, FUNDAMENTALS.md, TOOLING.md, ROADMAP.md."
   brand_color: "#475569"
 
 policy:

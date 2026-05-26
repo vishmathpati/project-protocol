@@ -21,11 +21,21 @@ of audience ids (see AUDIENCES below).
 
 | id | name | icon (Lucide) | blurb (≤120 chars) | page_slug | audiences |
 |----|------|---------------|---------------------|-----------|-----------|
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | short-links | Short Links | Link | Create branded short links with custom domains, QR codes, and deep links. | /links | marketers, developers |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | analytics   | Analytics   | BarChart3 | Real-time conversion analytics with full attribution. | /analytics | marketers |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | partners    | Partners    | Users  | Build embedded affiliate programs that scale with you. | /partners | marketers, product-teams |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | api         | API         | Code2  | First-class developer API with SDKs in 6 languages. | /api | developers |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | qr-codes    | QR Codes    | QrCode | Branded QR codes with logos, colors, and tracking. | /qr | marketers |
+<!-- /EXAMPLE -->
 
 ---
 
@@ -38,9 +48,15 @@ page or proof point.
 
 | id | name | descriptor | fear (one sentence) | want (one sentence) |
 |----|------|------------|----------------------|----------------------|
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | marketers       | Marketing teams | Design-conscious modern SaaS marketers | Vanity metrics that don't tie to revenue. | Attribution they can trust. |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | developers      | Developers | API-first builders at high-growth companies | Bloated link APIs with hidden quotas. | Programmatic short-link infra they can drop into a CLI. |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | product-teams   | Product teams | Growth + product folks running referral / affiliate motions | Building partner programs in-house with brittle scripts. | Embedded program infra with revenue share built in. |
+<!-- /EXAMPLE -->
 
 ---
 
@@ -53,9 +69,15 @@ hero comparison card; the page itself expands each into a section.
 
 | vs_competitor | our_strength | their_strength | page_slug |
 |---------------|--------------|----------------|-----------|
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Bitly         | Modern API + conversion tracking. | Brand recognition, long history. | /compare/bitly |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Rebrandly     | All-in-one with partner programs. | Custom domain volume at very large scale. | /compare/rebrandly |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | TinyURL       | Branded domains + analytics. | Free forever for casual use. | /compare/tinyurl |
+<!-- /EXAMPLE -->
 
 ---
 
@@ -68,9 +90,15 @@ media manifest, never a remote URL hot-linked from a competitor).
 
 | customer | role | company | quote | photo_url |
 |----------|------|---------|-------|-----------|
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Maya Chen | Head of Growth | Vercel-ish startup | "We replaced three tools with this. Attribution is finally honest." | /media/testimonials/maya-chen.jpg |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Theo Patel | Staff Engineer | Series-B fintech | "The API is what Bitly's should have been ten years ago." | /media/testimonials/theo-patel.jpg |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Lena Ström | VP Marketing | DTC brand | "Our affiliate program went from spreadsheet to revenue line in a week." | /media/testimonials/lena-strom.jpg |
+<!-- /EXAMPLE -->
 
 ---
 
@@ -83,11 +111,21 @@ rather than splitting the answer.
 
 | question | answer | page_slug |
 |----------|--------|-----------|
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Do you offer a free plan? | Yes — 1,000 clicks/month, one custom domain, full analytics. No card required. | /pricing |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Can I use my own domain? | Yes, on every paid plan. Connect via DNS in under 60 seconds. | /pricing |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Is the API rate-limited? | 1,000 req/min on Pro, 10,000 req/min on Business. Hard quotas only on Free. | /api |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | How does conversion tracking work? | We pixel-track clicks then match against your analytics provider via webhook or SDK. | /analytics |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | Do you support SAML SSO? | Yes, on Business and Enterprise. Okta, Google Workspace, Microsoft Entra. | /pricing |
+<!-- /EXAMPLE -->
 
 ---
 
@@ -99,12 +137,24 @@ footer and is the only field humans hand-edit between releases.
 
 | slug | title | last_updated |
 |------|-------|--------------|
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | /terms       | Terms of Service     | 2026-04-15 |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | /privacy     | Privacy Policy       | 2026-04-15 |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | /dpa         | Data Processing Addendum | 2026-04-15 |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | /security    | Security             | 2026-03-01 |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | /cookies     | Cookie Policy        | 2026-04-15 |
+<!-- /EXAMPLE -->
+<!-- EXAMPLE — DELETE BEFORE USE -->
 | /acceptable-use | Acceptable Use Policy | 2026-04-15 |
+<!-- /EXAMPLE -->
 
 ---
 

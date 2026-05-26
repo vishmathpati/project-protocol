@@ -72,6 +72,8 @@ This can be multiple pages — paste everything at once.
 Type DONE on a new line when finished.
 ```
 
+In Cowork (single-message chat interface), paste all content in a single message and end with DONE on the last line. In Claude Code / Codex (multi-line input), you can send multiple messages and type DONE in the final one.
+
 Accumulate all lines until "DONE" appears on its own line. Strip the "DONE" line.
 
 ### Step 4 — Summarize and write
@@ -132,11 +134,17 @@ Without asking, update two places:
 ```
 If no Key Files table exists, create a `## Key Files` section.
 
-**Root `CLAUDE.md`** — find `## Extended Context` section and append:
+**Root `CLAUDE.md`** — before appending, count the current line count of root `CLAUDE.md`. If adding the new entry would push the file past **280 lines**, stop and warn the user:
+
+> "Root `CLAUDE.md` is at [N] lines. Adding this entry would exceed the 280-line ceiling (§9.2). Options: (A) summarize or compact older `## Extended Context` entries to make room, (B) split the situation router to `agents/SITUATIONS.md` and leave a one-line pointer in `CLAUDE.md`, (C) add the entry anyway and accept the overage. Which do you prefer?"
+
+Wait for the user's choice before writing. If the user picks A or B, apply the compaction or split first, then add the new entry.
+
+If the file is under the ceiling (or once compaction is done), find `## Extended Context` section and append:
 ```
 - `agents/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
 ```
-If `## Extended Context` doesn't exist, create it at the bottom:
+The `## Extended Context` stub is created by `init-project` Phase 3 — do not re-create it; it already exists. If it is genuinely missing (legacy project), create it at the bottom:
 ```markdown
 ## Extended Context
 > These files go beyond the standard protocol. Read when their trigger applies.
