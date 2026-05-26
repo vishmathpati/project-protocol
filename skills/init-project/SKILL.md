@@ -32,10 +32,11 @@ project-root/
 │   ├── TOOLING.md         ← Node projects only; package manager rendered at Phase 4a
 │   ├── DESIGN.md
 │   ├── SITUATIONS.md      ← situation router; written at Phase 3b
-│   ├── STRUCTURE.md       ← created on first build-component run, or during Phase 0c modernize
+│   ├── STRUCTURE.md       ← created on first build-component run, OR during Phase 0c modernize, OR during Phase 4 of fresh init if user opts in
 │   ├── DISCOVERIES.md
 │   ├── WORKLOG.md
 │   ├── CHANGELOG.md
+│   ├── preview/           ← design-direction preview HTML lives here; gitignored; cleaned by audit
 │   └── docs/
 │       ├── INDEX.md
 │       └── detail/

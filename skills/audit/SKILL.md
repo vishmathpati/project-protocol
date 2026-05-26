@@ -40,7 +40,15 @@ Cross-file consistency check. Surfaces drift, does not fix.
 
 **3. Design-system scan** (UI projects only — skip if no `components/` or equivalent).
 
-Run the pre-ship checklist from `FUNDAMENTALS.md` against the current codebase:
+First, determine where to scan:
+
+1. Read `agents/STRUCTURE.md`. Extract every path from the `## Component locations` table (Generic, Marketing, App, Desktop tier paths).
+2. If `agents/STRUCTURE.md` has `**Monorepo:** true` in `## Project layout`, also read `**App paths:**` and include each app's component paths.
+3. If `agents/STRUCTURE.md` is missing, fall back to scanning from the project root.
+4. Always exclude from all grep commands: `node_modules/`, `.git/`, `dist/`, `build/`, `.next/`, `.turbo/`, `coverage/`. Pass these as exclusions to grep: `--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=build --exclude-dir=.next --exclude-dir=.turbo --exclude-dir=coverage`.
+5. For monorepos, scan each app's component paths separately and label findings with the app path (e.g. `apps/web/src/components/ui/button.tsx`).
+
+Run the pre-ship checklist from `FUNDAMENTALS.md` against the scoped paths:
 
 - **Raw values:** grep component files for hex literals (`#[0-9a-fA-F]{3,8}`), raw px outside utility classes, raw `font-family` strings. Any hit = token rule violation.
 - **Cardinal sins:** grep for any indigo / violet Tailwind hex from FUNDAMENTALS.md's list. Grep for emoji characters inside `<button>`, `<h*>`, `<li>`. Grep for two-stop gradients on hero elements.
@@ -49,12 +57,35 @@ Run the pre-ship checklist from `FUNDAMENTALS.md` against the current codebase:
 
 Findings here are category (A) — real violations.
 
-**4. Categorize findings:**
+**4. Garbage-collect `agents/preview/`.**
+
+`design-direction` writes versioned HTML preview files to `agents/preview/<direction-slug>-<date>.html`. These accumulate over multiple runs and are never automatically cleaned.
+
+1. List all files in `agents/preview/` (if the folder exists).
+2. Group by direction-slug (the filename prefix before the date).
+3. For each slug, keep the 2 most recent files (by filename date or mtime). Mark older ones for deletion.
+4. If there are files to delete, surface them to the user before acting:
+   ```
+   agents/preview/ — found N preview files, M can be cleaned:
+   Would delete:
+     agents/preview/brand-forest-2026-03-12.html
+     agents/preview/brand-forest-2026-02-28.html
+   Would keep (2 most recent per slug):
+     agents/preview/brand-forest-2026-05-01.html
+     agents/preview/brand-forest-2026-04-15.html
+   
+   Delete the older files? [yes / no / show them first]
+   ```
+5. Only delete after explicit user confirmation. Do not auto-delete.
+
+Findings here are category (B) — stale files. No fix required if the user chooses to keep them.
+
+**5. Categorize findings:**
 - **(A) Real contradiction / violation** — two files state mutually exclusive facts, OR a design-system rule is broken in code. Must fix.
 - **(B) Stale wording** — wording that's no longer accurate but not strictly conflicting. Should fix.
 - **(C) Intentional difference** — files differ on purpose (e.g., human-facing vs. agent-facing wording). No fix needed.
 
-**5. Report.** Output each finding with category and source files. Example:
+**6. Report.** Output each finding with category and source files. Example:
 
 ```
 [A] STATUS.md Next Action #3 references "ChannelTypes audit" but ROADMAP §7 slot 5 is named "Channel Types CRUD". Names disagree.
@@ -65,7 +96,7 @@ Findings here are category (A) — real violations.
 [C] human/agenda.md uses "you" wording; agents/STATUS.md uses neutral wording. Two-audience rule — no fix.
 ```
 
-**6. Do not auto-fix.** Show findings. Let the user decide which to fix and in what order. The fix typically requires the `discipline` skill for canon edits or the `design-check` skill for UI fixes.
+**7. Do not auto-fix.** Show findings. Let the user decide which to fix and in what order. The fix typically requires the `discipline` skill for canon edits or the `design-check` skill for UI fixes.
 
 ---
 

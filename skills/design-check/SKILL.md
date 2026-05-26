@@ -32,8 +32,11 @@ If the file does not produce visible UI (config, types, pure utility logic), thi
 If either file is missing → STOP. Run `init-project` first.
 
 **2. Search existing components — reuse over create.**
-- Glob `components/ui/*`, `components/primitives/*`, `components/blocks/*` (web) or `Views/*.swift` (Swift).
-- For the surface being built, list every component that solves the same or a similar problem.
+- First, read `agents/STRUCTURE.md` to get the actual component paths for this project:
+  - Read the `## Component locations` table — use the paths listed there for each tier (Generic, Marketing, App, Desktop).
+  - Read the `## Project layout` section — if `**Monorepo:** true`, read the `**App paths:**` list and scan each app's component paths separately.
+  - Fall back to default globs only if `agents/STRUCTURE.md` is missing: `components/ui/*`, `components/primitives/*`, `components/blocks/*` (web) or `Views/*.swift` (Swift).
+- Glob each detected component path for the surface being built; list every component that solves the same or a similar problem.
 - If a usable component exists: extend or compose it. Do not create a duplicate.
 - Surface to the user: "I'll reuse `<Button>` and `<Card>`. Need to extend `<Card>` with a `compact` variant. Confirm?"
 
@@ -46,7 +49,7 @@ If either file is missing → STOP. Run `init-project` first.
   - **STOP.** Do not improvise. Do not write a raw hex / px.
   - Propose the addition: name the new token, point at related existing tokens it derives from, explain why it's needed.
   - Wait for explicit user confirmation ("go", "do it", "approved").
-  - Once confirmed: add the token to `DESIGN.md` AND `global.css` (or `DesignTokens.swift`).
+  - Once confirmed: add the token to `DESIGN.md` AND the project's CSS token file. To find the correct token file, check `agents/STRUCTURE.md` `## Conventions detected` section for `Token chain:` — the file after the `→` arrow (e.g. `globals.css`, `global.css`, `tokens.css`) is where CSS vars live. For Swift projects, the token file is `DesignTokens.swift`. For monorepos, each app may have its own token file — write to the app path that matches the surface being edited.
 - Only proceed once every needed token exists.
 
 **5. Write code using approved tokens only.**
@@ -55,7 +58,9 @@ If either file is missing → STOP. Run `init-project` first.
 - Apply the 7 cardinal sins check from `FUNDAMENTALS.md` while writing — never emit indigo, two-stop gradients, emoji icons, etc.
 
 **6. Scan the diff.**
-- After writing, grep the diff for:
+- Scope the scan to the component paths recorded in `agents/STRUCTURE.md` (same paths used in Step 2). If STRUCTURE.md is missing, fall back to scanning from the project root. For monorepos, scan each app's component paths separately — do not scan the workspace root.
+- Exclude from the scan: `node_modules/`, `.git/`, `dist/`, `build/`, `.next/`, `.turbo/`, `coverage/`.
+- After writing, grep the scoped paths for:
   - Raw hex: `#[0-9a-fA-F]{3,8}` outside `:root` / token definition files.
   - Raw px in component files (not utility classes).
   - Raw `font-family` strings.

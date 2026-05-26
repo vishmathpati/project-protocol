@@ -146,6 +146,7 @@ Check `agents/docs/INDEX.md` dependency entries before classifying.
 - **WORKLOG.md** / **CHANGELOG.md** — same role as cowork's but for project work.
 - **docs/INDEX.md** — feature dependency map. Source for cross-feature lookups.
 - **docs/detail/** — deep reference. When changed: relevant feature contracts may need re-reading.
+- **preview/** — design-direction preview HTML files. Gitignored. Garbage-collected by `audit` (keeps most recent 2 per direction-slug).
 
 ### `human/`
 - **agenda.md** — daily steering file. When `agents/ROADMAP.md` or `agents/BRIEF.md` change: re-derive.

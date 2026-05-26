@@ -105,7 +105,50 @@ If the plugin-root env var is unset (some agents don't expose it): use the Read 
 
 ## `agents/TOOLING.md` (Node projects only)
 
-**Detect:** Node project if a `package.json` exists at the project root. If not Node (Swift, Python, plain repo): skip this section silently — do not create `agents/TOOLING.md`.
+### Step 4-pre — Monorepo detection
+
+Before proceeding with TOOLING.md, check whether this is a monorepo. Run all four checks:
+
+```bash
+# Check 1 — root package.json with "workspaces" field
+node -e "const p=require('./package.json'); process.exit(p.workspaces ? 0 : 1)" 2>/dev/null
+
+# Check 2 — pnpm workspace manifest
+ls pnpm-workspace.yaml 2>/dev/null
+
+# Check 3 — Turborepo config
+ls turbo.json 2>/dev/null
+
+# Check 4 — Nx config
+ls nx.json 2>/dev/null
+```
+
+**If any check passes → monorepo mode:**
+
+1. Scan for app-level `package.json` files:
+   ```bash
+   find apps packages -name "package.json" -maxdepth 3 2>/dev/null | grep -v node_modules
+   ```
+2. Present the detected apps to the user via `AskUserQuestion`:
+   ```
+   Detected monorepo. Found the following apps/packages with their own package.json:
+   - apps/web/package.json
+   - apps/api/package.json
+   - (etc.)
+
+   Which apps should get their own agents/TOOLING.md rules?
+   A — All of the above
+   B — Web app only (apps/web)
+   C — Let me specify
+   ```
+3. For each selected app, run Steps 4a and 4b (detect package manager, render TOOLING.md) scoped to that app's directory — read `apps/web/package.json` for lockfiles, write to `apps/web/agents/TOOLING.md` (or wherever the user designates).
+4. Record the monorepo flag and app paths in `agents/STRUCTURE.md` (or queue them for Phase 4-struct below if STRUCTURE.md doesn't exist yet). These paths are read by `design-check`, `audit`, and `build-component`.
+
+**If no check passes → single-app mode:** proceed with Steps 4a and 4b as before, writing to `agents/TOOLING.md` at project root.
+
+---
+
+**Detect Node (single-app path):** Node project if a `package.json` exists at the project root. If not Node (Swift, Python, plain repo): skip this section silently — do not create `agents/TOOLING.md`.
 
 ### Step 4a — Detect or ask package manager
 
@@ -248,15 +291,26 @@ All paths produce the same output: the `templates/DESIGN.md` scaffold with place
 - Do not change the DO NOT section's universal items — only **add** brand-specific anti-patterns.
 - Do not edit the Extension protocol wording — it's enforced by the `design-check` skill.
 
-### Step 5 — Lint after writing
+### Step 4-struct — Write monorepo flag to STRUCTURE.md
 
-```bash
-npx @google/design.md lint agents/DESIGN.md
+If `agents/STRUCTURE.md` already exists (written by a prior `build-component` run), append or update the following block at the top of the file (after the header comment, before `## Surfaces present`):
+
+```markdown
+## Project layout
+
+**Monorepo:** true | false
+**App paths:** apps/web, apps/api, packages/ui   ← list only if monorepo: true; remove this line if false
 ```
 
-Report errors (must fix), warnings (show, ask), info (silent).
+If `agents/STRUCTURE.md` does not exist yet, queue this data for when it is first created (by `build-component` or Phase 0c modernize). The monorepo flag and app paths must appear in STRUCTURE.md so `design-check`, `audit`, and `build-component` all read the same source of truth.
 
-If linter not available: note "Linter not available — install `@google/design.md` to validate."
+---
+
+### Step 5 — Custom DESIGN.md lint (optional)
+
+If you have a custom DESIGN.md linter configured for this project, run it here.
+
+No linter is shipped with project-protocol. The `@google/design.md` package is not a project-protocol dependency and is not installed by default. If you want to lint `agents/DESIGN.md`, install and configure your own linter and document it under "optional dev tools" in `agents/TOOLING.md`.
 
 ---
 
