@@ -5,6 +5,76 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [2.5.0] — 2026-05-26
+
+Major release. Three-layer architectural redesign. The biggest single release since the three-folder protocol shipped.
+
+### What changed in the architecture
+
+Until v2.4.0, the plugin described what should happen and hoped the agent picked it up. That worked in casual sessions and broke quietly the rest of the time: agents hardcoded design values, picked native `<select>` over shadcn `<Select>` inconsistently, projects on older plugin versions silently skipped new rules, skill-to-skill chains relied on description-match keyword luck. A 32-finding edge-case audit (`AUDIT-2026-05-26.md`) traced every variant back to the same root cause: skills are reactive — the agent has to *choose* to invoke them — and the plugin had no deterministic enforcement layer to back them up.
+
+v2.5.0 separates the plugin into three explicit layers, each with a different guarantee:
+
+- **Rules** — root `CLAUDE.md` is now the always-loaded brain. Full skill index (one row per skill with when-to-use + how-to-invoke), full hooks index (what fires when), situation router (common requests → which skill), all non-negotiable rules. The agent never has to guess what's available; the catalog is always in front of it.
+- **Enforcement** — hooks. Three new ones: PostToolUse design-scan (greps every write to UI files for raw hex/px/font/native-when-shadcn/cardinal sins), PostToolUse design-check dispatcher (fires after writes to component-tier files), SessionStart drift-detector (reads `agents/.plugin-version`, prompts `/migrate-project` when behind). Hooks don't rely on the agent choosing to read anything.
+- **Workflow** — skills, but every skill-to-skill chain now uses explicit `Skill(name)` calls in the parent's body. Zero description-match auto-chains. The chain runs no matter how the user phrased the request.
+
+### New things added
+
+- **`migrate-project` skill (16th skill).** Walks the manifest chain between the project's recorded plugin version and the installed plugin version, proposes each delta, confirms per change, never silent-overwrites a customized file. Refuses to run in Cowork (Cowork can't `git push`); exits with instructions to open the project in Claude Code or terminal.
+- **`migrations/vX.Y.Z.md` manifests.** One per release from v2.5.0 onward. Each lists files added, files modified (with previous-template snapshot reference for diff-against-current detection), rules added, files renamed/removed. Backfill `migrations/v2.4.0.md` documents the rule #8 delta so projects on v2.3.0 can catch up cleanly.
+- **`agents/.session-type` marker.** Written by `init-project` at bootstrap (`cowork` / `claude-code` / `codex`). All hooks now read it to pick the correct WORKLOG path; env-var heuristic is the fallback only.
+- **`agents/.plugin-version` + `agents/.plugin-version-skip`.** Per-project drift state. Skip is per-version (re-prompts on next plugin update) — no permanent-skip option, by design.
+- **`agents/SITUATIONS.md`.** The situation router was pre-emptively split out of CLAUDE.md to keep the brain under 280 lines.
+- **Two new non-negotiable rules in root CLAUDE.md.** Rule #9 — hybrid shadcn-first component selection (default to shadcn primitive; named-list of native exceptions; stop and ask when no primitive exists). Rule #10 — use the skill index, don't improvise a workflow when a skill exists for it.
+- **`## Extended Context` stub** in root CLAUDE.md template — `add-context` appends here cleanly; 280-line ceiling check added.
+
+### Behavioral changes — skill chain determinism
+
+- `build-component` Phase 5 explicitly calls `Skill("design-check")` after each write. Belt-and-suspenders with the new PostToolUse dispatcher hook.
+- `build-page` explicitly calls `Skill("build-component")` for new primitives and `Skill("design-check")` after each section write. Canon-modification hard rule rewritten to name protected files (DESIGN/STRUCTURE/BRAND/FUNDAMENTALS/marketing) and explicitly permit BRIEF/INDEX updates. `layouts/<slug>.md` softened from hard prerequisite to warn-and-continue.
+- `save-session` Step 10 fully rewritten with three deterministic branches keyed on `agents/.session-type`: `main` direct → simple add+commit+push; worktree branch → existing merge flow; Cowork → copy-paste fenced shell snippet (no git execution). Step 9.5 adds explicit `Skill("audit-before-close")` call.
+- `build-component` and `build-page` both add explicit `Skill("discipline")` calls when the change is structural (BRIEF, ROADMAP, or cross-tier).
+- `edit-plugin` gets Step 5 (Manifest discipline): version bumps must ship a `migrations/vX.Y.Z.md` in the same commit or the commit halts. L11 hot-copy activation path is now platform-conditional (env-var first, falls back to macOS / Linux paths).
+
+### Behavioral changes — multi-stack robustness
+
+- `init-project` detects monorepos (`workspaces` / `pnpm-workspace.yaml` / `turbo.json` / `nx.json`), writes per-app `agents/TOOLING.md`, records `**Monorepo:**` + `**App paths:**` in `STRUCTURE.md`.
+- `init-project` Phase 4 asks for package manager at first init (default to detected lockfile, one-key confirm); re-init reads existing `agents/TOOLING.md` and asks continue-or-switch.
+- `templates/TOOLING.md` personal `~/Arel OS/Projects/` path stripped entirely. Template now renders from chosen package manager.
+- `build-component` Phase 1 adds `src-tauri/tauri.conf.json` as a desktop surface signal regardless of frontend location. Tauri-at-root projects are no longer misclassified.
+- `design-check` Step 2 reads `agents/STRUCTURE.md` for tier paths instead of hardcoded globs. Step 6 diff scan scoped to `STRUCTURE.md` paths with exclude list (`node_modules`, `.git`, `dist`, `build`, `.next`, `.turbo`, `coverage`). Monorepo-aware: scans each app separately.
+- `audit` design-system scan does the same. New Step 4 garbage-collects `agents/preview/` HTMLs (keep 2 most recent per direction-slug, surfaces deletion list to user).
+- `build-component` Phase 5 treats `[VERIFY]` markers in `STRUCTURE.md` as "not detected" instead of authoritative.
+- `build-component` 2-round edit cap qualified as standalone-only; lifted when inline-called from `build-page`.
+
+### Cleanup sweep
+
+- `marketing-brief` `allowed-tools` no longer lists unused WebSearch; Codex sidecar now names `build-page` as primary consumer.
+- `init-project` Codex sidecar expanded from 7 words to ~50 words naming all five modes.
+- `design-direction` `allowed-tools` now includes WebSearch (Phase 4 moodboard actually uses it).
+- `add-context` Step 3 adds Cowork vs Claude Code / Codex qualifier for the type-DONE pattern. Step 5 counts CLAUDE.md lines before appending; warns at 280-line ceiling.
+- `session-recap` `allowed-tools` scoped from `Bash(git:*)` wildcard to read-only `Bash(ls / pwd / date / git status / git worktree / git log)`. Dead `sessions/` directory read removed.
+- `templates/CONTENT.md` link-shortener example rows wrapped in `<!-- EXAMPLE — DELETE BEFORE USE -->` markers.
+- `phase-4-design-system.md` dead `npx @google/design.md lint` step removed.
+- `init-project` SKILL.md `STRUCTURE.md` creation-path note expanded to list all three paths.
+- `agents/preview/` added to `init-project` output layout and root README template.
+
+### Migration
+
+Existing projects: run `/migrate-project` to backfill the new files (`.session-type`, `.plugin-version`, etc.) and apply the deltas from `migrations/v2.4.0.md` and `migrations/v2.5.0.md`. The SessionStart drift-detector hook will prompt automatically on first session after upgrading.
+
+Cowork projects: the drift-detector still detects and warns, but `migrate-project` itself refuses to run in Cowork. Open the project in Claude Code (or your terminal) and run `/migrate-project` there — Cowork can't `git push` the version bump, and silently no-op'ing the migration would leave the project in an unknown state.
+
+### Known runtime notes
+
+- The PostToolUse design-scan hook depends on the runtime exposing a tool-input file-path env var. If your host runtime uses a different env var name, the hook silently no-ops (safe). Verify in the Claude Code / Codex hook spec for your version.
+- The SessionStart drift-detector uses `python3 packaging.version` to compare semvers (Python 3.8+, standard on macOS / Linux). If `packaging` is unavailable, the warning still fires but without the specific manifest list. A pure-bash version comparison could replace this if needed.
+
+### Stats
+
+5 implementation commits (Phases A–E) under one redesign plan (`REDESIGN-PLAN-2026-05-26.md`). 32 audit findings closed (6 HIGH / 14 MEDIUM / 12 LOW). 28 files modified, 4 files created.
+
 ## [2.4.0] — 2026-05-24
 
 Patch release. Closes a long-standing gap in the design-system gate: agents kept hardcoding hex / px / font values in UI files because the always-loaded root `CLAUDE.md` template said nothing about tokens or `design-check`. The rules existed only in `DESIGN.md`, `FUNDAMENTALS.md`, and the `design-check` skill — files the agent only opens if it independently decides to. Even an obedient agent reading root `CLAUDE.md` cover-to-cover got zero signal that hardcoding was forbidden.
