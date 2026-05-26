@@ -40,6 +40,7 @@ Delegate to a fast sub-agent. Glob each of the following (exclude `node_modules/
 - `app/_components/**` or `app/components/**` — Next.js App Router co-located components.
 - `apps/web/src/components/**`, `apps/dashboard/src/components/**` — multi-app monorepo split.
 - `desktop/src/components/**` — Tauri / Electron desktop frontend.
+- `src-tauri/tauri.conf.json` — **Tauri desktop app signal.** If this file exists, record a `desktop (Tauri)` surface entry in STRUCTURE.md regardless of where the frontend components live (they may be at repo root, `src/`, `frontend/`, or elsewhere). Both the frontend surface AND the desktop surface must be recorded.
 - `Views/**/*.swift` — Swift / SwiftUI projects.
 
 For each path, record: exists / count of files / one sample file name. This is enough to propose locations without reading everything.
@@ -97,6 +98,7 @@ Look at route grouping and folder names to infer which **surfaces** this project
 | `app/(marketing)/**` or `app/marketing/**` or `apps/marketing/**` | Marketing (web) |
 | `app/(dashboard)/**` or `app/app/**` or `apps/dashboard/**` | App (web) |
 | `desktop/` with Tauri / Electron config | App (desktop) |
+| `src-tauri/tauri.conf.json` exists (any frontend location) | App (desktop, Tauri) — record alongside whatever web surface exists |
 | `app/(docs)/**`, `apps/docs/**`, `docs/` with MDX | Docs |
 | `emails/` with `react-email` deps | Email |
 | Single `src/` and no route groups | Single-surface (treat as App) |

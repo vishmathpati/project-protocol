@@ -6,7 +6,7 @@ Everything is decided: tier, strategy, data shape, location, convention. Phase 5
 
 ## 5.1 — Detect convention (silently)
 
-Before generating code, lock the project's convention. Use `STRUCTURE.md` if it recorded one. Otherwise re-detect from `package.json`:
+Before generating code, lock the project's convention. Use `STRUCTURE.md` if it recorded one — **but treat any value marked `[VERIFY]` as "not detected."** Only values without the `[VERIFY]` marker are authoritative. If all convention fields are `[VERIFY]` or missing, fall through to re-detect from `package.json`:
 
 | Detected | Convention | Code shape |
 |----------|-----------|------------|
@@ -120,7 +120,7 @@ User options:
 - **edit** → "what to change?" — accept free-text instructions, regenerate, re-preview.
 - **restart** → drop the current generation, return to Phase 2.
 
-Allow at most 2 edit rounds. After that, recommend taking it to discussion-mode for deeper rework.
+Allow at most 2 edit rounds. After that, recommend taking it to discussion-mode for deeper rework. **This cap applies to standalone invocations only.** If invoked inside a `build-page` session, this cap does not apply — iterate freely.
 
 ---
 
@@ -144,16 +144,13 @@ If the parent folder didn't exist before this (e.g. `src/components/marketing/` 
 
 ## 5.5 — Hand off to `design-check`
 
-After the write, the `design-check` skill should fire automatically (it's registered to trigger on "created component" / "edited component" patterns).
-
-If the host environment doesn't auto-fire skills, surface the prompt:
+After the write, explicitly invoke `design-check` via a `Skill` call:
 
 ```
-build-component — wrote src/components/marketing/pricing-card.tsx.
-
-  Next: design-check will sweep the file against DESIGN.md tokens, the 7 cardinal
-  sins, and the 5 required states. Run it now? (y / skip)
+Skill("design-check")
 ```
+
+This is deterministic — the explicit `Skill` call guarantees the chain fires regardless of host environment. The PostToolUse dispatcher hook from Phase A backs this up (Risk 2: double-fire is accepted; design-check is idempotent). Do not add a conditional or "if the host supports it" guard — the call is unconditional.
 
 Do not duplicate `design-check`'s 8 steps here. The two skills chain — `build-component` writes, `design-check` audits.
 
@@ -188,7 +185,7 @@ build-component — done
   No new tokens proposed. No cross-tier imports. No raw values.
 
   Next:
-    → design-check (auto-fires)
+    → design-check (invoked via explicit Skill call + PostToolUse hook)
     → To use: import { PricingCard } from "@/components/marketing/pricing-card"
 ```
 

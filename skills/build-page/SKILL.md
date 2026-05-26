@@ -45,10 +45,12 @@ Copy is inlined directly in the page JSX, sourced verbatim from `agents/marketin
 Before this skill can do useful work, these must exist:
 
 - `agents/CLAUDE.md`, `agents/BRAND.md`, `agents/DESIGN.md`, `agents/FUNDAMENTALS.md`, `agents/STRUCTURE.md`.
-- For **marketing pages**: `agents/marketing/CONTENT.md`, `agents/marketing/SITEMAP.md`, `agents/marketing/briefs/<slug>.md`, `agents/marketing/copy/<slug>.md`, `agents/marketing/MEDIA.md`, `agents/marketing/layouts/<slug>.md`.
+- For **marketing pages**: `agents/marketing/CONTENT.md`, `agents/marketing/SITEMAP.md`, `agents/marketing/briefs/<slug>.md`, `agents/marketing/copy/<slug>.md`, `agents/marketing/MEDIA.md`, `agents/marketing/layouts/<slug>.md` *(soft prerequisite — see below)*.
 - For **dashboard pages**: a brief (a row in `agents/ROADMAP.md`, a file at `agents/specs/<slug>.md`, or a one-paragraph spec the user types inline).
 
-If marketing canon is missing for a marketing-tier page → halt: *"Marketing canon missing for `<slug>`. Run `marketing-brief` first (or add the missing files), then re-invoke."*
+**Marketing canon prerequisite logic:**
+- **Hard halt** if `agents/marketing/briefs/<slug>.md` OR `agents/marketing/copy/<slug>.md` is missing → *"Marketing brief/copy missing for `<slug>`. Run `marketing-brief` first (or add the missing files), then re-invoke."*
+- **Warn and continue** if `agents/marketing/layouts/<slug>.md` is missing but brief + copy exist → surface a warning: *"Note: `layouts/<slug>.md` not found — proceeding without block-level wireframe intent. Layout decisions will be made in conversation."* The per-section workflow skips the layouts read step and relies on brief + copy alone. This covers the common case where `marketing-brief` has run through Phase 6 (copy written) but Phase 7 (layouts) is not yet complete.
 
 If a dashboard page has no brief → halt and ask the user to type a one-paragraph spec inline. Do not invent the spec.
 
@@ -117,7 +119,15 @@ When this skill fires:
    ```
    Also append a WORKLOG line: `[HH:MM] decided: build-page plan locked for /<slug> — N sections`.
 
-9. **Per-section work** — see `references/per-section-workflow.md`. For each section, in order: surface content, propose components, accept external references if dropped, decide strategy (reuse / adapt / build new), call `build-component` for build-new entries, append a WORKLOG line on close. Sequential, one section at a time, even if two are independent.
+9. **Per-section work** — see `references/per-section-workflow.md`. For each section, in order: surface content, propose components, accept external references if dropped, decide strategy (reuse / adapt / build new). When a section requires a net-new primitive, invoke `build-component` explicitly:
+   ```
+   Skill("build-component")
+   ```
+   After each section write completes (whether reuse, adapt, or new-build), invoke `design-check` explicitly:
+   ```
+   Skill("design-check")
+   ```
+   Both calls are unconditional — no "if host supports it" guard. Sequential, one section at a time, even if two are independent.
 
 10. **When all sections have real component paths**, do the wire-up. Write the actual page file:
     - **Marketing tier**: React Server Component, `export const metadata` for SEO, no top-level `"use client"`. Client behavior in small child components.
@@ -133,7 +143,7 @@ When this skill fires:
 
 11. **Update `agents/docs/INDEX.md` inline** — add the new page route to the index in the appropriate section. This satisfies the `save-session` Step 4 contract so the next save doesn't plant a reminder.
 
-12. **`design-check` fires automatically** after the page file is written (hook-driven). Let it run its 8 steps. Surface any flagged tokens, banned words, or cross-tier violations to the user. Fix in place where mechanical; ask where it's a judgment call.
+12. **`design-check` is explicitly invoked** after the page file is written via `Skill("design-check")` (backed by the PostToolUse hook — double-fire accepted, design-check is idempotent). Let it run its 8 steps. Surface any flagged tokens, banned words, or cross-tier violations to the user. Fix in place where mechanical; ask where it's a judgment call.
 
 13. **Closing.** Print the end-of-skill summary (see "Output shape" below). The session ends when the user closes the chat or types "save" / "save session". No special handoff machinery — STATUS.md Next Actions + WORKLOG carry whatever a future session needs.
 
@@ -142,6 +152,18 @@ When this skill fires:
 ## External references
 
 When the user drops a URL, pasted component code, or a screenshot during section work — see `references/per-section-workflow.md`, section "External reference adoption". Short version: fetch / parse, analyze the visual pattern + tokens it uses, cross-check against DESIGN.md (do our tokens cover it?) + BRAND.md (does the voice fit our archetype?) + the section's content (does the layout serve what we're saying?), recommend adopt / adapt / reject, and hand off to `build-component`'s existing `adopt-external` sub-mode if accepted.
+
+---
+
+## Structural-change gate
+
+Before proceeding when the planned page build is **structural** — defined as: touches `agents/BRIEF.md` (beyond the plan-lock append), touches `agents/ROADMAP.md`, or involves writing files across multiple tiers simultaneously — invoke the discipline skill first:
+
+```
+Skill("discipline")
+```
+
+Normal single-page builds with a plan-lock BRIEF append do NOT trigger this gate. It fires when the scope has expanded to affect the project's roadmap, cross-tier refactors, or multi-file canon changes beyond the expected BRIEF.md append + INDEX.md update.
 
 ---
 
@@ -154,9 +176,9 @@ When the user drops a URL, pasted component code, or a screenshot during section
 - **Per-section work is sequential.** One section at a time. Even when two sections are independent, do them in order — that's the conversation shape that keeps the user oriented.
 - **Lock-before-cascade.** Plan-lock writes a BRIEF block BEFORE any per-section work begins. (Cardinal rule from `agents/CLAUDE.md`.)
 - **One decision per WORKLOG line.** Canonical prefix vocabulary: `decided: / fixed: / tried_failed: / found_bug:`. No multi-line entries. Timestamp `[HH:MM]` at the start of every line.
-- **Never modify canon from this skill.** No edits to `DESIGN.md`, `STRUCTURE.md`, `BRAND.md`, `FUNDAMENTALS.md`, or any file in `agents/marketing/`. If canon needs to change, halt and tell the user: they update canon, we resume.
+- **Canon protection — explicit list.** The following files are read-only from this skill: `agents/DESIGN.md`, `agents/STRUCTURE.md`, `agents/BRAND.md`, `agents/FUNDAMENTALS.md`, and all files under `agents/marketing/` (CONTENT.md, SITEMAP.md, briefs/, copy/, MEDIA.md, layouts/). If any of these need to change, halt and tell the user: they update canon, we resume. **Permitted writes from this skill:** appending a version block to `agents/BRIEF.md` (Step 8 plan-lock), and updating `agents/docs/INDEX.md` with the new route (Step 11). These are not "canon modifications" — they are the expected output of this skill.
 - **The conversation is the state.** No state file. No scratch folder. If the session is interrupted, WORKLOG entries + STATUS Next Actions are the only resume mechanism — same as every other skill in the plugin.
-- **`design-check` chains automatically after wire-up.** Don't duplicate its 8 steps here.
+- **`design-check` is explicitly invoked after wire-up** via `Skill("design-check")` and after each per-section build. Don't duplicate its 8 steps here.
 - **Skip the marketing-content.ts pattern entirely.** Phase rule worth repeating: if it already exists, do not write to it.
 
 ---
@@ -201,7 +223,7 @@ INDEX.md updated: yes
 WORKLOG appends: <N>
 BRIEF blocks appended: <N>
 
-design-check just ran — <findings or "clean">.
+design-check ran (via explicit Skill call + PostToolUse hook) — <findings or "clean">.
 
 Next:
   → Save the session with /save-session when ready.
@@ -216,7 +238,7 @@ Next:
 - **`marketing-brief`** — the planning pass that locks the marketing-site canon (CONTENT, SITEMAP, briefs, copy, MEDIA, layouts) ONCE near the end of a project. `build-page` is the execution pass that turns those plans into real pages — invoked per page, ongoing.
 - **`build-component`** — atomic. One component at a time. `build-page` calls it inline whenever a section needs a net-new primitive. Atomic component requests from the user still go directly to `build-component`. They chain: `build-page` is the conductor, `build-component` is the player.
 - **`design-direction`** — locks brand identity ONCE at the start. Upstream of every page build.
-- **`design-check`** — UI write-time gate. Fires automatically after this skill's wire-up (and after each inline `build-component` call).
+- **`design-check`** — UI write-time gate. Explicitly invoked via `Skill("design-check")` after this skill's wire-up and after each inline `build-component` call. Backed by PostToolUse hook (double-fire accepted).
 - **`discussion-mode`** — pure conversation, no writes. If the user wants to think about a page WITHOUT committing to architecture, use that first, then `build-page` to actually compose.
 - **`init-project`** — bootstraps the three-folder layout. `build-page` assumes init-project + design-direction + (for marketing pages) marketing-brief have already run.
 - **`save-session`** — closes the session cleanly. Consumes the WORKLOG entries this skill wrote. If a build-page session ends mid-flow, save-session writes a `Resume /build-page <slug>` line to STATUS Next Actions automatically (because WORKLOG will show an open `decided: build-page started` line with no matching `decided: build-page complete` line).

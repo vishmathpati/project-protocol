@@ -67,7 +67,11 @@ No `build-component` call needed. Move to the next section.
 Adaptation means editing an existing component to add a variant, prop, or behavior. This goes through `build-component` because the cross-tier and token rules still apply.
 
 1. Confirm the delta: *"Adapting <ComponentName> — add `numbered` variant that prepends a step number above the title. Other variants untouched. Confirm?"*
-2. Invoke `build-component` with sub-mode "extend existing primitive". `build-component` runs its own preview-and-approve flow inside its Phase 5, edits the component file, gates through `design-check`, returns control.
+2. Invoke `build-component` explicitly:
+   ```
+   Skill("build-component")
+   ```
+   Pass sub-mode "extend existing primitive". `build-component` runs its own preview-and-approve flow inside its Phase 5, gates through `design-check` (explicit Skill call within build-component), returns control.
 3. Write WORKLOG line:
    ```
    [HH:MM] decided: §<n> built — adapted <ComponentName> (added <delta>)
@@ -77,13 +81,17 @@ Adaptation means editing an existing component to add a variant, prop, or behavi
 ## When the user picks Build new
 
 1. Confirm the intent: *"Building new <ComponentName> for §<n> — a <one-sentence shape>. Tier: <marketing | app | generic>. Composes <existing primitives>. Confirm?"*
-2. Invoke `build-component` with the intent spec. `build-component` runs its full 5-phase flow inside its own conversation:
+2. Invoke `build-component` explicitly:
+   ```
+   Skill("build-component")
+   ```
+   Pass the intent spec. `build-component` runs its full 5-phase flow inside its own conversation:
    - Phase 1: structure detection (skipped if STRUCTURE.md exists, which it should).
    - Phase 2: intake + tier (parent-skill provides; no question to user).
    - Phase 3: reuse scan (already done by build-page, but build-component re-runs in its scope — that's fine, it's fast).
    - Phase 4: data shape + location.
    - Phase 5: preview + write, with its own approval gate.
-   - `design-check` fires post-write.
+   - `design-check` is explicitly invoked post-write (via `Skill("design-check")` inside build-component section 5.5).
 3. `build-component` returns the file path.
 4. Write WORKLOG line:
    ```
@@ -158,7 +166,11 @@ Write the verdict to chat. Wait for the user to accept the verdict or push back.
 
 ### 7. Execute
 
-If adopt or adapt: invoke `build-component`'s `adopt-external` sub-mode. Pass:
+If adopt or adapt: invoke `build-component`'s `adopt-external` sub-mode explicitly:
+```
+Skill("build-component")
+```
+Pass:
 - The source (URL / pasted code / image path)
 - The normalization table from step 3
 - Any user-confirmed substitutions ("yes, use our accent not theirs")

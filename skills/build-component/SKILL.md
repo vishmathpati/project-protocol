@@ -91,6 +91,18 @@ User says: *"I want a component like [Mantine Combobox / Chakra Drawer / MUI Ste
 
 ---
 
+## Structural-change gate
+
+Before proceeding with any **structural change** — defined as: the planned component touches `agents/BRIEF.md` or `agents/ROADMAP.md`, or involves writing files across multiple tiers — invoke the discipline skill first:
+
+```
+Skill("discipline")
+```
+
+This threshold does NOT apply to normal single-component builds. It applies when the intake sentence implies a cross-tier refactor, a new tier introduction, or a change that would touch canon files beyond `agents/STRUCTURE.md`.
+
+---
+
 ## Hard rules
 
 - **No write without preview.** Phase 5 always shows the full code before saving.
@@ -99,7 +111,7 @@ User says: *"I want a component like [Mantine Combobox / Chakra Drawer / MUI Ste
 - **`cva + forwardRef + cn` triplet applies only to new primitives (Generic + Strategy C).** Compositions and variant-extensions don't need it. Imposing the triplet on a composition is over-engineering and produces noise.
 - **STRUCTURE.md is written once, read forever.** First run writes it after user confirmation. Subsequent runs read it and skip detection.
 - **Convention is detected, not asked.** If `shadcn-ui` / `class-variance-authority` is in `package.json` → cva+forwardRef+cn. If `styled-components` → styled-components. If `*.module.css` files exist → CSS modules. If none detected → ask the user, default to vanilla CSS-with-tokens.
-- **`design-check` runs automatically after Phase 5.** Don't duplicate its 8 steps here — `build-component` is the path-of-build, `design-check` is the gate-of-correctness. They chain.
+- **`design-check` is explicitly invoked after Phase 5** via `Skill("design-check")` in section 5.5. The PostToolUse hook backs this up (double-fire accepted; design-check is idempotent). Don't duplicate its 8 steps here — `build-component` is the path-of-build, `design-check` is the gate-of-correctness. They chain.
 - **Never modify `DESIGN.md` or `FUNDAMENTALS.md` from this skill.** Missing tokens route through `design-check` Step 4.
 
 ---
@@ -141,7 +153,7 @@ Tokens used:
   - <token 1>, <token 2>, <token 3>
 
 Next:
-  → design-check will run automatically against the written file.
+  → design-check invoked (explicit Skill call + PostToolUse hook) against the written file.
   → If new tokens were proposed, they remain pending until you confirm.
 ```
 
@@ -152,7 +164,7 @@ Next:
 - **`init-project`** — bootstraps the project layout and writes the canon files (`DESIGN.md`, `FUNDAMENTALS.md`, `STRUCTURE.md` if requested). `build-component` assumes those exist and writes components against them.
 - **`design-direction`** — sets brand-level direction and writes `BRAND.md` + `DESIGN.md` Overview. Upstream of any component work.
 - **`build-page`** *(new in v2.2)* — the compositional sibling. Where `build-component` writes ONE atomic thing (a button, a tile, a hero block), `build-page` orchestrates a WHOLE page: section architecture, hierarchy, asset manifest, reuse audit — and calls `build-component` inline whenever a section needs a net-new primitive. Use `build-component` directly for atomic component requests. Use `build-page` for "build the homepage / pricing page / dashboard overview". They chain: `build-page` is the conductor, `build-component` is the player.
-- **`design-check`** — the 8-step UI gate. `build-component` is the path-of-build, `design-check` is the gate-of-correctness. `design-check` fires automatically after Phase 5.
+- **`design-check`** — the 8-step UI gate. `build-component` is the path-of-build, `design-check` is the gate-of-correctness. `design-check` is explicitly invoked after Phase 5 via `Skill("design-check")` (backed by the PostToolUse hook).
 - **`discussion-mode`** — pure conversation, no writes. If the user wants to talk through a component idea without committing, use that first, then `build-component` to actually ship.
 - **`audit`** — periodic consistency scan across canon. Will catch drift between `STRUCTURE.md` and the actual filesystem if it happens.
 

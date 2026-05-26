@@ -173,13 +173,57 @@ Replace contents with:
 
 ---
 
-## Step 10 — Git sync (commit, push, auto-merge into `main`)
+## Step 9.5 — Invoke `audit-before-close`
 
-Without this step the canon updates from steps 3–9 stay stranded on the session's worktree branch. The user's local folder is on `main` and will not see them. Run this every save.
+Before committing, run the close-gate audit:
 
-### 10a — Capture git state
+```
+Skill("audit-before-close")
+```
 
-From the active worktree directory, run:
+This is unconditional. `audit-before-close` is idempotent — if it was already invoked earlier in this session, the double-call is accepted (locked Risk 7). Surface any findings to the user before proceeding to Step 10.
+
+---
+
+## Step 10 — Git sync (commit, push) — environment-aware
+
+> **Cowork variant:** outputs a copy-paste shell snippet because the Cowork runtime cannot `git push`. See branch (c) below.
+
+Read `agents/.session-type` to determine the environment. If the file is missing, fall back to env-var heuristic: `CLAUDE_PLUGIN_ROOT` or `CODEX_PLUGIN_ROOT` set → `claude-code` or `codex`; neither set → `cowork`.
+
+**Three branches:**
+
+---
+
+### Branch (a) — `claude-code` or `codex`, working directly on `main`
+
+Detected when: session-type is `claude-code` or `codex`, AND `git rev-parse --abbrev-ref HEAD` returns `main`.
+
+Simple add → commit → push:
+
+```bash
+git add cowork/ agents/ human/
+git commit -m "chore(session): save session YYYY-MM-DD · <agent label>"
+git push origin main
+```
+
+Separate the changed files before staging — same rule as always:
+- **Protocol .md files** under `cowork/`, `agents/`, or `human/` → stage automatically.
+- **Anything else** → list to the user and ASK before staging. Never sweep code files into a save-session commit.
+
+If `git status --porcelain` is clean: skip the commit; still run `git push origin main` to ensure main is up to date.
+
+If push fails (auth, non-fast-forward, network): **STOP** and report the exact error.
+
+---
+
+### Branch (b) — `claude-code` or `codex`, on a worktree branch
+
+Detected when: session-type is `claude-code` or `codex`, AND current branch is NOT `main`.
+
+This is the existing merge-to-main flow:
+
+**10b-1 — Capture git state**
 
 ```bash
 git rev-parse --show-toplevel       # current worktree path
@@ -189,43 +233,30 @@ git worktree list --porcelain       # all worktrees + which holds main
 git remote -v                       # confirm a remote exists
 ```
 
-If `HEAD` is detached (not on a branch): **STOP** and report — "Not on a branch — cannot auto-merge. Checkout a branch first, then re-run save."
+If `HEAD` is detached: **STOP** — "Not on a branch — cannot auto-merge. Checkout a branch first."
 
-If the repo has no remote: skip the push in 10c and the push in 10d; still do the local merge into `main`.
+If no remote: skip pushes; still do the local merge.
 
-### 10b — Stage and commit session updates
+**10b-2 — Stage and commit**
 
-If `git status --porcelain` is clean: skip to 10c.
-
-Otherwise, separate the changed files into two groups:
-
-- **Protocol .md files** under `cowork/`, `agents/`, or `human/` → expected output of steps 3–9. Stage automatically.
-- **Anything else** (code files, configs, untracked files outside the protocol folders) → list them to the user and ASK before staging. Never sweep arbitrary changes into a `save-session` commit.
-
-Stage protocol files only:
+Separate files (same rule as branch a). Stage protocol files only:
 
 ```bash
 git add cowork/ agents/ human/
 git commit -m "chore(session): save session YYYY-MM-DD · <agent label>"
 ```
 
-### 10c — Push the worktree branch to GitHub
-
-If current branch is already `main`: skip to 10d.
+**10b-3 — Push worktree branch**
 
 ```bash
 git push -u origin <current-branch>
 ```
 
-If push fails (auth, non-fast-forward, network): **STOP** and report the exact error. Do not attempt the merge — leave the user in a clean recoverable state.
+If push fails: **STOP** and report. Do not attempt merge.
 
-### 10d — Auto-merge into `main`
+**10b-4 — Merge into main**
 
-From `git worktree list --porcelain`, find the worktree on `main` (the user's local folder in Finder). Call its absolute path `<MAIN_PATH>`.
-
-If current branch IS `main`: just run `git -C "<MAIN_PATH>" push origin main` and skip the merge.
-
-Otherwise:
+From `git worktree list --porcelain`, find `<MAIN_PATH>` (worktree on `main`):
 
 ```bash
 git -C "<MAIN_PATH>" fetch origin
@@ -233,16 +264,39 @@ git -C "<MAIN_PATH>" merge --no-ff <current-branch> -m "merge: session YYYY-MM-D
 git -C "<MAIN_PATH>" push origin main
 ```
 
-If merge fails (conflicts): **STOP** and report — list the conflicted files and tell the user: "Resolve conflicts in `<MAIN_PATH>`, then run `git merge --continue && git push origin main`."
+If merge fails (conflicts): **STOP** — list conflicted files and tell the user: "Resolve conflicts in `<MAIN_PATH>`, then run `git merge --continue && git push origin main`."
 
-### 10e — Report git outcome (feeds into Step 11)
+---
+
+### Branch (c) — `cowork` (cannot `git push`)
+
+Detected when: session-type is `cowork`, OR neither `CLAUDE_PLUGIN_ROOT` nor `CODEX_PLUGIN_ROOT` is set.
+
+The Cowork runtime cannot execute `git push`. Do NOT attempt any git commands. Instead, generate a copy-paste shell snippet for the user to run in their terminal:
+
+````
+⚠️  Git sync must be done from your terminal — Cowork can't push.
+    Copy and run this in your project root:
+
+```bash
+git add cowork/ agents/ human/
+git commit -m "chore(session): save session YYYY-MM-DD · <agent label>"
+git push origin main
+```
+````
+
+Replace `YYYY-MM-DD` and `<agent label>` with the actual values. The user runs this snippet after the skill closes. Note this in Step 11 with a ⚠️ line instead of ✅ Git.
+
+---
+
+### 10-final — Report git outcome (feeds into Step 11)
 
 Capture for the final confirmation:
-- Files committed (count + tier)
-- Branch pushed to origin
-- Merge commit SHA on main (or "fast-forward")
-- Main pushed to origin
-- Anything skipped or that requires user follow-up
+- Which branch was taken (a / b / c)
+- Files staged (count + tier)
+- Branch pushed to origin (or "copy-paste snippet provided" for Cowork)
+- Merge commit SHA on main (or "fast-forward" or "N/A — working on main")
+- Anything skipped or requiring user follow-up
 
 ---
 
@@ -253,6 +307,7 @@ Capture for the final confirmation:
 ✅ <tier>/STATUS.md updated · [agent label]
 ✅ <tier>/BRIEF.md signed (v1.X) — [Y/N, or "no decisions this session"]
 ✅ <tier>/WORKLOG.md cleared
+✅ audit-before-close: ran (Step 9.5) — [findings or "clean"]
 ✅ agents/DISCOVERIES.md appended — [Y/N]
 ✅ human/agenda.md updated — [Y/N]
 ✅ Git: committed N file(s) · pushed <branch> → GitHub · merged into main · main pushed
@@ -261,10 +316,16 @@ Capture for the final confirmation:
 Session closed.
 ```
 
-If git sync was skipped or halted partway, replace the last `✅ Git:` line with:
+If git sync was skipped or halted partway, replace the `✅ Git:` line with:
 
 ```
 ⚠️ Git: <what happened> — <exact command the user needs to run>
+```
+
+For Cowork sessions (branch c), replace the `✅ Git:` line with:
+
+```
+⚠️ Git: Cowork can't push — copy-paste snippet above. Run it in your terminal to sync.
 ```
 
 ---
