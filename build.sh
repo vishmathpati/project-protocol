@@ -98,6 +98,22 @@ echo "  ✅ Full build:   $OUTPUT_FULL"
 mkdir -p "$STAGE_COWORK/.claude-plugin" "$STAGE_COWORK/skills"
 cp .claude-plugin/plugin.json "$STAGE_COWORK/.claude-plugin/"
 
+# Rename the Cowork build to a distinct plugin identity so Claude Desktop
+# treats it as a separate plugin from the FULL build (which keeps the original
+# project-protocol name). Without this, both builds share the same logical
+# plugin ID in the desktop app and enable/disable becomes coupled across
+# Cowork and Claude Code. The Cowork zip becomes "project-protocol-cowork".
+# Skill namespace also changes accordingly (project-protocol-cowork:save-session).
+python3 -c "
+import json
+p = '$STAGE_COWORK/.claude-plugin/plugin.json'
+d = json.load(open(p))
+d['name'] = 'project-protocol-cowork'
+d['description'] = 'Cowork build of project-protocol. ' + d['description']
+json.dump(d, open(p, 'w'), indent=2)
+print('  ↳ Renamed Cowork plugin to:', d['name'])
+"
+
 for skill_dir in skills/*/; do
   skill_name=$(basename "$skill_dir")
   mkdir -p "$STAGE_COWORK/skills/$skill_name"
