@@ -34,9 +34,9 @@ Everything else about this skill is the same as every other skill in the plugin.
 
 ## What it produces
 
-One real page file at the location dictated by `agents/STRUCTURE.md` (typically `src/app/(marketing)/<slug>/page.tsx` for marketing or `src/app/(dashboard)/<slug>/page.tsx` for dashboard, but read STRUCTURE.md — don't assume). Plus zero-to-many net-new component files written by inline `build-component` calls during the per-section work. Plus an INDEX.md entry for the new route.
+One real page file at the location dictated by `brain/STRUCTURE.md` (typically `src/app/(marketing)/<slug>/page.tsx` for marketing or `src/app/(dashboard)/<slug>/page.tsx` for dashboard, but read STRUCTURE.md — don't assume). Plus zero-to-many net-new component files written by inline `build-component` calls during the per-section work. Plus an INDEX.md entry for the new route.
 
-Copy is inlined directly in the page JSX, sourced verbatim from `agents/marketing/copy/<slug>.md` (marketing) or the dashboard brief. **No intermediate content mirror file is ever created** — not `lib/marketing-content.ts`, not `data/copy.ts`, nothing.
+Copy is inlined directly in the page JSX, sourced verbatim from `brain/marketing/copy/<slug>.md` (marketing) or the dashboard brief. **No intermediate content mirror file is ever created** — not `lib/marketing-content.ts`, not `data/copy.ts`, nothing.
 
 ---
 
@@ -44,13 +44,13 @@ Copy is inlined directly in the page JSX, sourced verbatim from `agents/marketin
 
 Before this skill can do useful work, these must exist:
 
-- `agents/CLAUDE.md`, `agents/BRAND.md`, `agents/DESIGN.md`, `agents/FUNDAMENTALS.md`, `agents/STRUCTURE.md`.
-- For **marketing pages**: `agents/marketing/CONTENT.md`, `agents/marketing/SITEMAP.md`, `agents/marketing/briefs/<slug>.md`, `agents/marketing/copy/<slug>.md`, `agents/marketing/MEDIA.md`, `agents/marketing/layouts/<slug>.md` *(soft prerequisite — see below)*.
-- For **dashboard pages**: a brief (a row in `agents/ROADMAP.md`, a file at `agents/specs/<slug>.md`, or a one-paragraph spec the user types inline).
+- `brain/CLAUDE.md`, `brain/BRAND.md`, `brain/DESIGN.md`, `brain/FUNDAMENTALS.md`, `brain/STRUCTURE.md`.
+- For **marketing pages**: `brain/marketing/CONTENT.md`, `brain/marketing/SITEMAP.md`, `brain/marketing/briefs/<slug>.md`, `brain/marketing/copy/<slug>.md`, `brain/marketing/MEDIA.md`, `brain/marketing/layouts/<slug>.md` *(soft prerequisite — see below)*.
+- For **dashboard pages**: a brief (a row in `brain/ROADMAP.md`, a file at `brain/specs/<slug>.md`, or a one-paragraph spec the user types inline).
 
 **Marketing canon prerequisite logic:**
-- **Hard halt** if `agents/marketing/briefs/<slug>.md` OR `agents/marketing/copy/<slug>.md` is missing → *"Marketing brief/copy missing for `<slug>`. Run `marketing-brief` first (or add the missing files), then re-invoke."*
-- **Warn and continue** if `agents/marketing/layouts/<slug>.md` is missing but brief + copy exist → surface a warning: *"Note: `layouts/<slug>.md` not found — proceeding without block-level wireframe intent. Layout decisions will be made in conversation."* The per-section workflow skips the layouts read step and relies on brief + copy alone. This covers the common case where `marketing-brief` has run through Phase 6 (copy written) but Phase 7 (layouts) is not yet complete.
+- **Hard halt** if `brain/marketing/briefs/<slug>.md` OR `brain/marketing/copy/<slug>.md` is missing → *"Marketing brief/copy missing for `<slug>`. Run `marketing-brief` first (or add the missing files), then re-invoke."*
+- **Warn and continue** if `brain/marketing/layouts/<slug>.md` is missing but brief + copy exist → surface a warning: *"Note: `layouts/<slug>.md` not found — proceeding without block-level wireframe intent. Layout decisions will be made in conversation."* The per-section workflow skips the layouts read step and relies on brief + copy alone. This covers the common case where `marketing-brief` has run through Phase 6 (copy written) but Phase 7 (layouts) is not yet complete.
 
 If a dashboard page has no brief → halt and ask the user to type a one-paragraph spec inline. Do not invent the spec.
 
@@ -60,7 +60,7 @@ If a dashboard page has no brief → halt and ask the user to type a one-paragra
 
 When this skill fires:
 
-1. **Ask which page** (if not in the user's message). Use AskUserQuestion with options drawn from `agents/marketing/SITEMAP.md` rows (for marketing tier) or from existing dashboard routes (for dashboard tier).
+1. **Ask which page** (if not in the user's message). Use AskUserQuestion with options drawn from `brain/marketing/SITEMAP.md` rows (for marketing tier) or from existing dashboard routes (for dashboard tier).
 
 2. **Detect tier** from the slug location in STRUCTURE.md + user wording. Confirm once if ambiguous.
 
@@ -135,13 +135,13 @@ When this skill fires:
     - **Copy inlined directly** from `copy/<slug>.md` or the dashboard brief.
     - **Top-of-file canon-pointer comment** as the sync contract:
       ```tsx
-      // Copy mirrors agents/marketing/copy/<slug>.md — when that file changes,
+      // Copy mirrors brain/marketing/copy/<slug>.md — when that file changes,
       // propagate the update here. Do NOT inline new copy without updating
       // the canon first.
       ```
     - **No `lib/marketing-content.ts` mirror.** Ever.
 
-11. **Update `agents/docs/INDEX.md` inline** — add the new page route to the index in the appropriate section. This satisfies the `save-session` Step 4 contract so the next save doesn't plant a reminder.
+11. **Update `brain/docs/INDEX.md` inline** — add the new page route to the index in the appropriate section. This satisfies the `save-session` Step 4 contract so the next save doesn't plant a reminder.
 
 12. **`design-check` is explicitly invoked** after the page file is written via `Skill("design-check")` (backed by the PostToolUse hook — double-fire accepted, design-check is idempotent). Let it run its 8 steps. Surface any flagged tokens, banned words, or cross-tier violations to the user. Fix in place where mechanical; ask where it's a judgment call.
 
@@ -157,7 +157,7 @@ When the user drops a URL, pasted component code, or a screenshot during section
 
 ## Structural-change gate
 
-Before proceeding when the planned page build is **structural** — defined as: touches `agents/BRIEF.md` (beyond the plan-lock append), touches `agents/ROADMAP.md`, or involves writing files across multiple tiers simultaneously — invoke the discipline skill first:
+Before proceeding when the planned page build is **structural** — defined as: touches `brain/BRIEF.md` (beyond the plan-lock append), touches `brain/ROADMAP.md`, or involves writing files across multiple tiers simultaneously — invoke the discipline skill first:
 
 ```
 Skill("discipline")
@@ -174,9 +174,9 @@ Normal single-page builds with a plan-lock BRIEF append do NOT trigger this gate
 - **Cross-tier imports are blocked** (inherited from `build-component`). Marketing pages never import from `app/`. App pages never import from `marketing/`. Cross-tier needs route through Generic + wrapper.
 - **`build-component` is invoked for net-new components only**, not for atomic edits to the page itself. Wire-up is done directly by this skill.
 - **Per-section work is sequential.** One section at a time. Even when two sections are independent, do them in order — that's the conversation shape that keeps the user oriented.
-- **Lock-before-cascade.** Plan-lock writes a BRIEF block BEFORE any per-section work begins. (Cardinal rule from `agents/CLAUDE.md`.)
+- **Lock-before-cascade.** Plan-lock writes a BRIEF block BEFORE any per-section work begins. (Cardinal rule from `brain/CLAUDE.md`.)
 - **One decision per WORKLOG line.** Canonical prefix vocabulary: `decided: / fixed: / tried_failed: / found_bug:`. No multi-line entries. Timestamp `[HH:MM]` at the start of every line.
-- **Canon protection — explicit list.** The following files are read-only from this skill: `agents/DESIGN.md`, `agents/STRUCTURE.md`, `agents/BRAND.md`, `agents/FUNDAMENTALS.md`, and all files under `agents/marketing/` (CONTENT.md, SITEMAP.md, briefs/, copy/, MEDIA.md, layouts/). If any of these need to change, halt and tell the user: they update canon, we resume. **Permitted writes from this skill:** appending a version block to `agents/BRIEF.md` (Step 8 plan-lock), and updating `agents/docs/INDEX.md` with the new route (Step 11). These are not "canon modifications" — they are the expected output of this skill.
+- **Canon protection — explicit list.** The following files are read-only from this skill: `brain/DESIGN.md`, `brain/STRUCTURE.md`, `brain/BRAND.md`, `brain/FUNDAMENTALS.md`, and all files under `brain/marketing/` (CONTENT.md, SITEMAP.md, briefs/, copy/, MEDIA.md, layouts/). If any of these need to change, halt and tell the user: they update canon, we resume. **Permitted writes from this skill:** appending a version block to `brain/BRIEF.md` (Step 8 plan-lock), and updating `brain/docs/INDEX.md` with the new route (Step 11). These are not "canon modifications" — they are the expected output of this skill.
 - **The conversation is the state.** No state file. No scratch folder. If the session is interrupted, WORKLOG entries + STATUS Next Actions are the only resume mechanism — same as every other skill in the plugin.
 - **`design-check` is explicitly invoked after wire-up** via `Skill("design-check")` and after each per-section build. Don't duplicate its 8 steps here.
 - **Skip the marketing-content.ts pattern entirely.** Phase rule worth repeating: if it already exists, do not write to it.
@@ -217,7 +217,7 @@ Components used:
   - <component 3> @ <path>  [built new via build-component]
   …
 
-Copy source: agents/marketing/copy/<slug>.md (or dashboard brief)
+Copy source: brain/marketing/copy/<slug>.md (or dashboard brief)
 Canon-pointer comment: written at file top.
 INDEX.md updated: yes
 WORKLOG appends: <N>

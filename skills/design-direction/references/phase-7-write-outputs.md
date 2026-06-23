@@ -2,8 +2,8 @@
 
 The skill finishes by writing:
 
-1. `agents/BRAND.md` — full, rich.
-2. `agents/DESIGN.md` — Overview section + brand-specific DO NOT block, **plus token frontmatter when Phase 6.5 returned new token values with user approval**.
+1. `brain/BRAND.md` — full, rich.
+2. `brain/DESIGN.md` — Overview section + brand-specific DO NOT block, **plus token frontmatter when Phase 6.5 returned new token values with user approval**.
 
 Phase 7 receives the alignment result from Phase 6.5 and writes accordingly.
 The optional token-regeneration handoff from previous versions is removed —
@@ -20,10 +20,10 @@ token alignment is now Phase 6.5's job, not an end-of-skill afterthought.
 
 ---
 
-## `agents/BRAND.md` — full template after this skill
+## `brain/BRAND.md` — full template after this skill
 
 ```markdown
-# agents/BRAND.md — <Project Name>
+# brain/BRAND.md — <Project Name>
 > What every agent must know before touching this project visually.
 > Locked via design-direction on <YYYY-MM-DD>.
 
@@ -81,7 +81,7 @@ Universal AI-slop refusals (indigo, gradients, emoji-icons, etc.) live in `DESIG
 
 ---
 
-## `agents/DESIGN.md` — Overview section
+## `brain/DESIGN.md` — Overview section
 
 The template has:
 
@@ -113,7 +113,7 @@ If the existing Overview is not the `[VERIFY]` placeholder — show the proposed
 
 ---
 
-## `agents/DESIGN.md` — brand-specific DO NOT block
+## `brain/DESIGN.md` — brand-specific DO NOT block
 
 The template has, at the bottom of the DO NOT section:
 
@@ -147,16 +147,16 @@ Output:
 
 ```
 ✅ Direction locked: <name>
-✅ Wrote agents/BRAND.md (full).
-✅ Wrote agents/DESIGN.md Overview.
-✅ Added <N> brand-specific anti-patterns to agents/DESIGN.md.
+✅ Wrote brain/BRAND.md (full).
+✅ Wrote brain/DESIGN.md Overview.
+✅ Added <N> brand-specific anti-patterns to brain/DESIGN.md.
 {{if Phase 6.5 returned approved token values}}
-✅ Wrote agents/DESIGN.md token frontmatter (colors, typography, spacing, radius, light_mode, dark_mode).
-✅ Preview: agents/preview/<direction-slug>-<date>.html
+✅ Wrote brain/DESIGN.md token frontmatter (colors, typography, spacing, radius, light_mode, dark_mode).
+✅ Preview: brain/preview/<direction-slug>-<date>.html
 {{end}}
 
 Next step:
-  npx @google/design.md lint agents/DESIGN.md
+  npx @google/design.md lint brain/DESIGN.md
     — syncs DESIGN.md → global.css (or DesignTokens.swift for Swift projects)
 
   Then start UI work. The design-check skill will fire on any visual change

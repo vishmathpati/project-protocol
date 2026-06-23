@@ -1,6 +1,6 @@
 # Phase 6 — Media manifest
 
-Write `agents/marketing/MEDIA.md`. Per section in each page, declare the visual-anchor type and what it shows. This file is the spec sheet for whoever (or whatever) produces the actual assets later.
+Write `brain/marketing/MEDIA.md`. Per section in each page, declare the visual-anchor type and what it shows. This file is the spec sheet for whoever (or whatever) produces the actual assets later.
 
 This phase also locks the **fictional-customer brand** — the single fake brand every product screenshot uses for visual coherence. Asked once, used everywhere.
 
@@ -36,10 +36,10 @@ If a real customer testimonial exists (from Phase 1 intake), the real customer i
 
 ---
 
-## File header — `agents/marketing/MEDIA.md`
+## File header — `brain/marketing/MEDIA.md`
 
 ```markdown
-# agents/marketing/MEDIA.md
+# brain/marketing/MEDIA.md
 > Visual-anchor manifest for the marketing surface.
 > Locked via marketing-brief on <YYYY-MM-DD>.
 > This file is a SPEC — not the assets themselves. Use it to brief whoever
@@ -111,14 +111,14 @@ Compositional types are also allowed:
 - **No actual image files.** This is a spec. The assets are produced separately (by the user, a designer, or a follow-up tool that reads this manifest).
 - **No file paths to images.** Once assets exist, their paths live in the component, not in MEDIA.md. MEDIA.md is the brief, not the index.
 - **No invented numbers passed off as real.** If a stat is fictional, flag `[VERIFY]`.
-- **No emoji as icons.** Banned across the project (`agents/FUNDAMENTALS.md`, `agents/DESIGN.md` DO NOT section).
+- **No emoji as icons.** Banned across the project (`brain/FUNDAMENTALS.md`, `brain/DESIGN.md` DO NOT section).
 
 ---
 
 ## Worked example — final MEDIA.md shape (excerpt)
 
 ```markdown
-# agents/marketing/MEDIA.md
+# brain/marketing/MEDIA.md
 > Visual-anchor manifest. Locked 2026-05-21.
 
 ## Fictional customer (locked)

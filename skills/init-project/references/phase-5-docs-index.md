@@ -1,9 +1,9 @@
-# Phase 5 — Generate `agents/docs/INDEX.md`
+# Phase 5 — Generate `brain/docs/INDEX.md`
 
 Analyze the codebase and generate a real, populated INDEX.md — not a blank template.
 
 ```bash
-mkdir -p agents/docs/detail
+mkdir -p brain/docs/detail
 ```
 
 ## 5a. Detect project shape (Haiku)
@@ -69,10 +69,10 @@ Output as structured list suitable for a dependency map.
 
 Provide this sub-agent the routes list, shared functions list, and services list.
 
-## 5e. Write `agents/docs/INDEX.md` (Sonnet)
+## 5e. Write `brain/docs/INDEX.md` (Sonnet)
 
 ```
-Write agents/docs/INDEX.md with exactly two sections.
+Write brain/docs/INDEX.md with exactly two sections.
 
 SECTION 1 — HUMAN MAP (no code, no file paths, no function names):
 - Project: one sentence + stack line
@@ -96,10 +96,10 @@ Flag uncertain items with [VERIFY].
 Every entry one line maximum. No prose paragraphs.
 ```
 
-## 5f. Create `agents/docs/detail/README.md`
+## 5f. Create `brain/docs/detail/README.md`
 
 ```markdown
-# agents/docs/detail/
+# brain/docs/detail/
 
 Deep-dive documentation for features too complex for a single dependency map entry.
 
@@ -109,7 +109,7 @@ Only create a file here when a feature's flow cannot be captured in the INDEX.md
 - DO create: OAuth flow, Stripe webhook pipeline, multi-step file processing.
 - DO NOT create: basic CRUD, simple UI components, standard API routes.
 
-When created, the INDEX.md entry links here: `→ agents/docs/detail/feature-name.md`
+When created, the INDEX.md entry links here: `→ brain/docs/detail/feature-name.md`
 
 ## Files
 (none yet — created as needed)

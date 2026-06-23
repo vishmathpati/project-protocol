@@ -1,6 +1,6 @@
 # Phase 3 — Sitemap
 
-Propose the page list. The user adds, removes, or renames. Output is `agents/marketing/SITEMAP.md` — every other phase iterates over rows from this file.
+Propose the page list. The user adds, removes, or renames. Output is `brain/marketing/SITEMAP.md` — every other phase iterates over rows from this file.
 
 The sitemap exists because per-page work (briefs, copy, layouts) needs a locked set of targets. Without it, Phase 4 invents pages, Phase 5 misses pages, the nav builds against one list and the footer against another.
 
@@ -58,14 +58,14 @@ Each row in SITEMAP.md captures the minimum a brief needs to start.
 | `intent` | One sentence — what this page does for the user. |
 | `primary CTA` | The single action this page asks for. Verb + object. |
 | `audience descriptor` | One line — who's reading this page. |
-| `brief file` | Path to the brief in `agents/marketing/briefs/`. |
+| `brief file` | Path to the brief in `brain/marketing/briefs/`. |
 
 ---
 
-## Output file shape — `agents/marketing/SITEMAP.md`
+## Output file shape — `brain/marketing/SITEMAP.md`
 
 ```markdown
-# agents/marketing/SITEMAP.md
+# brain/marketing/SITEMAP.md
 > Page list for the marketing surface. Every brief, copy file, and layout sketch
 > references a row here by slug.
 > Locked via marketing-brief on <YYYY-MM-DD>.
@@ -120,7 +120,7 @@ Surface the proposed sitemap and ask:
 >
 > Say "go" to lock, or list the edits.
 
-After confirmation, write `agents/marketing/SITEMAP.md`. Lock and proceed to Phase 4.
+After confirmation, write `brain/marketing/SITEMAP.md`. Lock and proceed to Phase 4.
 
 ---
 

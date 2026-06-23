@@ -21,7 +21,7 @@ The component is a pure function of its props. Caller passes everything in.
 
 ### Shape 2 — Project registry (Marketing only)
 
-The component reads from a project-level content registry — `agents/marketing/CONTENT.md`. If a marketing-content workflow exists in the project (typically created by a separate `marketing-brief` skill), it stores authoritative versions of:
+The component reads from a project-level content registry — `brain/marketing/CONTENT.md`. If a marketing-content workflow exists in the project (typically created by a separate `marketing-brief` skill), it stores authoritative versions of:
 
 - Feature list (name, one-line description, illustration ref).
 - Audience segments (designer / engineer / PM).
@@ -32,7 +32,7 @@ The component reads from a project-level content registry — `agents/marketing/
 
 Marketing components can import a typed accessor (e.g. `getFeatures()`, `getPlans()`) instead of accepting `features={[…]}` as props. Single source of truth — change a feature description in one place, every marketing block updates.
 
-Check for `agents/marketing/CONTENT.md`. If present, propose registry-driven. If absent, fall back to props or ad-hoc copy with a user prompt.
+Check for `brain/marketing/CONTENT.md`. If present, propose registry-driven. If absent, fall back to props or ad-hoc copy with a user prompt.
 
 ### Shape 3 — Hook-driven (App only)
 
@@ -175,13 +175,13 @@ If C, halt Phase 4 and tell the user to add the hook first. Building a component
 If the locked tier is Marketing:
 
 ```bash
-test -f agents/marketing/CONTENT.md
+test -f brain/marketing/CONTENT.md
 ```
 
 If present, read its structure (typical headings: Features, Audiences, Comparisons, Testimonials, Pricing, FAQ). Map the intake to a registry section:
 
 ```
-build-component — found agents/marketing/CONTENT.md
+build-component — found brain/marketing/CONTENT.md
 
   Sections available:
     - Features (12 entries)
@@ -205,7 +205,7 @@ If CONTENT.md is missing, default to props (Shape 1) without asking.
 
 ```yaml
 data_shape: registry        # one of: props | registry | hook | hardcoded
-data_source: agents/marketing/CONTENT.md#pricing
+data_source: brain/marketing/CONTENT.md#pricing
 hook_used: null
 props_signature:
   - planSlug: "free" | "pro" | "team"

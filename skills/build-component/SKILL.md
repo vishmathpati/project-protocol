@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*,find:*,cat:*,grep:*,test
 
 The orchestrated path for adding a new component to an existing project. Decides where it lives, what tier it belongs to, what to reuse, what data it consumes, and which convention to write it in — then writes the code and lets `design-check` fire as the post-write gate.
 
-This skill does not invent a design system. It assumes `agents/DESIGN.md` and `agents/FUNDAMENTALS.md` already exist (via `init-project` or `design-direction`). If either is missing, halt and route the user to `init-project` first.
+This skill does not invent a design system. It assumes `brain/DESIGN.md` and `brain/FUNDAMENTALS.md` already exist (via `init-project` or `design-direction`). If either is missing, halt and route the user to `init-project` first.
 
 ---
 
@@ -27,7 +27,7 @@ If the change is a tiny edit to an existing component (e.g. swap a label), do NO
 
 ## What it produces
 
-One component file written to the project's existing folder structure, normalized against `agents/DESIGN.md` tokens, importing only from layers it is allowed to import from. Plus, on first ever run, a written `agents/STRUCTURE.md` capturing the project's component layout so subsequent runs do not re-detect.
+One component file written to the project's existing folder structure, normalized against `brain/DESIGN.md` tokens, importing only from layers it is allowed to import from. Plus, on first ever run, a written `brain/STRUCTURE.md` capturing the project's component layout so subsequent runs do not re-detect.
 
 Nothing else is touched. `DESIGN.md` / `FUNDAMENTALS.md` are read-only here; if a token is missing, the skill hands off to `design-check` Step 4 (propose new token, wait for confirmation).
 
@@ -39,7 +39,7 @@ Walk these in order. Each phase has a reference doc — open only when entering 
 
 ### Phase 1 — Structure detection
 
-Check for `agents/STRUCTURE.md`. If it exists, read and use it (skip the rest of this phase). If not, run first-run detection: glob common component folders, read `tsconfig.json` paths, scan `package.json` for stack indicators, detect surface route groups, propose findings, then write a confirmed `agents/STRUCTURE.md`.
+Check for `brain/STRUCTURE.md`. If it exists, read and use it (skip the rest of this phase). If not, run first-run detection: glob common component folders, read `tsconfig.json` paths, scan `package.json` for stack indicators, detect surface route groups, propose findings, then write a confirmed `brain/STRUCTURE.md`.
 
 → See `references/phase-1-structure-detection.md`.
 
@@ -79,7 +79,7 @@ Two non-default entry paths. Same 5 phases, but the inputs change.
 
 ### Adopt external — paste a copy-paste component
 
-User says: *"I want to use [URL or pasted source] in my project."* Examples: an Aceternity card, a Magic UI hero, a shadcn block, a Tailwind UI snippet. The skill reads the source, identifies values that don't match `agents/DESIGN.md` tokens, proposes a normalized version using project tokens, asks for confirmation, writes to the Generic location from `STRUCTURE.md`. Unmappable values (e.g. a shadow that doesn't match any defined token) get surfaced — the user adds a new token, accepts the raw value as a one-off (cardinal-sin violation), or simplifies.
+User says: *"I want to use [URL or pasted source] in my project."* Examples: an Aceternity card, a Magic UI hero, a shadcn block, a Tailwind UI snippet. The skill reads the source, identifies values that don't match `brain/DESIGN.md` tokens, proposes a normalized version using project tokens, asks for confirmation, writes to the Generic location from `STRUCTURE.md`. Unmappable values (e.g. a shadow that doesn't match any defined token) get surfaced — the user adds a new token, accepts the raw value as a one-off (cardinal-sin violation), or simplifies.
 
 → See `references/adopt-external.md`.
 
@@ -93,20 +93,20 @@ User says: *"I want a component like [Mantine Combobox / Chakra Drawer / MUI Ste
 
 ## Structural-change gate
 
-Before proceeding with any **structural change** — defined as: the planned component touches `agents/BRIEF.md` or `agents/ROADMAP.md`, or involves writing files across multiple tiers — invoke the discipline skill first:
+Before proceeding with any **structural change** — defined as: the planned component touches `brain/BRIEF.md` or `brain/ROADMAP.md`, or involves writing files across multiple tiers — invoke the discipline skill first:
 
 ```
 Skill("discipline")
 ```
 
-This threshold does NOT apply to normal single-component builds. It applies when the intake sentence implies a cross-tier refactor, a new tier introduction, or a change that would touch canon files beyond `agents/STRUCTURE.md`.
+This threshold does NOT apply to normal single-component builds. It applies when the intake sentence implies a cross-tier refactor, a new tier introduction, or a change that would touch canon files beyond `brain/STRUCTURE.md`.
 
 ---
 
 ## Hard rules
 
 - **No write without preview.** Phase 5 always shows the full code before saving.
-- **No raw hex / px / font-string in the output.** Every visual value resolves through `agents/DESIGN.md` via the project's token system (CSS variables → Tailwind alias, or `styled-components` theme, or Swift `Color`).
+- **No raw hex / px / font-string in the output.** Every visual value resolves through `brain/DESIGN.md` via the project's token system (CSS variables → Tailwind alias, or `styled-components` theme, or Swift `Color`).
 - **Cross-tier imports are blocked.** Marketing never imports from app/. App never imports from marketing/. Cross-tier needs go to Generic + wrapper.
 - **`cva + forwardRef + cn` triplet applies only to new primitives (Generic + Strategy C).** Compositions and variant-extensions don't need it. Imposing the triplet on a composition is over-engineering and produces noise.
 - **STRUCTURE.md is written once, read forever.** First run writes it after user confirmation. Subsequent runs read it and skip detection.

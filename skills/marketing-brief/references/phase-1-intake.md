@@ -2,7 +2,7 @@
 
 Read existing canon. Surface what's already known. Ask only for missing pieces. The goal of this phase is a one-page synthesis the user confirms before any marketing file is written.
 
-This phase exists because by the time `marketing-brief` runs, the project has been live for weeks — `agents/BRAND.md`, `agents/ROADMAP.md`, `agents/STATUS.md`, `agents/docs/INDEX.md` are populated. Re-asking the user for audience, features, or surface mix is wasteful. The intake reads first, then asks for gaps only.
+This phase exists because by the time `marketing-brief` runs, the project has been live for weeks — `brain/BRAND.md`, `brain/ROADMAP.md`, `brain/STATUS.md`, `brain/docs/INDEX.md` are populated. Re-asking the user for audience, features, or surface mix is wasteful. The intake reads first, then asks for gaps only.
 
 ---
 
@@ -10,25 +10,25 @@ This phase exists because by the time `marketing-brief` runs, the project has be
 
 Read each via `Read` tool. If absent, note the gap; do not stop.
 
-1. **`agents/BRAND.md`**
+1. **`brain/BRAND.md`**
    - Pull: audience descriptor, emotional state, archetype, reference tribe, refusal list.
    - These shape voice and which competitors / aesthetics to position against.
 
-2. **`agents/ROADMAP.md`**
+2. **`brain/ROADMAP.md`**
    - Pull: locked features list (shipped + in-flight). This becomes the seed for CONTENT.md's FEATURES table.
    - If a feature is shipped but marked "draft" in the roadmap, treat as shipped for marketing purposes — ask the user to confirm.
 
-3. **`agents/docs/INDEX.md`**
+3. **`brain/docs/INDEX.md`**
    - Pull: the actual feature-to-code map. Useful for detecting features the roadmap forgot to add (and vice versa).
 
-4. **`agents/STATUS.md`**
+4. **`brain/STATUS.md`**
    - Pull: what's live now vs. in flight. Marketing claims must match reality — if a feature is "in flight", it doesn't get a feature page yet; mention it in the changelog at most.
 
-5. **`agents/STRUCTURE.md`** (or `agents/docs/INDEX.md` if STRUCTURE.md absent)
+5. **`brain/STRUCTURE.md`** (or `brain/docs/INDEX.md` if STRUCTURE.md absent)
    - Pull: declared surfaces.
    - Also used for the auto-skip check from the parent SKILL.md — if there's no `marketing` / `landing` / `web` surface, refuse and exit.
 
-6. **`agents/BRIEF.md`**
+6. **`brain/BRIEF.md`**
    - Pull: locked decisions about monetisation, pricing model, primary distribution channel.
    - Pricing model decides whether `pricing` is a real page or a "talk to sales" stub.
 
@@ -116,7 +116,7 @@ The corrected synthesis. Phase 2 consumes:
 
 ## Hard rules
 
-- **Read first, ask second.** If `agents/BRAND.md` has the audience, do not re-ask.
+- **Read first, ask second.** If `brain/BRAND.md` has the audience, do not re-ask.
 - **Do not invent a feature.** If it's not in ROADMAP, INDEX, or live code, it doesn't go in CONTENT later. Flag it; don't add it.
 - **Do not invent a competitor.** If the user hasn't named one, comparison pages are skipped in Phase 3.
 - **One pass on synthesis.** No looping. Correct, confirm, lock, advance.

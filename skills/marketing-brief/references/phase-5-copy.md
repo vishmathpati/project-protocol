@@ -1,6 +1,6 @@
 # Phase 5 — Per-page copy
 
-For each page in SITEMAP.md, write the final copy file at `agents/marketing/copy/<slug>.md`. Every headline, subhead, button label, section copy, footer text — finalised, ready to paste into JSX.
+For each page in SITEMAP.md, write the final copy file at `brain/marketing/copy/<slug>.md`. Every headline, subhead, button label, section copy, footer text — finalised, ready to paste into JSX.
 
 Phase 4 produced the brief (intent). Phase 5 turns intent into strings. The two-pass split exists because writing copy and structuring intent at the same time always loses one of them.
 
@@ -11,10 +11,10 @@ Phase 4 produced the brief (intent). Phase 5 turns intent into strings. The two-
 Every visible string the page renders, organised by section, in the same order as the brief.
 
 ```markdown
-# agents/marketing/copy/<slug>.md
+# brain/marketing/copy/<slug>.md
 > Final copy for the <page name> page. Locked via marketing-brief on <YYYY-MM-DD>.
-> Reads from: agents/marketing/CONTENT.md (features, testimonials, FAQs).
-> Reads brief: agents/marketing/briefs/<slug>.md.
+> Reads from: brain/marketing/CONTENT.md (features, testimonials, FAQs).
+> Reads brief: brain/marketing/briefs/<slug>.md.
 
 ## Section 1 — <section name>
 - Eyebrow: "<final string or (none)>"
@@ -77,7 +77,7 @@ Exceptions: legal pages, list pages with no fold (blog landing, changelog), sect
 
 ## Banned-words enforcement
 
-Read `agents/FUNDAMENTALS.md` § banned words before writing. Scan every line of every copy file against the list. Common entries — these illustrate the pattern; the live list lives in FUNDAMENTALS.md:
+Read `brain/FUNDAMENTALS.md` § banned words before writing. Scan every line of every copy file against the list. Common entries — these illustrate the pattern; the live list lives in FUNDAMENTALS.md:
 
 - "seamless", "seamlessly"
 - "robust"
@@ -135,10 +135,10 @@ Also banned across the board:
 ## Worked example — `copy/home.md`
 
 ```markdown
-# agents/marketing/copy/home.md
+# brain/marketing/copy/home.md
 > Final copy for the Home page. Locked via marketing-brief on 2026-05-21.
-> Reads from: agents/marketing/CONTENT.md.
-> Reads brief: agents/marketing/briefs/home.md.
+> Reads from: brain/marketing/CONTENT.md.
+> Reads brief: brain/marketing/briefs/home.md.
 
 ## Section 1 — Hero
 - Eyebrow: (none)

@@ -913,7 +913,7 @@ Keep it self-contained — no external CSS, no JS framework, no build step.
       <div class="dialog">
         <h3>Confirm change</h3>
         <p>You are about to apply the proposed tokens to this project.</p>
-        <p>This replaces values in <code>agents/DESIGN.md</code> and the live <code>global.css</code> after the next sync.</p>
+        <p>This replaces values in <code>brain/DESIGN.md</code> and the live <code>global.css</code> after the next sync.</p>
         <div class="footer">
           <button class="btn btn-secondary">Cancel</button>
           <button class="btn btn-default">Confirm</button>
@@ -997,7 +997,7 @@ Phase 6.5 builds a substitution map from the locked direction + generated
 token values. Most fields are direct copies. A few need computation.
 
 ### Direct substitutions
-- `{{project_name}}` — from `agents/BRAND.md` Product.Name
+- `{{project_name}}` — from `brain/BRAND.md` Product.Name
 - `{{direction_name}}` — Phase 6 locked direction name
 - `{{character}}` — one-line character from the direction (Phase 5 "personality sentence")
 - `{{light_*}}` / `{{dark_*}}` / `{{accent_*}}` / `{{status_*}}` — direct hex from `new_token_values`
@@ -1066,7 +1066,7 @@ the project&apos;s actual hex values substituted.
 specifically for the hero.
 
 **`{{hero_subhead}}`** — 2–3 sentences explaining the product, written in
-the brand&apos;s tone. Use audience + problem from `agents/BRAND.md`.
+the brand&apos;s tone. Use audience + problem from `brain/BRAND.md`.
 
 **`{{hero_primary_cta}}`** — short verb-led CTA (e.g., "Get started",
 "Read the brief", "See it in action"). Match brand archetype.
@@ -1086,7 +1086,7 @@ dashboard sidebar email placeholder (`sofia@{{project_slug}}.com`). E.g.,
 
 **`{{feature_1_title}}` … `{{feature_6_title}}`** — six short feature
 titles (3–4 words each), brand-fitting. Use the project's actual feature
-list from `agents/BRAND.md` / brief if available. Otherwise generate
+list from `brain/BRAND.md` / brief if available. Otherwise generate
 brand-fitting placeholders matching the locked archetype. Examples:
 
 - Sage → "Source-linked answers" / "Side-by-side comparison" / "Cite-by-default"
@@ -1188,12 +1188,12 @@ knows the preview is approximate.
 Write to:
 
 ```
-agents/preview/<direction-name-slug>-<YYYY-MM-DD>.html
+brain/preview/<direction-name-slug>-<YYYY-MM-DD>.html
 ```
 
 Slug: lowercase, hyphenated direction name (e.g., `editorial-cream`).
 
-Add `agents/preview/` to `.gitignore` on first preview generation if not
+Add `brain/preview/` to `.gitignore` on first preview generation if not
 already ignored. Previews are throwaway approval surfaces, not canon.
 
 After writing, surface to the user as part of the Phase 6.5 step 5 diff
@@ -1204,13 +1204,13 @@ Token alignment — comparing locked direction "Editorial Cream" vs existing DES
 
 [diff table here per phase-6-5-token-alignment.md]
 
-👀 Preview rendered: file:///<absolute-path>/agents/preview/editorial-cream-2026-05-22.html
+👀 Preview rendered: file:///<absolute-path>/brain/preview/editorial-cream-2026-05-22.html
 
 Open it in your browser to see the tokens applied to real components. Light/dark
 toggle is in the top-right of the preview.
 
 When you&apos;re ready:
-  [approve / apply all] — write the new tokens to agents/DESIGN.md
+  [approve / apply all] — write the new tokens to brain/DESIGN.md
   [iterate] — tell me what to change (in plain language)
   [reject] — keep existing tokens, only write Overview + DO NOT
 ```

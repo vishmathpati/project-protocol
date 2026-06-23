@@ -1,12 +1,12 @@
 ---
 name: add-context
-description: Add an extended-context doc to `agents/docs/` and cross-reference it in root CLAUDE.md + agents/docs/INDEX.md. Triggers — "add context", "add context file", "create an integration doc".
+description: Add an extended-context doc to `brain/docs/` and cross-reference it in root CLAUDE.md + brain/docs/INDEX.md. Triggers — "add context", "add context file", "create an integration doc".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir:*,ls:*,cat:*)
 ---
 
 # Add Context
 
-Add one or more extended context files to an already-initialized project. Each file is written into `agents/docs/` and immediately cross-referenced in root `CLAUDE.md` and `agents/docs/INDEX.md` so no file is orphaned.
+Add one or more extended context files to an already-initialized project. Each file is written into `brain/docs/` and immediately cross-referenced in root `CLAUDE.md` and `brain/docs/INDEX.md` so no file is orphaned.
 
 ---
 
@@ -14,13 +14,13 @@ Add one or more extended context files to an already-initialized project. Each f
 
 Before adding anything, silently read:
 1. **Root `CLAUDE.md`** — check if `## Extended Context` section exists; note current contents.
-2. **`agents/docs/INDEX.md`** — locate the Key Files table; note current entries.
+2. **`brain/docs/INDEX.md`** — locate the Key Files table; note current entries.
 
 If either file is missing, stop and tell the user:
 
 > "This project doesn't appear to have the three-folder protocol set up yet — run init-project first."
 
-If the project has the legacy flat layout (no `agents/` folder), also stop and tell the user:
+If the project has the legacy flat layout (no `brain/` folder), also stop and tell the user:
 
 > "This project is on the legacy flat layout. Run init-project to migrate to the three-folder layout first, or place context files manually if you want to stay on legacy."
 
@@ -51,13 +51,13 @@ Or describe in plain English — I'll categorize it.
 What should this file be called?
 (examples: data-contracts.md, domain.md, stripe-integration.md)
 
-It will live in `agents/docs/`.
+It will live in `brain/docs/`.
 ```
 
-Check whether `agents/docs/[filename]` already exists. If yes, ask:
+Check whether `brain/docs/[filename]` already exists. If yes, ask:
 
 ```
-agents/docs/[filename] already exists. What would you like to do?
+brain/docs/[filename] already exists. What would you like to do?
 
 A — Append new content to the existing file
 B — Replace it entirely
@@ -118,45 +118,45 @@ Add a header to every file:
 ---
 ```
 
-Show preview: "Here's what I'll write to `agents/docs/[filename]` — does this look right?"
+Show preview: "Here's what I'll write to `brain/docs/[filename]` — does this look right?"
 
 Apply corrections, then write the file.
 
-Create `agents/docs/` if it doesn't exist: `mkdir -p agents/docs`
+Create `brain/docs/` if it doesn't exist: `mkdir -p brain/docs`
 
 ### Step 5 — Cross-reference immediately
 
 Without asking, update two places:
 
-**`agents/docs/INDEX.md`** — find the Key Files table and add:
+**`brain/docs/INDEX.md`** — find the Key Files table and add:
 ```
-| agents/docs/[filename] | [type]: [what it contains] — read before [trigger condition] |
+| brain/docs/[filename] | [type]: [what it contains] — read before [trigger condition] |
 ```
 If no Key Files table exists, create a `## Key Files` section.
 
 **Root `CLAUDE.md`** — before appending, count the current line count of root `CLAUDE.md`. If adding the new entry would push the file past **280 lines**, stop and warn the user:
 
-> "Root `CLAUDE.md` is at [N] lines. Adding this entry would exceed the 280-line ceiling (§9.2). Options: (A) summarize or compact older `## Extended Context` entries to make room, (B) split the situation router to `agents/SITUATIONS.md` and leave a one-line pointer in `CLAUDE.md`, (C) add the entry anyway and accept the overage. Which do you prefer?"
+> "Root `CLAUDE.md` is at [N] lines. Adding this entry would exceed the 280-line ceiling (§9.2). Options: (A) summarize or compact older `## Extended Context` entries to make room, (B) split the situation router to `brain/SITUATIONS.md` and leave a one-line pointer in `CLAUDE.md`, (C) add the entry anyway and accept the overage. Which do you prefer?"
 
 Wait for the user's choice before writing. If the user picks A or B, apply the compaction or split first, then add the new entry.
 
 If the file is under the ceiling (or once compaction is done), find `## Extended Context` section and append:
 ```
-- `agents/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
+- `brain/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
 ```
 The `## Extended Context` stub is created by `init-project` Phase 3 — do not re-create it; it already exists. If it is genuinely missing (legacy project), create it at the bottom:
 ```markdown
 ## Extended Context
 > These files go beyond the standard protocol. Read when their trigger applies.
 
-- `agents/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
+- `brain/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
 ```
 
-If the file is architecture- or decisions-related (type C, or any file capturing "why" decisions were made), also update **`agents/BRIEF.md`**:
+If the file is architecture- or decisions-related (type C, or any file capturing "why" decisions were made), also update **`brain/BRIEF.md`**:
 - Find or create a `## Reference files` section
-- Append: `- agents/docs/[filename] — [description]`
+- Append: `- brain/docs/[filename] — [description]`
 
-Confirm: "Written ✅ — referenced in root CLAUDE.md and agents/docs/INDEX.md."
+Confirm: "Written ✅ — referenced in root CLAUDE.md and brain/docs/INDEX.md."
 
 ### Step 6 — Loop
 
@@ -177,8 +177,8 @@ Output a tidy summary:
 
 ```
 Extended context files added:
-  ✅ agents/docs/[filename-1] — [type] — referenced in root CLAUDE.md + agents/docs/INDEX.md
-  ✅ agents/docs/[filename-2] — [type] — referenced in root CLAUDE.md + agents/docs/INDEX.md
+  ✅ brain/docs/[filename-1] — [type] — referenced in root CLAUDE.md + brain/docs/INDEX.md
+  ✅ brain/docs/[filename-2] — [type] — referenced in root CLAUDE.md + brain/docs/INDEX.md
 
 Root CLAUDE.md §Extended Context now lists [N] files.
 Next session, the relevant agent will read these when their trigger condition applies.

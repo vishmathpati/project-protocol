@@ -1,6 +1,6 @@
 # Phase 4 — Per-page briefs
 
-For each page in SITEMAP.md, write one brief file at `agents/marketing/briefs/<slug>.md`. The brief is the structural skeleton for the page — what the page is *for*, who's reading it, what the story arc is, what sections appear and what each section does.
+For each page in SITEMAP.md, write one brief file at `brain/marketing/briefs/<slug>.md`. The brief is the structural skeleton for the page — what the page is *for*, who's reading it, what the story arc is, what sections appear and what each section does.
 
 Briefs do NOT contain final copy. That's Phase 5. Briefs contain intent.
 
@@ -11,9 +11,9 @@ This separation exists because copy without a brief drifts into list-of-features
 ## Brief shape — every brief has these sections
 
 ```markdown
-# agents/marketing/briefs/<slug>.md
+# brain/marketing/briefs/<slug>.md
 > Brief for the <page name> page. Locked via marketing-brief on <YYYY-MM-DD>.
-> Reads from: agents/marketing/CONTENT.md (features, audiences, testimonials, FAQs).
+> Reads from: brain/marketing/CONTENT.md (features, audiences, testimonials, FAQs).
 
 ## Audience state on entry
 What does the reader fear or want before they open this page? One paragraph.
@@ -57,9 +57,9 @@ Each section gets all six fields. Missing field → "(none)" explicitly, never b
 ## Worked example — `briefs/home.md`
 
 ```markdown
-# agents/marketing/briefs/home.md
+# brain/marketing/briefs/home.md
 > Brief for the Home page. Locked via marketing-brief on 2026-05-21.
-> Reads from: agents/marketing/CONTENT.md (features, audiences, testimonials, FAQs).
+> Reads from: brain/marketing/CONTENT.md (features, audiences, testimonials, FAQs).
 
 ## Audience state on entry
 First-time visitor, arrived from a search like "<category> tool" or a referral.

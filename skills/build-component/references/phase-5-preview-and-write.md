@@ -34,7 +34,7 @@ strategy: A
 proposed_name: PricingCard
 location: src/components/marketing/pricing-card.tsx
 data_shape: registry
-data_source: agents/marketing/CONTENT.md#pricing
+data_source: brain/marketing/CONTENT.md#pricing
 prior_art_used:
   - Card from @/components/ui/card
   - Heading, Text from @/components/ui/typography

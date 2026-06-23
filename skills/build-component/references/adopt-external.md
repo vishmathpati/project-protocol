@@ -1,6 +1,6 @@
 # Sub-mode — Adopt external
 
-A copy-paste component from a ship-the-source library (Aceternity, Magic UI, shadcn blocks, Tailwind UI snippets, any random GitHub gist) gets pulled into the project. The skill's job: normalize it against `agents/DESIGN.md` tokens before it lands.
+A copy-paste component from a ship-the-source library (Aceternity, Magic UI, shadcn blocks, Tailwind UI snippets, any random GitHub gist) gets pulled into the project. The skill's job: normalize it against `brain/DESIGN.md` tokens before it lands.
 
 Adopt-external uses the same 5 phases as the default flow, but the inputs come from the source (URL or pasted code), not from intake.
 
@@ -22,7 +22,7 @@ If the user mentions a headless / installable library (Mantine, Chakra, MUI, Rea
 
 ## Phase 1 — Structure detection
 
-Identical to the default flow. Read or write `agents/STRUCTURE.md`. The adopted component will almost always land in the **Generic** folder (it's a primitive, brought in for reuse), so the Generic location is what matters.
+Identical to the default flow. Read or write `brain/STRUCTURE.md`. The adopted component will almost always land in the **Generic** folder (it's a primitive, brought in for reuse), so the Generic location is what matters.
 
 ---
 

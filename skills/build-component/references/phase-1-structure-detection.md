@@ -2,20 +2,20 @@
 
 Before anything else, the skill needs to know where this project's components live, what tiers exist, and which convention is in use. This phase reads only — no writes until the user confirms findings.
 
-The output of this phase is a confirmed `agents/STRUCTURE.md`. On every subsequent run of `build-component`, that file is read and this phase is a no-op.
+The output of this phase is a confirmed `brain/STRUCTURE.md`. On every subsequent run of `build-component`, that file is read and this phase is a no-op.
 
 ---
 
-## 1.1 — Check for existing `agents/STRUCTURE.md`
+## 1.1 — Check for existing `brain/STRUCTURE.md`
 
 ```
-Read: agents/STRUCTURE.md
+Read: brain/STRUCTURE.md
 ```
 
 If present and well-formed (has the expected sections — Tiers, Locations, Convention, Surfaces), parse it into a structure object and skip to Phase 2. One-line announcement to the user:
 
 ```
-Structure detected (agents/STRUCTURE.md):
+Structure detected (brain/STRUCTURE.md):
   Tiers: Generic, Marketing, App
   Convention: cva + forwardRef + cn (shadcn-style)
   Surfaces: marketing (web), dashboard (web)
@@ -23,7 +23,7 @@ Structure detected (agents/STRUCTURE.md):
 Proceeding to intake.
 ```
 
-If `agents/STRUCTURE.md` is missing or malformed → run first-run detection (1.2 onward).
+If `brain/STRUCTURE.md` is missing or malformed → run first-run detection (1.2 onward).
 
 ---
 
@@ -112,7 +112,7 @@ Record the surface set. Examples:
 
 ---
 
-## 1.6 — Propose findings + write `agents/STRUCTURE.md`
+## 1.6 — Propose findings + write `brain/STRUCTURE.md`
 
 Surface everything detected to the user via `AskUserQuestion` (or as a confirmation message). Shape:
 
@@ -134,27 +134,27 @@ Detected structure for this project:
 
   No desktop / docs / email surfaces detected.
 
-Save this as agents/STRUCTURE.md so future component builds skip detection?
+Save this as brain/STRUCTURE.md so future component builds skip detection?
   A — Yes, save and continue.
   B — Save but let me edit it first.
   C — Skip the save, run one-off this time.
 ```
 
-- **A** → copy `templates/STRUCTURE.md` to `agents/STRUCTURE.md` then patch the detected values into it (see 1.6a). Continue to Phase 2.
+- **A** → copy `templates/STRUCTURE.md` to `brain/STRUCTURE.md` then patch the detected values into it (see 1.6a). Continue to Phase 2.
 - **B** → copy + patch as in A, then open an edit pass with the user (add a tier, rename a folder, change the convention) before the final write.
 - **C** → keep the structure object in memory only. Future runs re-detect.
 
 ### 1.6a — Copy the canonical template, then patch detected values
 
-The shape of `agents/STRUCTURE.md` is fixed — the plugin ships a canonical template at `templates/STRUCTURE.md` (sections: Surfaces present, Component locations, Stack per surface, Conventions detected, Cross-tier import rules, plus a commented WORKED EXAMPLE block). Phase 1 fills the placeholders, it does not invent the shape.
+The shape of `brain/STRUCTURE.md` is fixed — the plugin ships a canonical template at `templates/STRUCTURE.md` (sections: Surfaces present, Component locations, Stack per surface, Conventions detected, Cross-tier import rules, plus a commented WORKED EXAMPLE block). Phase 1 fills the placeholders, it does not invent the shape.
 
 Copy the template first:
 
 ```bash
-cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/STRUCTURE.md" agents/STRUCTURE.md
+cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/STRUCTURE.md" brain/STRUCTURE.md
 ```
 
-If neither `CODEX_PLUGIN_ROOT` nor `CLAUDE_PLUGIN_ROOT` is set (some agents don't expose the env var): use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/STRUCTURE.md`.
+If neither `CODEX_PLUGIN_ROOT` nor `CLAUDE_PLUGIN_ROOT` is set (some agents don't expose the env var): use the Read tool to fetch the template content from the plugin install path, then Write it to `brain/STRUCTURE.md`.
 
 Once the copy is in place, patch the placeholders with detected values:
 
@@ -175,8 +175,8 @@ Do not invent new sections. Do not strip sections from the template — if a sec
 
 Halt Phase 1 (and the whole skill) if:
 
-- `agents/DESIGN.md` does not exist → route the user to `init-project` first. Reason: there's no token canon to normalize against.
-- `agents/FUNDAMENTALS.md` does not exist → route the user to `init-project` first. Reason: there's no craft layer for `design-check` to enforce later.
+- `brain/DESIGN.md` does not exist → route the user to `init-project` first. Reason: there's no token canon to normalize against.
+- `brain/FUNDAMENTALS.md` does not exist → route the user to `init-project` first. Reason: there's no craft layer for `design-check` to enforce later.
 - No component folders detected AND no `package.json` AND no source files → this is an empty repo. Route to `init-project`.
 
 For partial states (e.g. `DESIGN.md` exists but no components folder yet), continue — the skill will offer to create the first component folder in Phase 4.
@@ -206,7 +206,7 @@ Detected:
   App tier folder does not exist yet. Recommend: components/app/
   Surfaces: marketing (web), dashboard (web) — both present in app/ route groups.
 
-Save this as agents/STRUCTURE.md? I'll create components/marketing/ and components/app/
+Save this as brain/STRUCTURE.md? I'll create components/marketing/ and components/app/
 on first need (not now).
 ```
 

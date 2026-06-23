@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'PLUGIN_ROOT=\"${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}\"; if [ -z \"$PLUGIN_ROOT\" ]; then exit 0; fi; PLUGIN_VERSION=$(python3 -c \"import sys,json; print(json.load(open(\\\"$PLUGIN_ROOT/.claude-plugin/plugin.json\\\"))[\\\"version\\\"])\" 2>/dev/null); if [ -z \"$PLUGIN_VERSION\" ]; then exit 0; fi; PROJECT_VERSION=$(cat agents/.plugin-version 2>/dev/null || echo \"pre-2.5.0\"); if [ -z \"$PROJECT_VERSION\" ]; then PROJECT_VERSION=\"pre-2.5.0\"; fi; SKIP=$(cat agents/.plugin-version-skip 2>/dev/null); if [ \"$SKIP\" = \"$PLUGIN_VERSION\" ]; then exit 0; fi; if [ \"$PROJECT_VERSION\" = \"$PLUGIN_VERSION\" ]; then exit 0; fi; MANIFESTS=$(ls \"$PLUGIN_ROOT/migrations/\" 2>/dev/null | sort -V | while IFS= read -r f; do V=\"${f%.md}\"; V=\"${V#v}\"; if python3 -c \"import sys; from packaging.version import Version; sys.exit(0 if Version(\\\"$V\\\") > Version(\\\"${PROJECT_VERSION#pre-}\\\".replace(\\\"2.5.0\\\",\\\"2.5.0\\\")) and Version(\\\"$V\\\") <= Version(\\\"$PLUGIN_VERSION\\\") else 1)\" 2>/dev/null; then printf \"%s \" \"$f\"; fi; done 2>/dev/null); if [ -z \"$MANIFESTS\" ]; then MANIFESTS=\"(check migrations/ in plugin root)\"; fi; printf \"\\n████████████████████████████████████████████\\n⚠  Plugin drift detected.\\n   Project recorded version : %s\\n   Current plugin version   : %s\\n   Missing migrations       : %s\\n\\n   Run /migrate-project to apply pending deltas.\\n   Or write %s into agents/.plugin-version-skip to defer\\n   (skip resets on next plugin update).\\n████████████████████████████████████████████\\n\" \"$PROJECT_VERSION\" \"$PLUGIN_VERSION\" \"$MANIFESTS\" \"$PLUGIN_VERSION\" >&2'"
+            "command": "bash -c 'PLUGIN_ROOT=\"${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}\"; if [ -z \"$PLUGIN_ROOT\" ]; then exit 0; fi; PLUGIN_VERSION=$(python3 -c \"import sys,json; print(json.load(open(\\\"$PLUGIN_ROOT/.claude-plugin/plugin.json\\\"))[\\\"version\\\"])\" 2>/dev/null); if [ -z \"$PLUGIN_VERSION\" ]; then exit 0; fi; PROJECT_VERSION=$(cat brain/.plugin-version 2>/dev/null || echo \"pre-2.5.0\"); if [ -z \"$PROJECT_VERSION\" ]; then PROJECT_VERSION=\"pre-2.5.0\"; fi; SKIP=$(cat brain/.plugin-version-skip 2>/dev/null); if [ \"$SKIP\" = \"$PLUGIN_VERSION\" ]; then exit 0; fi; if [ \"$PROJECT_VERSION\" = \"$PLUGIN_VERSION\" ]; then exit 0; fi; MANIFESTS=$(ls \"$PLUGIN_ROOT/migrations/\" 2>/dev/null | sort -V | while IFS= read -r f; do V=\"${f%.md}\"; V=\"${V#v}\"; if python3 -c \"import sys; from packaging.version import Version; sys.exit(0 if Version(\\\"$V\\\") > Version(\\\"${PROJECT_VERSION#pre-}\\\".replace(\\\"2.5.0\\\",\\\"2.5.0\\\")) and Version(\\\"$V\\\") <= Version(\\\"$PLUGIN_VERSION\\\") else 1)\" 2>/dev/null; then printf \"%s \" \"$f\"; fi; done 2>/dev/null); if [ -z \"$MANIFESTS\" ]; then MANIFESTS=\"(check migrations/ in plugin root)\"; fi; printf \"\\n████████████████████████████████████████████\\n⚠  Plugin drift detected.\\n   Project recorded version : %s\\n   Current plugin version   : %s\\n   Missing migrations       : %s\\n\\n   Run /migrate-project to apply pending deltas.\\n   Or write %s into brain/.plugin-version-skip to defer\\n   (skip resets on next plugin update).\\n████████████████████████████████████████████\\n\" \"$PROJECT_VERSION\" \"$PLUGIN_VERSION\" \"$MANIFESTS\" \"$PLUGIN_VERSION\" >&2'"
           }
         ]
       }
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[project-protocol] %s is in cleared state — remember to append an entry for this change.\\n\" \"$WORKLOG\" >&2; fi'"
+            "command": "bash -c 'WORKLOG=\"brain/WORKLOG.md\"; if [ -f \"$WORKLOG\" ] && grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[project-protocol] %s is in cleared state — remember to append an entry for this change.\\n\" \"$WORKLOG\" >&2; fi'"
           }
         ]
       }
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -q \"^# Worklog\" \"$WORKLOG\"; then BACKUP=\"${WORKLOG%.md}.backup-$(date +%Y%m%d-%H%M%S).md\"; cp \"$WORKLOG\" \"$BACKUP\"; echo \"[project-protocol] PreCompact: $WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- $WORKLOG CONTENTS ---\"; cat \"$WORKLOG\"; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: $WORKLOG empty or cleared — no backup needed\"; fi'"
+            "command": "bash -c 'WORKLOG=\"brain/WORKLOG.md\"; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -q \"^# Worklog\" \"$WORKLOG\"; then BACKUP=\"brain/WORKLOG.backup-$(date +%Y%m%d-%H%M%S).md\"; cp \"$WORKLOG\" \"$BACKUP\"; echo \"[project-protocol] PreCompact: $WORKLOG backed up. Contents preserved below for post-compaction context:\"; echo \"--- $WORKLOG CONTENTS ---\"; cat \"$WORKLOG\"; echo \"--- END WORKLOG ---\"; else echo \"[project-protocol] PreCompact: $WORKLOG empty or cleared — no backup needed\"; fi'"
           }
         ]
       }
@@ -70,7 +70,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_start\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
+            "command": "bash -c 'WORKLOG=\"brain/WORKLOG.md\"; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_start\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
           }
         ]
       }
@@ -81,7 +81,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_stop\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
+            "command": "bash -c 'WORKLOG=\"brain/WORKLOG.md\"; if [ -f \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then printf \"[%s] subagent_stop\\n\" \"$(date +%H:%M)\" >> \"$WORKLOG\"; fi'"
           }
         ]
       }
@@ -92,7 +92,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'if [ -f \"agents/.session-type\" ]; then SESSION_TYPE=$(cat agents/.session-type); else if [ -n \"${CLAUDE_PLUGIN_ROOT:-}${CODEX_PLUGIN_ROOT:-}\" ]; then SESSION_TYPE=\"claude-code\"; else SESSION_TYPE=\"cowork\"; fi; fi; if [ \"$SESSION_TYPE\" = \"cowork\" ]; then WORKLOG=\"cowork/WORKLOG.md\"; else WORKLOG=\"agents/WORKLOG.md\"; fi; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then LINE_COUNT=$(wc -l < \"$WORKLOG\" | tr -d \" \"); echo \"[project-protocol] $WORKLOG has $LINE_COUNT lines of unsaved work. Run save-session before closing.\"; fi'"
+            "command": "bash -c 'WORKLOG=\"brain/WORKLOG.md\"; if [ -f \"$WORKLOG\" ] && [ -s \"$WORKLOG\" ] && ! grep -qE \"^# Worklog — cleared|^> Cleared after each session\\\\.$\" \"$WORKLOG\"; then LINE_COUNT=$(wc -l < \"$WORKLOG\" | tr -d \" \"); echo \"[project-protocol] $WORKLOG has $LINE_COUNT lines of unsaved work. Run save-session before closing.\"; fi'"
           }
         ]
       }
@@ -112,7 +112,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'FILE=\"${TOOL_INPUT_FILE_PATH:-${TOOL_INPUT_PATH:-}}\"; if [ -z \"$FILE\" ]; then exit 0; fi; case \"$FILE\" in */node_modules/*|*/.git/*|*/dist/*|*/build/*|*/.next/*) exit 0 ;; esac; MATCH=0; STRUCTURE=\"agents/STRUCTURE.md\"; if [ -f \"$STRUCTURE\" ]; then if grep -q \"components/ui\\|components/primitives\\|components/blocks\\|Views/\\|src/components\" \"$STRUCTURE\"; then case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; else case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; if [ \"$MATCH\" = \"1\" ]; then printf \"[project-protocol] design-check dispatcher: file written to %s. Run /design-check on this file before continuing.\\n\" \"$FILE\" >&2; fi'"
+            "command": "bash -c 'FILE=\"${TOOL_INPUT_FILE_PATH:-${TOOL_INPUT_PATH:-}}\"; if [ -z \"$FILE\" ]; then exit 0; fi; case \"$FILE\" in */node_modules/*|*/.git/*|*/dist/*|*/build/*|*/.next/*) exit 0 ;; esac; MATCH=0; STRUCTURE=\"brain/STRUCTURE.md\"; if [ -f \"$STRUCTURE\" ]; then if grep -q \"components/ui\\|components/primitives\\|components/blocks\\|Views/\\|src/components\" \"$STRUCTURE\"; then case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; else case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; if [ \"$MATCH\" = \"1\" ]; then printf \"[project-protocol] design-check dispatcher: file written to %s. Run /design-check on this file before continuing.\\n\" \"$FILE\" >&2; fi'"
           }
         ]
       }

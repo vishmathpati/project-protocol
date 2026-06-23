@@ -1,8 +1,10 @@
 # Phase 0c — Modernize an already-initiated project
 
-Runs only when Phase 0 classifies the project as **modernize** (Mode A) — either the user invoked init-project with explicit upgrade intent, or audit mode detected significant drift and the user opted in. The goal is to upgrade an existing project to the latest plugin version, re-confirm canon with the user, sweep the codebase for design-system drift, and clean up waste.
+Runs only when Phase 0 classifies the project as **modernize** (Mode A) — either the user invoked init-project with explicit upgrade intent, or audit mode detected significant drift and the user opted in. The project is already on the single `brain/` layout. The goal is to upgrade it to the latest plugin version, re-confirm canon with the user, sweep the codebase for design-system drift, and clean up waste.
 
 This phase is **interactive**. It does not silently rewrite canon. Each populated file gets a "confirm or edit" pass. The only silent rewrites are the locked global standards (FUNDAMENTALS.md, TOOLING.md) — same rule as every other init mode.
+
+> This phase assumes the project is already on `brain/`. If the project is on the OLD three-folder or flat-root layout, Phase 0 hands off to `migrate-to-brain` and never reaches here.
 
 ---
 
@@ -22,17 +24,17 @@ Read-only sweep. Produce a state report; do not modify anything yet.
 
 Check and record:
 
-- **Three-folder protocol present?** — confirmed by Mode A condition. Note the structure.
-- **STRUCTURE.md present at `agents/STRUCTURE.md`?** If missing, schedule first-run detection in sub-phase 5.
-- **For each canon file** in `{cowork/STATUS.md, cowork/BRIEF.md, agents/STATUS.md, agents/BRIEF.md, agents/ROADMAP.md, agents/BRAND.md, agents/DESIGN.md, agents/DISCOVERIES.md, README.md, CLAUDE.md}`:
+- **`brain/` layout present?** — confirmed by Mode A condition. Note the structure.
+- **STRUCTURE.md present at `brain/STRUCTURE.md`?** If missing, schedule first-run detection in sub-phase 5.
+- **For each canon file** in `{brain/STATUS.md, brain/BRIEF.md, brain/ROADMAP.md, brain/BRAND.md, brain/DESIGN.md, brain/DISCOVERIES.md, brain/WONT-DO.md, README.md, CLAUDE.md}`:
   - Exists? Populated with real content (>50% non-placeholder — heuristic: ratio of non-`[VERIFY]` non-stub lines)?
-  - Stale? Last modified >30 days ago (`stat` or `git log -1 --format=%ct <file>` — but `git` is out of bounds here; use filesystem mtime).
-- **Plugin version markers:** parse the project's README, root CLAUDE.md, and any `agents/CHANGELOG.md` for plugin-version mentions. Note current version.
+  - Stale? Last modified >30 days ago (use filesystem mtime; `git` is out of bounds here).
+- **Plugin version markers:** read `brain/.plugin-version`, and parse the project's README, root CLAUDE.md, and `brain/CHANGELOG.md` for plugin-version mentions. Note current version.
 - **Waste candidates:**
-  - WORKLOG backups: `cowork/WORKLOG.md.bak*`, `agents/WORKLOG.md.bak*`, any `WORKLOG-YYYY-MM-DD.md` older than 7 days that has already been rolled into CHANGELOG.
+  - WORKLOG backups: `brain/WORKLOG.md.bak*`, any `WORKLOG-YYYY-MM-DD.md` older than 7 days that has already been rolled into CHANGELOG.
   - Files in `archive/`, `_archived/`, `legacy/`, `_old/`, `.deprecated/` folders.
-  - Stale docs in `agents/docs/detail/` — last modified >90 days AND not referenced by `agents/docs/INDEX.md`.
-  - Abandoned design files: `DESIGN.md.bak`, `BRAND-old.md`, screenshot dumps in `agents/` root (PNGs, JPGs).
+  - Stale docs in `brain/docs/detail/` — last modified >90 days AND not referenced by `brain/docs/INDEX.md`.
+  - Abandoned design files: `DESIGN.md.bak`, `BRAND-old.md`, screenshot dumps in `brain/` root (PNGs, JPGs).
 
 Output a state report to the user:
 
@@ -40,17 +42,16 @@ Output a state report to the user:
 Modernize state report
 
   Plugin version detected:   <version or "unknown">
-  Three-folder protocol:     present
+  brain/ layout:             present
   STRUCTURE.md:              <present | missing>
 
   Canon files:
-    cowork/STATUS.md         populated, last touched <N> days ago
-    cowork/BRIEF.md          thin (mostly placeholder), last touched <N> days ago
-    agents/BRIEF.md          populated, last touched <N> days ago
-    agents/BRAND.md          populated, last touched <N> days ago
-    agents/DESIGN.md         populated, last touched <N> days ago
-    agents/ROADMAP.md        stale (>30d), populated
-    agents/STATUS.md         populated, last touched <N> days ago
+    brain/STATUS.md          populated, last touched <N> days ago
+    brain/BRIEF.md           populated, last touched <N> days ago
+    brain/WONT-DO.md         thin (mostly placeholder), last touched <N> days ago
+    brain/BRAND.md           populated, last touched <N> days ago
+    brain/DESIGN.md          populated, last touched <N> days ago
+    brain/ROADMAP.md         stale (>30d), populated
     ...
 
   Waste candidates:           <K> files (will list before archiving)
@@ -65,7 +66,7 @@ Press any key to continue, or "cancel" to stop.
 
 For each populated canon file detected in sub-phase 1, run a confirm-or-edit pass.
 
-Iterate in this order: `agents/BRAND.md`, `agents/BRIEF.md`, `agents/ROADMAP.md`, `agents/STATUS.md`, `agents/DESIGN.md`. (Cowork-tier files are not re-confirmed here — their content is session-driven, not user-curated.)
+Iterate in this order: `brain/BRAND.md`, `brain/BRIEF.md`, `brain/ROADMAP.md`, `brain/STATUS.md`, `brain/DESIGN.md`.
 
 For each file:
 
@@ -108,26 +109,28 @@ Record the per-file decision for the modernize report.
 
 Same rule as every other init mode — these are locked plugin standards, not per-project content.
 
-1. **`agents/FUNDAMENTALS.md`** — copy verbatim from `${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/FUNDAMENTALS.md`. Silently overwrite.
+1. **`brain/FUNDAMENTALS.md`** — copy verbatim from `${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/FUNDAMENTALS.md`. Silently overwrite.
 
    ```bash
-   cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/FUNDAMENTALS.md" agents/FUNDAMENTALS.md
+   cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/FUNDAMENTALS.md" brain/FUNDAMENTALS.md
    ```
 
-2. **`agents/TOOLING.md`** — only if `package.json` exists at project root (Node project). Copy verbatim from the plugin template. Silently overwrite.
+2. **`brain/TOOLING.md`** — only if `package.json` exists at project root (Node project). Copy verbatim from the plugin template. Silently overwrite.
 
    ```bash
    if [ -f package.json ]; then
-     cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TOOLING.md" agents/TOOLING.md
+     cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TOOLING.md" brain/TOOLING.md
    fi
    ```
 
-3. **`agents/DESIGN.md`** — DO NOT silently overwrite token frontmatter. Tokens are per-project. Instead, verify the structural envelope:
+3. **`brain/DESIGN.md`** — DO NOT silently overwrite token frontmatter. Tokens are per-project. Instead, verify the structural envelope:
    - YAML frontmatter present (starts and ends with `---`)?
    - Required sections present in body: Overview, Colors, Typography, Spacing, Radius, Shadow, Components, **DO NOT**, **Extension protocol**, **Agent prompt guide**.
    - If any section is missing, surface to the user via AskUserQuestion: "Your DESIGN.md is missing the `<section>` section. I can copy the missing scaffold from the template and leave your existing content untouched. Apply?" — A yes / B skip.
 
    If the user picks A, splice the missing section in from the plugin template's `templates/DESIGN.md`. Never modify existing sections.
+
+4. **`brain/.plugin-version`** — write the current plugin version to this marker after the standards above are applied. The drift-detector hook reads this file.
 
 Record what was applied for the modernize report.
 
@@ -139,7 +142,7 @@ Hand off to the upgraded `design-check` skill in **scan-all-files mode** (not di
 
 ```
 Task(
-  prompt="Run design-check in scan-all-files mode. Walk every component / page / style file in the codebase. Compare each against agents/DESIGN.md tokens. Categorize findings per file as (a) auto-fix-safe — hardcoded hex / px / font values that map cleanly to a known token, and (b) human-judgment — values without a clean token mapping, ambiguous accent usage, or anything the design system doesn't yet cover. Return findings grouped by file, sorted by severity (highest first).",
+  prompt="Run design-check in scan-all-files mode. Walk every component / page / style file in the codebase. Compare each against brain/DESIGN.md tokens. Categorize findings per file as (a) auto-fix-safe — hardcoded hex / px / font values that map cleanly to a known token, and (b) human-judgment — values without a clean token mapping, ambiguous accent usage, or anything the design system doesn't yet cover. Return findings grouped by file, sorted by severity (highest first).",
   subagent_type="general-purpose",
   model="sonnet"
 )
@@ -181,9 +184,9 @@ Record auto-fix and pending counts for the modernize report.
 
 ## 0c.5 — STRUCTURE.md reconciliation
 
-`agents/STRUCTURE.md` documents the codebase's surface map (marketing / dashboard / desktop, component conventions, styling approach). It must reflect the actual codebase.
+`brain/STRUCTURE.md` documents the codebase's surface map (marketing / dashboard / desktop, component conventions, styling approach). It must reflect the actual codebase.
 
-### If `agents/STRUCTURE.md` is missing — first-run detection
+### If `brain/STRUCTURE.md` is missing — first-run detection
 
 Use Glob + a Haiku sub-agent to detect the project's structure:
 
@@ -193,7 +196,7 @@ Use Glob + a Haiku sub-agent to detect the project's structure:
 
 Generate a draft STRUCTURE.md and show to the user before writing.
 
-### If `agents/STRUCTURE.md` is present — verify against reality
+### If `brain/STRUCTURE.md` is present — verify against reality
 
 Glob the current codebase. Diff each documented surface against the filesystem:
 
@@ -232,10 +235,10 @@ For each waste candidate detected in sub-phase 1, present the list to the user b
 ```
 Waste candidates — will move to archive/2026-05-21-modernize/ (never deleted):
 
-  [ ] cowork/WORKLOG.md.bak               (12 days old, rolled into CHANGELOG)
-  [ ] agents/docs/detail/old-spec.md      (143 days old, not in INDEX.md)
+  [ ] brain/WORKLOG.md.bak               (12 days old, rolled into CHANGELOG)
+  [ ] brain/docs/detail/old-spec.md      (143 days old, not in INDEX.md)
   [ ] DESIGN-old.md                       (legacy file, replaced)
-  [ ] agents/screenshot-2024-12-04.png    (orphaned, not referenced)
+  [ ] brain/screenshot-2024-12-04.png     (orphaned, not referenced)
 
 Proceed?
   A — Yes, archive all of the above
@@ -261,7 +264,7 @@ For any canon file the user chose **C — Rebuild** in sub-phase 0c.2: hand off 
 
 ```
 Task(
-  prompt="Re-anchor the brand for an existing project. The user marked <file> for rebuild during a modernize pass. Run the full design-direction flow but preserve all user-locked content already in agents/BRIEF.md. Treat this as a re-anchor, not a fresh init.",
+  prompt="Re-anchor the brand for an existing project. The user marked <file> for rebuild during a modernize pass. Run the full design-direction flow but preserve all user-locked content already in brain/BRIEF.md. Treat this as a re-anchor, not a fresh init.",
   subagent_type="general-purpose",
   model="sonnet"
 )
@@ -281,19 +284,20 @@ Final output. One screen. No preamble.
 Modernize report — <project name>
 
   Canon re-confirmed (kept as-is):
-    - agents/BRAND.md
-    - agents/STATUS.md
+    - brain/BRAND.md
+    - brain/STATUS.md
 
   Canon edited per user input:
-    - agents/BRIEF.md     (scope tightened, 2 locked decisions added)
+    - brain/BRIEF.md     (scope tightened, 2 locked decisions added)
 
   Canon marked for design-direction re-anchor:
-    - agents/DESIGN.md    (handed off — see design-direction output above)
+    - brain/DESIGN.md    (handed off — see design-direction output above)
 
   Global standards updated (silent):
-    - agents/FUNDAMENTALS.md
-    - agents/TOOLING.md
-    - agents/DESIGN.md structure verified (no sections missing)
+    - brain/FUNDAMENTALS.md
+    - brain/TOOLING.md
+    - brain/DESIGN.md structure verified (no sections missing)
+    - brain/.plugin-version bumped to <version>
 
   Codebase design-drift sweep:
     - Files scanned:           <N>
@@ -304,13 +308,13 @@ Modernize report — <project name>
     - <created from first-run detection | reconciled <N> mismatches | left as-is>
 
   Waste archived (→ archive/<YYYY-MM-DD>-modernize/):
-    - cowork/WORKLOG.md.bak
-    - agents/docs/detail/old-spec.md
+    - brain/WORKLOG.md.bak
+    - brain/docs/detail/old-spec.md
     - DESIGN-old.md
 
   Next steps for you:
     - Review the <K> human-judgment design findings in <follow-up file or list>.
-    - Confirm the design-direction output for agents/DESIGN.md.
+    - Confirm the design-direction output for brain/DESIGN.md.
     - <any [VERIFY] items raised during the canon confirmation loop>
 ```
 

@@ -1,6 +1,6 @@
 # Phase 4 — Design system files
 
-Create `agents/BRAND.md`, `agents/FUNDAMENTALS.md`, `agents/TOOLING.md` (Node only), `agents/DESIGN.md`, `agents/DISCOVERIES.md`. Also confirm `agents/BRIEF.md` from Phase 3 is the right shape.
+Create `brain/BRAND.md`, `brain/FUNDAMENTALS.md`, `brain/TOOLING.md` (Node only), `brain/DESIGN.md`, `brain/DISCOVERIES.md`. Also confirm `brain/BRIEF.md` from Phase 3 is the right shape.
 
 Never silently overwrite. Always read first, ask before replacing.
 
@@ -34,7 +34,7 @@ If `design-direction` is unavailable (older plugin version, or skill missing on 
 
 ---
 
-## `agents/BRAND.md`
+## `brain/BRAND.md`
 
 **If exists:** read, use as context for DESIGN.md generation, do not overwrite.
 
@@ -69,7 +69,7 @@ C — Skip for now (blank stub)
 **If C:** create blank stub:
 
 ```markdown
-# agents/BRAND.md — [Project Name]
+# brain/BRAND.md — [Project Name]
 > What every agent must know before touching this project.
 
 ## Product
@@ -91,19 +91,19 @@ Mark auto-detected fields with `[VERIFY]`.
 
 ---
 
-## `agents/FUNDAMENTALS.md`
+## `brain/FUNDAMENTALS.md`
 
-**Always:** copy verbatim from the plugin template at `${CLAUDE_PLUGIN_ROOT}/templates/FUNDAMENTALS.md` to `agents/FUNDAMENTALS.md`. Silently replace any existing version — this is a global standard.
+**Always:** copy verbatim from the plugin template at `${CLAUDE_PLUGIN_ROOT}/templates/FUNDAMENTALS.md` to `brain/FUNDAMENTALS.md`. Silently replace any existing version — this is a global standard.
 
 ```bash
-cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/FUNDAMENTALS.md" agents/FUNDAMENTALS.md
+cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/FUNDAMENTALS.md" brain/FUNDAMENTALS.md
 ```
 
-If the plugin-root env var is unset (some agents don't expose it): use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/FUNDAMENTALS.md`. Do not modify per project.
+If the plugin-root env var is unset (some agents don't expose it): use the Read tool to fetch the template content from the plugin install path, then Write it to `brain/FUNDAMENTALS.md`. Do not modify per project.
 
 ---
 
-## `agents/TOOLING.md` (Node projects only)
+## `brain/TOOLING.md` (Node projects only)
 
 ### Step 4-pre — Monorepo detection
 
@@ -136,23 +136,23 @@ ls nx.json 2>/dev/null
    - apps/api/package.json
    - (etc.)
 
-   Which apps should get their own agents/TOOLING.md rules?
+   Which apps should get their own brain/TOOLING.md rules?
    A — All of the above
    B — Web app only (apps/web)
    C — Let me specify
    ```
-3. For each selected app, run Steps 4a and 4b (detect package manager, render TOOLING.md) scoped to that app's directory — read `apps/web/package.json` for lockfiles, write to `apps/web/agents/TOOLING.md` (or wherever the user designates).
-4. Record the monorepo flag and app paths in `agents/STRUCTURE.md` (or queue them for Phase 4-struct below if STRUCTURE.md doesn't exist yet). These paths are read by `design-check`, `audit`, and `build-component`.
+3. For each selected app, run Steps 4a and 4b (detect package manager, render TOOLING.md) scoped to that app's directory — read `apps/web/package.json` for lockfiles, write to `apps/web/brain/TOOLING.md` (or wherever the user designates).
+4. Record the monorepo flag and app paths in `brain/STRUCTURE.md` (or queue them for Phase 4-struct below if STRUCTURE.md doesn't exist yet). These paths are read by `design-check`, `audit`, and `build-component`.
 
-**If no check passes → single-app mode:** proceed with Steps 4a and 4b as before, writing to `agents/TOOLING.md` at project root.
+**If no check passes → single-app mode:** proceed with Steps 4a and 4b as before, writing to `brain/TOOLING.md` at project root.
 
 ---
 
-**Detect Node (single-app path):** Node project if a `package.json` exists at the project root. If not Node (Swift, Python, plain repo): skip this section silently — do not create `agents/TOOLING.md`.
+**Detect Node (single-app path):** Node project if a `package.json` exists at the project root. If not Node (Swift, Python, plain repo): skip this section silently — do not create `brain/TOOLING.md`.
 
 ### Step 4a — Detect or ask package manager
 
-**On first init (no `agents/TOOLING.md` exists):**
+**On first init (no `brain/TOOLING.md` exists):**
 
 1. Scan for lockfiles at the project root:
    ```bash
@@ -175,13 +175,13 @@ ls nx.json 2>/dev/null
    A — bun (recommended)  B — pnpm  C — npm  D — yarn
    ```
 
-**On re-init (`agents/TOOLING.md` already exists):**
+**On re-init (`brain/TOOLING.md` already exists):**
 
-1. Read the `**Package manager:**` line from `agents/TOOLING.md` to get the current choice.
+1. Read the `**Package manager:**` line from `brain/TOOLING.md` to get the current choice.
 2. Re-run the lockfile scan above to detect the current lockfile.
 3. Ask via `AskUserQuestion`:
    ```
-   agents/TOOLING.md records {current-manager} as the package manager.
+   brain/TOOLING.md records {current-manager} as the package manager.
    Lockfile detected: {detected or "none"}.
    Continue with {current-manager} or switch?
    [Y] Continue with {current-manager}  [N] Switch to {detected or "choose"}
@@ -190,7 +190,7 @@ ls nx.json 2>/dev/null
 
 ### Step 4b — Render and write TOOLING.md
 
-Once the package manager is confirmed, read the plugin template from `${CLAUDE_PLUGIN_ROOT:-${CODEX_PLUGIN_ROOT}}/templates/TOOLING.md` (or use Read tool if env var unset), replace every `{bun|pnpm|npm|yarn}` placeholder with the chosen manager, replace `{bun.lock|pnpm-lock.yaml|package-lock.json|yarn.lock}` with the corresponding lockfile name, replace `{manager}` with the chosen manager name, then write to `agents/TOOLING.md`.
+Once the package manager is confirmed, read the plugin template from `${CLAUDE_PLUGIN_ROOT:-${CODEX_PLUGIN_ROOT}}/templates/TOOLING.md` (or use Read tool if env var unset), replace every `{bun|pnpm|npm|yarn}` placeholder with the chosen manager, replace `{bun.lock|pnpm-lock.yaml|package-lock.json|yarn.lock}` with the corresponding lockfile name, replace `{manager}` with the chosen manager name, then write to `brain/TOOLING.md`.
 
 ```bash
 # Example for bun selection — sed replacements match the placeholder patterns
@@ -198,16 +198,16 @@ MANAGER="bun"; LOCKFILE="bun.lock"
 sed -e "s/{bun|pnpm|npm|yarn}/$MANAGER/g" \
     -e "s/{bun.lock|pnpm-lock.yaml|package-lock.json|yarn.lock}/$LOCKFILE/g" \
     -e "s/{manager}/$MANAGER/g" \
-    "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TOOLING.md" > agents/TOOLING.md
+    "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TOOLING.md" > brain/TOOLING.md
 ```
 
-If the plugin-root env var is unset: use the Read tool to fetch the template, apply substitutions in the Write content, then Write to `agents/TOOLING.md`.
+If the plugin-root env var is unset: use the Read tool to fetch the template, apply substitutions in the Write content, then Write to `brain/TOOLING.md`.
 
 When written, confirm the project's actual `package.json` / `.nvmrc` / `.npmrc` match the declared manager. If they drift, surface as a `[VERIFY]` item at Phase 7 — do not auto-fix.
 
 ---
 
-## `agents/DESIGN.md`
+## `brain/DESIGN.md`
 
 Most important file in Phase 4. The shape is fixed — `templates/DESIGN.md` is a complete scaffold with token categories, DO NOT section, and Extension protocol already filled in. **Phase 4 fills the placeholders, it does not invent the shape.**
 
@@ -236,7 +236,7 @@ If the plugin-root env var is unset: use the Read tool to fetch the template con
 
 ### Step 2 — Detect existing tokens in the project
 
-Read `agents/DESIGN.md` if it exists. Check for YAML frontmatter (starts with `---` and contains `name:` and a recognisable token block before the closing `---`).
+Read `brain/DESIGN.md` if it exists. Check for YAML frontmatter (starts with `---` and contains `name:` and a recognisable token block before the closing `---`).
 
 - Has frontmatter with `font:` + `surface:` + `light_mode:` + `dark_mode:` blocks → already v2.1 shape. Branch: "Existing DESIGN.md — fill gaps only".
 - Has frontmatter with the old flat `colors:` / `typography:` blocks → legacy v1 shape. Branch: "Legacy upgrade — re-shape into v2.1 template" (split fonts into display/body/mono, rename `bg`/`surface`/`surface-2`/`text`/`border` to `paper`/`ash`/`ink`/`hairline`, derive `light_mode` + `dark_mode` blocks).
@@ -255,7 +255,7 @@ If existing tokens found, present them and ask:
 Found design tokens in: [files]
 Sample: [5–10 CSS variables or Tailwind values]
 
-What would you like to do with agents/DESIGN.md?
+What would you like to do with brain/DESIGN.md?
 
 A — Transfer existing system as-is into the template (document what's there, no visual change)
 B — Transfer existing + I'll tell you what to add or change
@@ -293,7 +293,7 @@ All paths produce the same output: the `templates/DESIGN.md` scaffold with place
 
 ### Step 4-struct — Write monorepo flag to STRUCTURE.md
 
-If `agents/STRUCTURE.md` already exists (written by a prior `build-component` run), append or update the following block at the top of the file (after the header comment, before `## Surfaces present`):
+If `brain/STRUCTURE.md` already exists (written by a prior `build-component` run), append or update the following block at the top of the file (after the header comment, before `## Surfaces present`):
 
 ```markdown
 ## Project layout
@@ -302,7 +302,7 @@ If `agents/STRUCTURE.md` already exists (written by a prior `build-component` ru
 **App paths:** apps/web, apps/api, packages/ui   ← list only if monorepo: true; remove this line if false
 ```
 
-If `agents/STRUCTURE.md` does not exist yet, queue this data for when it is first created (by `build-component` or Phase 0c modernize). The monorepo flag and app paths must appear in STRUCTURE.md so `design-check`, `audit`, and `build-component` all read the same source of truth.
+If `brain/STRUCTURE.md` does not exist yet, queue this data for when it is first created (by `build-component` or Phase 0c modernize). The monorepo flag and app paths must appear in STRUCTURE.md so `design-check`, `audit`, and `build-component` all read the same source of truth.
 
 ---
 
@@ -310,18 +310,18 @@ If `agents/STRUCTURE.md` does not exist yet, queue this data for when it is firs
 
 If you have a custom DESIGN.md linter configured for this project, run it here.
 
-No linter is shipped with project-protocol. The `@google/design.md` package is not a project-protocol dependency and is not installed by default. If you want to lint `agents/DESIGN.md`, install and configure your own linter and document it under "optional dev tools" in `agents/TOOLING.md`.
+No linter is shipped with project-protocol. The `@google/design.md` package is not a project-protocol dependency and is not installed by default. If you want to lint `brain/DESIGN.md`, install and configure your own linter and document it under "optional dev tools" in `brain/TOOLING.md`.
 
 ---
 
-## `agents/DISCOVERIES.md`
+## `brain/DISCOVERIES.md`
 
 **If exists:** keep as-is. Append-only.
 
 **If missing:** create stub.
 
 ```markdown
-# agents/DISCOVERIES.md — [Project Name]
+# brain/DISCOVERIES.md — [Project Name]
 > What worked. Updated per session, not per feature.
 > Format: [date] · [agent] · [component/pattern] — what worked and why
 
@@ -333,10 +333,10 @@ No linter is shipped with project-protocol. The `@google/design.md` package is n
 
 ## End of Phase 4 — BRIEF.md reminder
 
-If `agents/BRIEF.md` was created as a stub during Phase 3, surface:
+If `brain/BRIEF.md` was created as a stub during Phase 3, surface:
 
 ```
-📋 agents/BRIEF.md was created as a stub. Worth adding from this init:
+📋 brain/BRIEF.md was created as a stub. Worth adding from this init:
 - [Design system choice: A / B / C / custom — and why]
 - [Stack or architecture decisions surfaced during init]
 - [Scope constraints mentioned]

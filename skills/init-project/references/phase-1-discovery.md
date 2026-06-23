@@ -2,7 +2,7 @@
 
 Find every `.md` file in the project and bucket it by audience.
 
-> **Note:** Phase 0 (mode detection) runs upstream of this phase and sets the mode. Phase 1 only runs for `mode = fresh` or `mode = audit`. For `mode = empty`, Phase 1 is skipped — the bootstrap answer object from Phase 0a is passed straight to Phase 3. For `mode = migration`, Phase 0b runs first and Phase 1 only buckets the non-standard markdown files Phase 0b passed forward.
+> **Note:** Phase 0 (mode detection) runs upstream of this phase and sets the mode. Phase 1 only runs for `mode = fresh` or `mode = audit`. For `mode = empty`, Phase 1 is skipped — the bootstrap answer object from Phase 0a is passed straight to Phase 3. Projects on an OLD layout never reach Phase 1 — Phase 0 hands them off to the `migrate-to-brain` skill.
 
 ## 1a. Glob for markdown
 
@@ -24,14 +24,14 @@ Separate every file into three buckets:
 
 **Protocol files** (Phase 3 handles):
 - Root `CLAUDE.md`, root `README.md`
-- `STATUS.md`, `BRIEF.md`, `WORKLOG.md`, `CHANGELOG.md` (any location)
+- `STATUS.md`, `BRIEF.md`, `WONT-DO.md`, `WORKLOG.md`, `CHANGELOG.md`, `agenda.md` (any location)
 - `ROADMAP.md`
 
 **Design system files** (Phase 4 handles):
 - `BRAND.md`, `FUNDAMENTALS.md`, `DESIGN.md`, `DISCOVERIES.md`
 
 **Other** (Phase 2 handles):
-- README.md if not at root, CONTRIBUTING.md, ARCHITECTURE.md, NOTES.md, legacy docs/ files outside `agents/docs/`, etc.
+- README.md if not at root, CONTRIBUTING.md, ARCHITECTURE.md, NOTES.md, legacy docs/ files outside `brain/docs/`, etc.
 
 ## 1c. Summarize "other" files
 
@@ -57,7 +57,7 @@ docs/API.md       — REST endpoint reference, 15 endpoints
 
 ## 1d. (Moved upstream)
 
-Layout detection used to live here but now runs in Phase 0 (mode detection). By the time Phase 1 runs, the mode and audit flag are already known. If `audit_flag = true`, Phase 1 still buckets every markdown file but Phases 3–6 only fill missing files and never overwrite populated content.
+Layout detection lives in Phase 0 (mode detection). By the time Phase 1 runs, the mode and audit flag are already known. If `audit_flag = true`, Phase 1 still buckets every markdown file but Phases 3–6 only fill missing files and never overwrite populated content.
 
 ## Output of Phase 1
 

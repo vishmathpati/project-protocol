@@ -84,7 +84,7 @@ Per-section component decisions don't merit their own BRIEF blocks — they fold
 
 ## What goes in INDEX.md
 
-Read `agents/docs/INDEX.md`. Find the section that lists pages (usually `## Pages` or `## Routes` or a similar heading). Append a row for the new page:
+Read `brain/docs/INDEX.md`. Find the section that lists pages (usually `## Pages` or `## Routes` or a similar heading). Append a row for the new page:
 
 ```markdown
 - `/<slug>` — <one-line intent from brief> · `src/app/(<tier>)/<slug>/page.tsx`
@@ -96,7 +96,7 @@ This satisfies `save-session` Step 4. Without this inline update, save-session p
 
 ## What does NOT happen
 
-- **No `agents/build-page-scratch/` folder.** Ever.
+- **No `brain/build-page-scratch/` folder.** Ever.
 - **No state file.** The conversation transcript + canon + WORKLOG are the state.
 - **No iteration history files** (e.g. `plan-v1.md`, `plan-v2.md`). Iterate in place in chat.
 - **No tool palette restriction.** Standard `allowed-tools` per the SKILL.md frontmatter. The discipline is prose, not enforcement.

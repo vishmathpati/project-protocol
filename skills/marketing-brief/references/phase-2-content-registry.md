@@ -1,6 +1,6 @@
 # Phase 2 — Content registry
 
-Write `agents/marketing/CONTENT.md`. This file is the single source of truth for every marketing fact that appears in more than one place: features, audiences, comparisons, testimonials, FAQs, legal pages.
+Write `brain/marketing/CONTENT.md`. This file is the single source of truth for every marketing fact that appears in more than one place: features, audiences, comparisons, testimonials, FAQs, legal pages.
 
 Every later marketing file — sitemap, briefs, copy, layouts — reads from this. The nav menu, the footer columns, the feature-pages index, the testimonial blocks all resolve their content by referencing CONTENT rows, never by hardcoding strings.
 
@@ -32,9 +32,9 @@ Before writing CONTENT.md, scan the codebase to confirm the feature list from Ph
    - Page titles, `<h1>` strings, route names.
    - Recurring component names (`<Dashboard>`, `<Editor>`, `<Sharing>`, `<Inbox>`).
 
-3. **Read `agents/ROADMAP.md`** locked features list.
+3. **Read `brain/ROADMAP.md`** locked features list.
 
-4. **Read `agents/docs/INDEX.md`** feature map.
+4. **Read `brain/docs/INDEX.md`** feature map.
 
 Merge the three sources. Surface any deltas to the user:
 
@@ -55,16 +55,16 @@ After confirmation, this is the FEATURES seed.
 
 ## Copy the canonical template, then patch detected values
 
-The shape of `agents/marketing/CONTENT.md` is fixed — the plugin ships a canonical template at `templates/CONTENT.md` (sections: FEATURES, AUDIENCES, COMPARISONS, TESTIMONIALS, FAQS, LEGAL_PAGES, plus the "How pages consume this file" and "Editing rules" appendices). Phase 2 fills the placeholders, it does not invent the shape.
+The shape of `brain/marketing/CONTENT.md` is fixed — the plugin ships a canonical template at `templates/CONTENT.md` (sections: FEATURES, AUDIENCES, COMPARISONS, TESTIMONIALS, FAQS, LEGAL_PAGES, plus the "How pages consume this file" and "Editing rules" appendices). Phase 2 fills the placeholders, it does not invent the shape.
 
 Copy the template first:
 
 ```bash
-mkdir -p agents/marketing
-cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/CONTENT.md" agents/marketing/CONTENT.md
+mkdir -p brain/marketing
+cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/CONTENT.md" brain/marketing/CONTENT.md
 ```
 
-If neither `CODEX_PLUGIN_ROOT` nor `CLAUDE_PLUGIN_ROOT` is set (some agents don't expose the env var): use the Read tool to fetch the template content from the plugin install path, then Write it to `agents/marketing/CONTENT.md`.
+If neither `CODEX_PLUGIN_ROOT` nor `CLAUDE_PLUGIN_ROOT` is set (some agents don't expose the env var): use the Read tool to fetch the template content from the plugin install path, then Write it to `brain/marketing/CONTENT.md`.
 
 Once the copy is in place, patch the detected/elicited values into the existing tables. The template ships with realistic example rows (short-links / analytics / partners, marketers / developers / product-teams, etc.) — **delete those example rows** and replace with rows derived from the FEATURES seed above plus the user's answers in Phase 1.
 
@@ -80,9 +80,9 @@ What to patch per table:
 Hard rules for the patch:
 
 - Do not delete the file header (the `> Single source of truth …` blockquote) or the "How pages consume this file" / "Editing rules" appendices. They're contract, not example.
-- Do not invent features that don't trace to code or `agents/ROADMAP.md`.
+- Do not invent features that don't trace to code or `brain/ROADMAP.md`.
 - Mark any auto-detected row that wasn't explicitly confirmed by the user with `[VERIFY]` in one of its cells.
-- Banned-words list applies to blurbs and FAQ answers — scan against `agents/FUNDAMENTALS.md` § banned words before writing.
+- Banned-words list applies to blurbs and FAQ answers — scan against `brain/FUNDAMENTALS.md` § banned words before writing.
 
 ---
 
@@ -183,7 +183,7 @@ If the project doesn't have legal pages yet, write the rows with `last reviewed:
 CONTENT.md opens with a short header so a human opening the file knows what it is:
 
 ```markdown
-# agents/marketing/CONTENT.md
+# brain/marketing/CONTENT.md
 > Single source of truth for every shared marketing fact.
 > Locked via marketing-brief on <YYYY-MM-DD>.
 > All marketing components must read from this file. Never hardcode a feature
@@ -202,7 +202,7 @@ CONTENT.md opens with a short header so a human opening the file knows what it i
 
 ## Merging into an existing CONTENT.md
 
-If `agents/marketing/CONTENT.md` already exists:
+If `brain/marketing/CONTENT.md` already exists:
 
 1. Read it. Parse each table.
 2. Surface every existing row to the user one table at a time:
@@ -220,4 +220,4 @@ If `agents/marketing/CONTENT.md` already exists:
 - **No emoji icons.** Icon column names a lucide-style symbol or "none". `audit` and `design-check` will flag emoji icons downstream.
 - **No invented features.** Every FEATURES row must trace to code or ROADMAP.
 - **No invented testimonials with real-looking author + real-looking company together.** Either both are clearly fictional (using the locked fictional-customer brand from Phase 6) or both are real with the customer's permission.
-- **Banned-words list applies** to blurbs and FAQ answers. Scan against `agents/FUNDAMENTALS.md` § banned words before writing.
+- **Banned-words list applies** to blurbs and FAQ answers. Scan against `brain/FUNDAMENTALS.md` § banned words before writing.

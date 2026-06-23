@@ -1,0 +1,7 @@
+interface:
+  display_name: "Migrate to Brain"
+  short_description: "One-time migration from the old three-folder layout (cowork/, agents/, human/) to the unified brain/ folder — DELETE before public launch"
+  brand_color: "#b45309"
+
+policy:
+  allow_implicit_invocation: false

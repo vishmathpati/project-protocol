@@ -1,6 +1,6 @@
 # Phase 7 — Layout sketches
 
-For each page in SITEMAP.md, write `agents/marketing/layouts/<slug>.md`. Each layout is a block-level wireframe in markdown — rectangles labelled with intent. Full-bleed vs contained, image-left vs text-right, sticky elements, alternating rhythm.
+For each page in SITEMAP.md, write `brain/marketing/layouts/<slug>.md`. Each layout is a block-level wireframe in markdown — rectangles labelled with intent. Full-bleed vs contained, image-left vs text-right, sticky elements, alternating rhythm.
 
 NOT a pixel-perfect mockup. NOT Figma. Structural intent only. `build-component` consumes the layout when implementing each page's actual JSX.
 
@@ -25,11 +25,11 @@ Rectangles use ASCII boxes. Width is not literal — these aren't pixels — but
 ## Worked example — `layouts/home.md`
 
 ```markdown
-# agents/marketing/layouts/home.md
+# brain/marketing/layouts/home.md
 > Layout sketch for the Home page. Locked via marketing-brief on 2026-05-21.
-> Reads brief: agents/marketing/briefs/home.md.
-> Reads copy: agents/marketing/copy/home.md.
-> Reads media: agents/marketing/MEDIA.md § Home.
+> Reads brief: brain/marketing/briefs/home.md.
+> Reads copy: brain/marketing/copy/home.md.
+> Reads media: brain/marketing/MEDIA.md § Home.
 
 ## Global shell
 
@@ -228,6 +228,6 @@ This is what makes `build-component` work mechanically. The implementer reads th
 - **Each block declares mobile behaviour** — how it stacks.
 - **Visual anchors reference MEDIA.md** — never restate what the anchor is, point at the manifest row.
 - **Data sources reference CONTENT.md** — never inline a feature or testimonial.
-- **No pixels.** ASCII boxes show relative width, not absolute. The implementer picks the actual values from `agents/DESIGN.md` tokens.
+- **No pixels.** ASCII boxes show relative width, not absolute. The implementer picks the actual values from `brain/DESIGN.md` tokens.
 - **Footer + nav are sketched once** in `layouts/home.md` (or a dedicated `layouts/_shell.md`) and reused. Not redrawn per page.
 - **Rhythm check before locking** — full-bleed / contained alternation, background alternation, image-side alternation. If three consecutive sections are identical in those axes, re-arrange.

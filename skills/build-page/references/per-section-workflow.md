@@ -5,13 +5,13 @@ After the page plan is locked (BRIEF block written, WORKLOG line appended), the 
 ## Entering a section
 
 Read the section's material from canon. For marketing pages:
-- The relevant block from `agents/marketing/copy/<slug>.md` (headlines, body, CTAs).
+- The relevant block from `brain/marketing/copy/<slug>.md` (headlines, body, CTAs).
 - The corresponding MEDIA.md entry (visual anchor type).
-- The corresponding row in `agents/marketing/layouts/<slug>.md` (block-level wireframe intent).
+- The corresponding row in `brain/marketing/layouts/<slug>.md` (block-level wireframe intent).
 - The CONTENT.md rows it references (FEATURES, FAQS, TESTIMONIALS as applicable).
 
 For dashboard pages:
-- The relevant slice of the page brief (`agents/specs/<slug>.md` or the relevant ROADMAP row).
+- The relevant slice of the page brief (`brain/specs/<slug>.md` or the relevant ROADMAP row).
 - Existing dashboard primitives the section might compose (PageHeader, KpiStrip, ChartCard, DataTable, EmptyState, ErrorState, Skeleton).
 
 Then surface the section to the user, one paragraph:
@@ -205,7 +205,7 @@ Wait for "yes". Then proceed to wire-up (covered in SKILL.md step 10).
 
 ## What does NOT happen during per-section work
 
-- **Don't propose copy changes.** Copy is locked in `copy/<slug>.md`. If the user wants to change copy mid-build, that's a separate edit to canon, not a build-page concern. Halt: *"Copy is canon. Update `agents/marketing/copy/<slug>.md` first, then resume."*
+- **Don't propose copy changes.** Copy is locked in `copy/<slug>.md`. If the user wants to change copy mid-build, that's a separate edit to canon, not a build-page concern. Halt: *"Copy is canon. Update `brain/marketing/copy/<slug>.md` first, then resume."*
 - **Don't propose CONTENT.md changes.** Same rule. CONTENT changes go through a separate update to canon.
 - **Don't propose new DESIGN.md tokens.** If the section genuinely needs a token we don't have, that's a `design-check` Step 4 conversation (and it'll fire automatically). Don't anticipate by editing DESIGN.md yourself.
 - **Don't bundle two sections into one `build-component` call.** One component per call. Even if two sections both need a hero-shaped thing, build them separately — they probably differ in ways that matter.

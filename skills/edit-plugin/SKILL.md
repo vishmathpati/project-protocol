@@ -23,7 +23,7 @@ The problem it solves: an agent edits a skill, the user thanks them, the session
   - `README.md`, `CHANGELOG.md`, `build.sh`, `install.sh`
 - Slash command: `/edit-plugin`
 
-**Does NOT fire for:** edits to *projects that use this plugin* (their `cowork/`, `agents/`, `human/` files). That work uses `save-session` for its git hygiene. This skill is only for changes to the plugin source itself.
+**Does NOT fire for:** edits to *projects that use this plugin* (their `brain/` files). That work uses `save-session` for its git hygiene. This skill is only for changes to the plugin source itself.
 
 ---
 
@@ -165,4 +165,4 @@ The plugin is the discipline mechanism for every other project. The plugin itsel
 
 ## Difference from `save-session`
 
-`save-session` syncs **a project that uses this plugin** — its `cowork/agents/human` markdown files. `edit-plugin` syncs **changes to this plugin itself**. The user's local folder for project-protocol is the plugin source repo, and it must always match `origin/main` on GitHub.
+`save-session` syncs **a project that uses this plugin** — its `brain/` markdown files. `edit-plugin` syncs **changes to this plugin itself**. The user's local folder for project-protocol is the plugin source repo, and it must always match `origin/main` on GitHub.

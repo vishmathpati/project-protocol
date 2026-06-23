@@ -1,7 +1,7 @@
 # Phase 6.5 — Token alignment check
 
 After the user picks a direction in Phase 6 (or accepts a hybrid), this phase
-compares the locked direction against the existing `agents/DESIGN.md` token
+compares the locked direction against the existing `brain/DESIGN.md` token
 frontmatter and decides what Phase 7 writes.
 
 This is the phase that closes the gap between "I locked a new brand direction"
@@ -19,7 +19,7 @@ Not skippable.
 
 ## What it does
 
-1. **Detect surface tier(s) for this project.** From `agents/BRAND.md` Product.Surfaces
+1. **Detect surface tier(s) for this project.** From `brain/BRAND.md` Product.Surfaces
    field (or ask the user if absent), classify as one of:
    - dashboard / app only — internal tool, product UI
    - marketing only — landing site, no product chrome
@@ -34,7 +34,7 @@ Not skippable.
    - both: generate a single shared body family + separate display family for
      marketing; type scales differ per surface (encode both in DESIGN.md type_scale)
 
-2. **Detect cultural anchor + script requirements.** From `agents/BRAND.md`
+2. **Detect cultural anchor + script requirements.** From `brain/BRAND.md`
    Cultural anchor field, decide whether the brand needs non-Latin script
    support. If brand mentions India / Hindi / Tamil / Devanagari / Bengali /
    Gujarati / Gurmukhi — Latin alone is wrong. The body font MUST pair with:
@@ -46,7 +46,7 @@ Not skippable.
 
    If no non-Latin signal, default Latin-only stack.
 
-3. **Read the existing token frontmatter** in `agents/DESIGN.md`. Extract:
+3. **Read the existing token frontmatter** in `brain/DESIGN.md`. Extract:
    - `font.display`, `font.body`, `font.mono`
    - `accent.primary`, `accent.secondary` (if present)
    - `surface.paper`, `surface.ash`, `surface.ink` (or legacy `--bg`, `--surface`, `--ink` for projects on the old shape)
@@ -207,7 +207,7 @@ Use the surface tier detected in step 1 to pick which layout(s) to render:
   (surface layouts), the 21 component sections, the literal HTML template
   with placeholders, font-loading rules (Google Fonts only — substitute with
   notice for everything else), file path conventions
-  (`agents/preview/<slug>-<date>.html`), and the iteration loop semantics.
+  (`brain/preview/<slug>-<date>.html`), and the iteration loop semantics.
 
 Always render the preview when tokens are changing. Skip only when alignment
 result is `match` (no token changes).
@@ -232,13 +232,13 @@ radius.sm/md/lg:   4/8/12       →  6/10/14                     [MISMATCH — d
 
 spacing:           [4,8,12,16,24,32,48,64]  →  same             [MATCH]
 
-👀 Preview rendered: file:///<absolute-project-path>/agents/preview/editorial-cream-2026-05-22.html
+👀 Preview rendered: file:///<absolute-project-path>/brain/preview/editorial-cream-2026-05-22.html
 
 Open it in your browser to see the tokens applied to real components.
 Light/dark toggle is in the top-right.
 
 When you're ready:
-  approve / apply all  — write the new tokens to agents/DESIGN.md
+  approve / apply all  — write the new tokens to brain/DESIGN.md
   iterate              — tell me what to change in plain language
   reject               — keep existing tokens, only write Overview + DO NOT
 ```

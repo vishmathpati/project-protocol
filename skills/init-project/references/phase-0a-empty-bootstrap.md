@@ -1,6 +1,6 @@
 # Phase 0a — Empty-project bootstrap
 
-Runs only when Phase 0 classifies the project as **empty** (Mode C) and the user opted to answer questions rather than accept placeholder templates. The goal is to gather just enough information that the three-folder templates can be populated with real content from the start.
+Runs only when Phase 0 classifies the project as **empty** (Mode D) and the user opted to answer questions rather than accept placeholder templates. The goal is to gather just enough information that the `brain/` templates can be populated with real content from the start.
 
 This phase is read + collect + plan. It does NOT create files. Phase 3 onwards uses the answers gathered here to write populated templates instead of `[Project Name]` placeholders.
 
@@ -25,9 +25,9 @@ Use `AskUserQuestion`. Ask in a single batch if the tool supports multiple-choic
    - B — Prototype (some code exists but not stable)
    - C — Actively building (real codebase, in development)
    - D — Already shipping (live with users)
-6. **Locked decisions** — anything already decided you want captured in `agents/BRIEF.md` v1.0? Free text, can be empty.
+6. **Locked decisions** — anything already decided you want captured in `brain/BRIEF.md` v1.0? Free text, can be empty.
    - Examples: "No auth in v1", "MIT licensed", "Postgres, not MongoDB", "Single binary deploy".
-7. **First chapter direction** — what's the first thing you'd like on `agents/ROADMAP.md`? One sentence.
+7. **First chapter direction** — what's the first thing you'd like on `brain/ROADMAP.md`? One sentence.
    - Example: "Get a working end-to-end skeleton — auth + one happy path."
 
 Mark any answer the user explicitly punts on (e.g., "haven't decided", "skip") with `[VERIFY]` so Phase 7 surfaces it.
@@ -72,34 +72,27 @@ A structured answer object passed forward to Phase 3:
 **Phase 3 — root `README.md`**
 - Opening paragraph uses `one_sentence` + `user`.
 
-**Phase 3 — `cowork/STATUS.md`**
-- `## Current focus` line uses `direction` answer (or "Setting up the project" if empty).
+**Phase 3 — `brain/STATUS.md`**
+- `## Current sprint` line uses `direction` answer (or "Setting up the project" if empty).
+- `## Next actions` lists one placeholder: "Open `brain/BRIEF.md` and confirm tech stack + scope."
 
-**Phase 3 — `cowork/BRIEF.md` v1.0**
-- `### What this is` derived from `one_sentence`.
-- Leave `Locked decisions` empty — orchestration locks are user-driven.
-
-**Phase 3 — `agents/STATUS.md`**
-- `## Current sprint` line uses `direction`.
-- `## Next actions` lists one placeholder: "Open `agents/BRIEF.md` and confirm tech stack + scope."
-
-**Phase 3 — `agents/BRIEF.md` v1.0**
+**Phase 3 — `brain/BRIEF.md` v1.0**
 - `### What we're building` uses `one_sentence`.
 - `### Tech stack — chosen` pre-fills a single row from `stack` (or marks `[VERIFY]` if "undecided").
 - `### Architecture decisions` lists every entry from `locked_decisions`.
 - `### Scope — in / out` left empty with `[VERIFY]` markers.
 
-**Phase 3 — `agents/ROADMAP.md`**
+**Phase 3 — `brain/ROADMAP.md`**
 - `## Direction` uses the answer to question 7.
 - `## Phases / Acts` seeded with one stub: `### Act 1 — <direction summary>` with `[VERIFY]` on done criteria.
 
-**Phase 4 — `agents/BRAND.md`**
+**Phase 4 — `brain/BRAND.md`**
 - Name + one-sentence + target user are already known; the BRAND flow only needs the personality / tone / not-this answer (one short question instead of three).
 
-**Phase 4 — `agents/DESIGN.md`**
+**Phase 4 — `brain/DESIGN.md`**
 - No existing tokens to detect. Use the "no existing tokens" branch (A — generate fresh from product description / B — describe the vibe).
 
-**Phase 5 — `agents/docs/INDEX.md`**
+**Phase 5 — `brain/docs/INDEX.md`**
 - Minimal stub:
   - Section 1 Human Map: project sentence + "Pages: (none yet)" + "Features: (none yet)".
   - Section 2 Agent Dependency Index: all sections present, all marked `[VERIFY]` or "(none yet — add as features ship)".
@@ -117,7 +110,7 @@ A structured answer object passed forward to Phase 3:
 If the user types "skip questions" / "just placeholders" / "I'll fill it in later" at any point inside Phase 0a:
 - Discard whatever was collected.
 - Set the answer object to defaults (`project_name` = repo folder name, everything else `[VERIFY]`).
-- Continue to Phase 3 — the templates fall back to the placeholder behavior used in Mode D (fresh).
+- Continue to Phase 3 — the templates fall back to the placeholder behavior used in Mode E (fresh).
 
 ---
 

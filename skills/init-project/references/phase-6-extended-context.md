@@ -46,7 +46,7 @@ Or describe in plain English.
 What should this file be called?
 (examples: data-contracts.md, domain.md, stripe-integration.md)
 
-It will live in agents/docs/.
+It will live in brain/docs/.
 ```
 
 ### Step 3 — Context collection
@@ -70,7 +70,7 @@ Structure the paste based on file type:
 
 **External integration** → sections: What it does | Auth method | Key endpoints/webhooks | Rate limits | Error codes | Env vars required.
 
-Show preview: "Here's what I'll write to `agents/docs/[filename]` — does this look right?"
+Show preview: "Here's what I'll write to `brain/docs/[filename]` — does this look right?"
 
 Apply corrections, write the file.
 
@@ -78,19 +78,19 @@ Apply corrections, write the file.
 
 Update two places:
 
-**`agents/docs/INDEX.md`** — add to Key Files table:
+**`brain/docs/INDEX.md`** — add to Key Files table:
 ```
-| agents/docs/[filename] | [type]: [what it contains] — read before [trigger condition] |
+| brain/docs/[filename] | [type]: [what it contains] — read before [trigger condition] |
 ```
 
 **Root `CLAUDE.md`** — append to `## Extended Context` section (create if doesn't exist):
 ```
-- `agents/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
+- `brain/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
 ```
 
-If file is architecture- or decisions-related: also add to `agents/BRIEF.md` `## Reference files`:
+If file is architecture- or decisions-related: also add to `brain/BRIEF.md` `## Reference files`:
 ```
-- `agents/docs/[filename]` — [description]
+- `brain/docs/[filename]` — [description]
 ```
 
 ### Step 6 — Loop
@@ -104,4 +104,4 @@ N — Done
 
 ## Output
 
-End of Phase 6: every extended context file is written, referenced in INDEX.md and root CLAUDE.md, and (if architecture-related) referenced in agents/BRIEF.md.
+End of Phase 6: every extended context file is written, referenced in INDEX.md and root CLAUDE.md, and (if architecture-related) referenced in brain/BRIEF.md.

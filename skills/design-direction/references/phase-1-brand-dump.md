@@ -8,13 +8,13 @@ One free-text prompt to the user. No structured form, no multiple-choice, no axi
 
 Before prompting the user, check:
 
-1. `agents/BRAND.md` — if it exists and has populated sections (anything beyond `[VERIFY]` placeholders), read it. Map its content onto the dump.
-2. `agents/STATUS.md` — current sprint, audience hints, surface mix.
+1. `brain/BRAND.md` — if it exists and has populated sections (anything beyond `[VERIFY]` placeholders), read it. Map its content onto the dump.
+2. `brain/STATUS.md` — current sprint, audience hints, surface mix.
 3. Root `CLAUDE.md` — `## What this is` section.
 4. Root `README.md` — opening paragraph.
-5. `agents/BRIEF.md` — any locked decisions about audience, monetisation, surfaces.
+5. `brain/BRIEF.md` — any locked decisions about audience, monetisation, surfaces.
 
-If those files cover what the dump prompt asks for, **skip the prompt** and synthesise the dump silently. Tell the user: *"Pulling the brand context from `agents/BRAND.md` + `agents/STATUS.md` — you already wrote most of this. I'll add follow-up only if I find gaps."* Then proceed to Phase 2.
+If those files cover what the dump prompt asks for, **skip the prompt** and synthesise the dump silently. Tell the user: *"Pulling the brand context from `brain/BRAND.md` + `brain/STATUS.md` — you already wrote most of this. I'll add follow-up only if I find gaps."* Then proceed to Phase 2.
 
 If only some fields are answered by existing canon, ask only for the missing pieces.
 

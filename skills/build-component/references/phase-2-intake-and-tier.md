@@ -52,7 +52,7 @@ Examples:
 - `LogoBar` (the customer logos strip).
 - `FAQAccordion` (the marketing FAQ list with the project's actual questions baked in).
 
-Marketing components can read from `agents/marketing/CONTENT.md` if it exists (features list, comparisons, testimonials registry). Otherwise they take props or use ad-hoc copy.
+Marketing components can read from `brain/marketing/CONTENT.md` if it exists (features list, comparisons, testimonials registry). Otherwise they take props or use ad-hoc copy.
 
 ### App
 
@@ -149,7 +149,7 @@ The locked tier determines:
 | Tier | Reads | Writes to | Allowed imports | Convention applies |
 |------|-------|-----------|-----------------|-------------------|
 | Generic | `DESIGN.md`, `FUNDAMENTALS.md` | `{generic-folder}/` from STRUCTURE.md | Utilities only (cn, icons, headless libs) | Yes — full triplet if new primitive |
-| Marketing | `DESIGN.md`, `FUNDAMENTALS.md`, optionally `agents/marketing/CONTENT.md` | `{marketing-folder}/` | Generic + utilities | Triplet not required — composition first |
+| Marketing | `DESIGN.md`, `FUNDAMENTALS.md`, optionally `brain/marketing/CONTENT.md` | `{marketing-folder}/` | Generic + utilities | Triplet not required — composition first |
 | App | `DESIGN.md`, `FUNDAMENTALS.md`, project hooks / API layer | `{app-folder}/` | Generic + utilities | Triplet not required — composition first |
 
 Marketing and App tiers should be compositions in almost all cases. The `cva + forwardRef + cn` triplet applies to NEW Generic primitives, not to a `Hero` that's stitching together a `<Heading>`, `<Text>`, `<Button>`, and `<Image>`. Phase 3 makes that distinction explicit.

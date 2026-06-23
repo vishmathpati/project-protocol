@@ -1,4 +1,4 @@
-# agents/marketing/CONTENT.md
+# brain/marketing/CONTENT.md
 > Single source of truth for marketing content.
 > Every marketing page reads from this — nav menus, footer columns, feature
 > pages, comparison pages, testimonial sections, FAQ sections, legal nav.
@@ -7,7 +7,7 @@
 >
 > Rule of thumb: if a name, slug, blurb, audience, or quote appears on more
 > than one page, it lives here and pages render it by id. If it only appears
-> on one page, it can stay in that page's copy file in `agents/marketing/copy/`.
+> on one page, it can stay in that page's copy file in `brain/marketing/copy/`.
 
 ---
 
@@ -85,7 +85,7 @@ hero comparison card; the page itself expands each into a section.
 
 Customer quotes. `customer` is the person's name, `role` + `company` make
 the attribution line. `quote` is verbatim — never paraphrased. `photo_url`
-is the path under `agents/marketing/media/` (managed by `marketing-brief`
+is the path under `brain/marketing/media/` (managed by `marketing-brief`
 media manifest, never a remote URL hot-linked from a competitor).
 
 | customer | role | company | quote | photo_url |
@@ -132,7 +132,7 @@ rather than splitting the answer.
 ## LEGAL_PAGES
 
 Footer legal nav. Each row renders one `/<slug>` page sourced from
-`agents/marketing/copy/legal/<slug>.md`. `last_updated` shows in the page
+`brain/marketing/copy/legal/<slug>.md`. `last_updated` shows in the page
 footer and is the only field humans hand-edit between releases.
 
 | slug | title | last_updated |
@@ -171,7 +171,7 @@ footer and is the only field humans hand-edit between releases.
 - **Comparison pages** — render one row of `COMPARISONS`.
 - **Global FAQ page** — renders all of `FAQS`, grouped by `page_slug`.
 - **Legal pages** — render `LEGAL_PAGES` row + the matching markdown file
-  in `agents/marketing/copy/legal/`.
+  in `brain/marketing/copy/legal/`.
 
 ## Editing rules
 
@@ -182,4 +182,4 @@ footer and is the only field humans hand-edit between releases.
 3. **Audiences must exist in the AUDIENCES table** before being used in
    a FEATURES row — `marketing-brief` enforces this.
 4. **Testimonial quotes are verbatim.** If you need to shorten one, get
-   the customer's written approval and log it in `agents/DECISIONS.md`.
+   the customer's written approval and log it in `brain/DECISIONS.md`.
