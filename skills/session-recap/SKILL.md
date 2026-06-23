@@ -13,6 +13,8 @@ stand right now so work can continue without losing the thread.
 
 ## Step 1 — Read context
 
+> Single canon: all project state lives in `brain/`. Recap always reads `brain/STATUS.md` and `brain/WORKLOG.md` regardless of which tool (Claude Code, Codex, or Cowork) saved last — this is what prevents empty recaps.
+
 Read in order:
 
 1. Run `pwd` and `git status --short --branch` if this is a git repository.
@@ -21,9 +23,9 @@ Read in order:
    - If the cwd contains `.claude/worktrees/`, warn: this is a **Claude Code worktree** — local uncommitted changes from the main checkout are not present here.
    - In either worktree case, state the main checkout path (strip the worktree suffix) so the user knows where the real files live.
    - If there are uncommitted changes, summarize them briefly.
-2. Root `CLAUDE.md` — overall project orientation: current tier, active skills, rules.
-3. `agents/STATUS.md` (or `cowork/STATUS.md` in Cowork) — project health, blockers, last-known state.
-4. Tail of `agents/WORKLOG.md` (or `cowork/WORKLOG.md` in Cowork) — real-time log of this session's events. Read the last 50 lines; do not read the entire file.
+2. Root `CLAUDE.md` — overall project orientation: active skills, rules.
+3. `brain/STATUS.md` — project health, blockers, last-known state.
+4. Tail of `brain/WORKLOG.md` — real-time log of this session's events. Read the last 50 lines; do not read the entire file.
 
 ---
 
@@ -55,8 +57,8 @@ Where we are:
 ## Rules
 
 - Keep it short. Purpose is orientation, not documentation.
-- If WORKLOG.md is empty, say so — session may have just started.
-- Surface any STATUS.md blockers even if not discussed this session.
+- If `brain/WORKLOG.md` is empty, say so — session may have just started.
+- Surface any `brain/STATUS.md` blockers even if not discussed this session.
 - Never report "no commit", "no branch", "no file changes", or similar git state unless verified with `git status --short --branch` in the current cwd.
 - If STATUS.md and git state disagree, trust live git state and mention the mismatch.
 - Worktree check is mandatory — both `.codex/worktrees/` and `.claude/worktrees/` patterns must be detected and surfaced before reading any project files.

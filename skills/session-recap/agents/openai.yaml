@@ -1,6 +1,6 @@
 interface:
   display_name: "Session Recap"
-  short_description: "Mid-session snapshot of what's been done and what's still open"
+  short_description: "Mid-session snapshot — reads brain/STATUS.md and brain/WORKLOG.md to report what's done and what's still open"
   brand_color: "#475569"
 
 policy:
