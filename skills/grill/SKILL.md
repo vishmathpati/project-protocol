@@ -52,12 +52,25 @@ You're done when there are no unresolved branches left — every fork has an ans
 
 ---
 
-## Step 5 — Write the sharpened goal + plan into the chapter
+## Step 5 — Pick the execution method
 
-Write the result into the chapter file `brain/chapters/NN-name.md` — fill the **Goal** and **Plan** sections (creating them if the chapter is fresh):
+Now that the goal and scope are clear, choose how this chapter will be executed. Pick **one** of the three methods based on the chapter's size and nature:
+
+- **solo** — small and self-contained; one tool/session does both planning and the work. Use when the chapter is bounded, low-risk, and doesn't need a separate worktree.
+- **CEO + worker** — one specialist worker executes the chapter in a dedicated worktree. Use for most delegated chapters: clear goal, single discipline, reviewable in one pass.
+- **CEO + specialists** — a large chapter that naturally spans multiple specialist passes (e.g. backend → UI → wire-up), each appending its own Completion Report. Use when the chapter has hard seams between disciplines or when parallel passes are the only sane way to scope it.
+
+State your recommended method and give a one-line reason. Confirm with the user (a quick "yes" is fine). Record the chosen method in the chapter file's **Method** field (see Step 6).
+
+---
+
+## Step 6 — Write the sharpened goal + plan into the chapter
+
+Write the result into the chapter file `brain/chapters/NN-name.md` — fill the **Goal**, **Method**, and **Plan** sections (creating them if the chapter is fresh):
 
 - **Goal** — one tight paragraph of what "done" means: concrete, verifiable, reflecting every decision just made.
-- **Plan** — the ordered steps, now unambiguous because the branches are resolved.
+- **Method** — one of `solo` | `CEO+worker` | `CEO+specialists`, as chosen in Step 5.
+- **Plan** — the ordered steps, now unambiguous because the branches are resolved. For `CEO+specialists`, note the specialist passes in order.
 
 If decisions surfaced new things the project should explicitly NOT do, note them so the CEO can fold them into `brain/WONT-DO.md` (you sharpen the chapter; the CEO owns the shared canon). Hand back to whoever invoked you — `/ceo` to delegate, `/solo` to execute.
 
@@ -69,4 +82,4 @@ If decisions surfaced new things the project should explicitly NOT do, note them
 - One question at a time, each with a recommended answer. Never batch.
 - If the codebase can answer it, explore — don't ask.
 - No question cap; stop only when every branch of the tree is resolved.
-- You write only the chapter's Goal / Plan. Shared canon (BRIEF / STATUS / WONT-DO) stays the CEO's.
+- You write only the chapter's Goal / Method / Plan. Shared canon (BRIEF / STATUS / WONT-DO) stays the CEO's.

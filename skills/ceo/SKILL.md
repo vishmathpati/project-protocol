@@ -15,7 +15,48 @@ A **chapter** is one meaningful unit of work: one file at `brain/chapters/NN-nam
 
 ---
 
-## Step 0 — Author stamp + worktree awareness
+## Step 0 — Orient (the default opening move)
+
+When `/ceo` is invoked **without a direct instruction**, you START here — orientation, not action.
+
+**Direct-command bypass (check this FIRST).** If the user's invocation already says what they want, SKIP the menu entirely and do it immediately. Examples:
+
+- "invoke solo, go" → run `/solo` now.
+- "plan chapter 3" → go straight to chapter planning for chapter 3 (delegate to `grill`).
+- "verify chapter 2" / "chapter 2 done, check" → go straight to verify (Step 3).
+- "new chapter: <X>" → go straight to chapter definition (Step 1).
+
+The menu below is ONLY the default when the user hasn't told you what they want. Never make a user sit through the menu when they've already given a direct order.
+
+**Otherwise, orient the user:**
+
+1. Read `brain/STATUS.md` (and `brain/ROADMAP.md` if it exists). If `brain/` doesn't exist yet, say so and point the user at `/init-project`.
+2. Tell the user where things stand in 2–4 lines: the **active chapter** (if any), what's **in flight** (roadmap or discussion), and **what's next** per STATUS.
+3. Offer modes — **and which modes you offer DEPENDS ON STATE:**
+
+   **If nothing is in progress** — no active chapter, no in-flight roadmap, no open discussion per STATUS — offer exactly THESE THREE modes:
+
+   - **Roadmap planning** (project scope) — set or adjust direction; define/reorder chapters in `brain/ROADMAP.md`.
+   - **Chapter planning** (chapter scope) — sharpen and run ONE chapter.
+   - **Discussion** — think out loud, no edits (`/discussion-mode`).
+
+   **If something IS in progress** — STATUS shows an active chapter, an in-flight roadmap, or an open discussion — offer those three PLUS:
+
+   - **Execute** — run the active chapter (solo / delegate to a worker, per its chosen method).
+   - **Verify** — check a worker's Completion Report against the chapter Goal (Step 3).
+
+   **Execute and Verify appear ONLY when there is an ongoing thing to execute or verify.** If nothing is in progress, do NOT offer them — there is nothing to run and nothing to check. This is a hard rule, not a suggestion.
+
+After the user picks (or if they gave a direct command up front), proceed to the matching step below.
+
+### The two planning scopes
+
+- **Roadmap planning — project scope.** Set or adjust overall direction; define and reorder the chapters in `brain/ROADMAP.md`. The roadmap is **OPTIONAL** — small projects may have only chapters and no roadmap at all. `/init-project` seeds the initial setup chapters; the roadmap is built **here**, in roadmap planning, when the project is large enough to warrant one. Don't force a roadmap onto a small project.
+- **Chapter planning — chapter scope.** Sharpen and run exactly ONE chapter. This **delegates to the `grill` skill**, which interrogates the chapter into shape AND picks the execution method (**solo / CEO+worker / CEO+specialists**), writing that chosen method into the chapter file. You don't pick the method by hand here — `grill` does, and records it.
+
+---
+
+## Step 0.1 — Author stamp + worktree awareness
 
 Detect the author stamp (used to label every entry you write — never to pick a folder):
 
@@ -173,6 +214,7 @@ Commit the chapter file on main, then tell the user to hand the chapter back to 
 
 ## Rules
 
+- Orient first (Step 0): on a bare `/ceo`, read STATUS, report where things stand, then offer state-aware modes. Offer **Execute** and **Verify** ONLY when something is actually in progress. A direct instruction skips the menu — act on it immediately.
 - You own the shared canon (BRIEF / STATUS / ROADMAP / WONT-DO + CHANGELOG / agenda). Workers never edit these.
 - Stay worktree-aware: read worker output via `git show`/`git diff` against the worker branch; never assume their uncommitted local files are visible.
 - Trust the report by default; deep-check only on a trigger (Step 4).

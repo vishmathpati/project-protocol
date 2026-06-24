@@ -36,6 +36,8 @@ Copy `_TEMPLATE.md` when creating a new chapter.
 ## Goal
 <CEO: what this chapter delivers>
 
+**Method:** solo | CEO+worker | CEO+specialists
+
 ## Plan
 <CEO: approach; how it splits across workers if multi-specialist>
 
