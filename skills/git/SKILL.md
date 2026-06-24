@@ -113,7 +113,28 @@ The goal in every tool: **new worktrees branch from your LOCAL HEAD of the canon
 
 ### Claude Code
 
-1. **Set the base ref to local HEAD.** In settings:
+1. **Verify `worktree.baseRef` BEFORE creating any worktree.** Read the active Claude Code settings (`.claude/settings.json` in the project root, or `~/.claude/settings.json` if no project-level file exists) and check the value of `worktree.baseRef`.
+
+   ```bash
+   # Check project-level settings first, fall back to user-level:
+   cat .claude/settings.json 2>/dev/null || cat ~/.claude/settings.json 2>/dev/null
+   ```
+
+   - If `worktree.baseRef` is `"head"` → proceed to step 2.
+   - If it is **missing, `null`, or `"origin/HEAD"`** (the default) → **STOP and warn the user:**
+
+   > ⚠️ **`worktree.baseRef` is not set to `"head"`.**
+   > With the current setting, new worktrees will branch from the **stale remote** (`origin/HEAD`), which forces a push before work can begin. Add this to your Claude Code settings (`.claude/settings.json` or `~/.claude/settings.json`):
+   >
+   > ```json
+   > { "worktree": { "baseRef": "head" } }
+   > ```
+   >
+   > Confirm once you've saved the change, then we'll proceed.
+
+   Do not create the worktree until the user confirms the setting is in place.
+
+2. **Set the base ref to local HEAD** (if not already set — do this once per project or globally):
 
    ```json
    { "worktree": { "baseRef": "head" } }
@@ -121,7 +142,7 @@ The goal in every tool: **new worktrees branch from your LOCAL HEAD of the canon
 
    The default is `origin/HEAD` (= the remote) — that default is the cause of "I had to push first." Setting `head` makes new worktrees branch from local HEAD.
 
-2. **Create the worktree:**
+3. **Create the worktree:**
 
    ```bash
    claude --worktree <name>
@@ -129,7 +150,7 @@ The goal in every tool: **new worktrees branch from your LOCAL HEAD of the canon
 
    …or use the desktop **auto-worktree** (it creates one per session under `.claude/worktrees/`, branch `worktree-*`).
 
-3. **Bring gitignored files across.** A new worktree is a clean checkout — `.env` and other gitignored files don't come with it. Add a **`.worktreeinclude`** file listing them (e.g. `.env`, `.env.local`) so Claude Code copies them into each new worktree.
+4. **Bring gitignored files across.** A new worktree is a clean checkout — `.env` and other gitignored files don't come with it. Add a **`.worktreeinclude`** file listing them (e.g. `.env`, `.env.local`) so Claude Code copies them into each new worktree.
 
 ### Codex
 

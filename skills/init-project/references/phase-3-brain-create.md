@@ -31,38 +31,32 @@ Copy `_TEMPLATE.md` when creating a new chapter.
 ### Write `brain/chapters/_TEMPLATE.md`
 
 ```markdown
-# Chapter NN — [name]
+# Chapter NN — <name>
 
 ## Goal
-<!-- CEO: one sentence — what done looks like. -->
+<CEO: what this chapter delivers>
 
 ## Plan
-<!-- CEO: ordered steps the worker should follow. -->
+<CEO: approach; how it splits across workers if multi-specialist>
 
-## Completion Report
-<!-- Worker: append this section after finishing. Use the `worker` skill for the exact format. -->
+---
+<!-- Completion Reports append below — one per worker pass (e.g. backend, then UI, then wire-up). Never overwrite a prior report. -->
 
-### Goal echo
-<!-- Restate the goal as you understood it. -->
+<!-- CEO Verdicts append below, one per report verified. -->
+```
 
-### Status
-<!-- DONE / PARTIAL / BLOCKED — one line. -->
+The canonical **Completion Report** format (workers append one per pass):
 
-### Changed
-<!-- Files added, modified, or deleted. -->
+```markdown
+## Completion Report — YYYY-MM-DD · <author stamp>
+**Goal:** … / **Status:** done|partial|blocked / **Changed:** … / **Verified:** … / **Flags:** … / **Commit:** branch · hash
+```
 
-### Verified
-<!-- How you confirmed it works (tests run, screenshots, manual check). -->
+The canonical **Verdict** format (CEO appends one per report verified):
 
-### Flags
-<!-- Anything the CEO should know: surprises, scope creep, follow-up items. -->
-
-### Commit
-<!-- Branch name and commit hash(es). -->
-
-## CEO Verdict
-<!-- approved — merged to main on YYYY-MM-DD -->
-<!-- returned — [reason]; worker to address before re-submit -->
+```markdown
+## Verdict — YYYY-MM-DD · CEO (<author stamp>)
+**Decision:** approved | changes requested / **Notes:** …
 ```
 
 ### Write `brain/.plugin-version` marker
@@ -387,7 +381,7 @@ If you change anything upstream, check everything downstream.
 > Real-time log. Cleared by save-session. Every entry is author-stamped.
 > Format per entry: YYYY-MM-DD HH:MM · [Cowork | Codex | Claude Code] — what was done.
 
-(empty — last session closed cleanly)
+> WORKLOG cleared — last session closed cleanly.
 ```
 
 ### `brain/CHANGELOG.md`

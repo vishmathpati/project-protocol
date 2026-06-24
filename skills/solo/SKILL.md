@@ -55,29 +55,16 @@ Pick the lighter of two homes by size:
 [YYYY-MM-DD] [author stamp] · fixed: <what> — <where>
 ```
 
-**Small-but-real work** → a short chapter file `brain/chapters/NN-name.md` using the standard report shape (echo the worker's contract so it stays consistent with `/worker`):
+**Small-but-real work** → a chapter file `brain/chapters/NN-name.md`. If the chapter doesn't exist yet, start it with the title + a `> Solo:` stamp; if it already exists (a chapter may already hold earlier reports and Verdicts), **append** your report as a new dated section at the bottom — never overwrite an existing one. Use this EXACT Completion Report template (same as `/worker`, so the record speaks the CEO's language):
 
-```markdown
-# Chapter NN — <name>
-
-> Solo: YYYY-MM-DD [author stamp]
-
-## Completion Report — YYYY-MM-DD [author stamp]
-
-**Goal** — [what you set out to do]
-
-**Status** — done
-
-**Changed**
-- path/or/area — what + why
-
-**Verified**
-- [what you ran/checked and the result]
-
-**Flags**
-- [anything notable, or "none"]
-
-**Commit** — <branch> @ <hash>
+```
+## Completion Report — YYYY-MM-DD · <author stamp>
+**Goal:** <echo what was asked>
+**Status:** done | partial | blocked
+**Changed:** <one line per file/area>
+**Verified:** <what ran + result>
+**Flags:** <deviations / risks / unsure — these are the CEO's drill-down targets>
+**Commit:** <branch · hash>
 ```
 
 Same sections as the `/worker` Completion Report — so if a solo job later grows into a delegated one, the record already speaks the CEO's language.
@@ -111,5 +98,5 @@ Then capture the hash into the report's **Commit** line if you committed first.
 
 - Solo is for small work only. The moment it grows — multiple parts, decisions to lock, or a sensitive area (auth, money, deletion, security) — escalate to `/ceo` + `/worker`.
 - Report shape matches `/worker`'s Completion Report, so records stay consistent across all three skills.
-- Trivial work goes to WORKLOG; small-but-real work gets its own chapter file.
+- Trivial work goes to WORKLOG; small-but-real work goes to a chapter file — **append** a new dated report if the chapter already exists, never overwrite a prior one.
 - Never push from Cowork; commit locally and emit the push command.

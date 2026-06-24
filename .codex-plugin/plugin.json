@@ -1,7 +1,7 @@
 {
   "name": "project-protocol",
-  "version": "2.5.0",
-  "description": "Project session discipline plugin. Three-folder layout (cowork, agents, human) with root CLAUDE.md as the always-loaded brain. 16 skills including migrate-project, build-page, build-component, marketing-brief, design-direction, design-check with auto-fix, and edit-plugin self-discipline gate. 9 hook events including PostToolUse design-scan and SessionStart drift-detector. Per-release migration manifests. Compatible with Claude Code and Codex.",
+  "version": "3.0.0",
+  "description": "Project session discipline plugin. Single brain/ canon (STATUS, BRIEF, WONT-DO, ROADMAP, WORKLOG, CHANGELOG, agenda, docs/, chapters/) replaces the old three-folder layout. 24 skills including CEO/worker/solo role model with git-worktree handoff, new git, grill, bug-fixing, handoff, migrate-to-brain, ceo, worker, and solo skills. Author stamps (· Cowork / · Codex / · Claude Code) replace .session-type marker. Per-release migration manifests. Compatible with Claude Code and Codex.",
   "author": {
     "name": "Vish Mathpati"
   }

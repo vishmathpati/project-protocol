@@ -13,7 +13,7 @@ The last gate. Before marking work done, verify it actually matches the spec.
 ## When this fires
 
 - About to mark a chapter or task complete.
-- About to update `STATUS.md` to remove an item from "in progress".
+- About to update `brain/STATUS.md` to remove an item from "in progress".
 - About to write a `CHANGELOG.md` entry that says something shipped.
 - About to tell the user "this is done".
 - Slash command: `/audit-close`
@@ -22,7 +22,7 @@ The last gate. Before marking work done, verify it actually matches the spec.
 
 ## The protocol
 
-**1. Open the original contract/spec.** The `BRIEF.md` version block, the contract section in `DATA-CONTRACTS.md`, the PRD, or whatever defined "done" for this work.
+**1. Open the original contract/spec.** The `brain/BRIEF.md` version block for this chapter, the Goal/contract section at the top of the active chapter file in `brain/chapters/`, a PRD the user names, or whatever defined "done" for this work. If none of those exist, ask the user: "What was the contract for this work?"
 
 **2. List the requirements.** Extract each requirement from the spec as a one-line item.
 
@@ -37,9 +37,9 @@ The last gate. Before marking work done, verify it actually matches the spec.
 
 State each clearly. Do not gloss.
 
-**6. User confirmation.** Show the audit findings. Wait for explicit "satisfied, close it" before updating `STATUS.md` / `CHANGELOG.md` / closing the chapter.
+**6. User confirmation.** Show the audit findings. Wait for explicit "satisfied, close it" before updating `brain/STATUS.md` / `CHANGELOG.md` / closing the chapter.
 
-**7. If not satisfied:** capture the gap as a new `BRIEF.md` version block and return the chapter to active status. Do not silently close incomplete work.
+**7. If not satisfied:** capture the gap as a new `brain/BRIEF.md` version block and return the chapter to active status. Do not silently close incomplete work.
 
 ---
 

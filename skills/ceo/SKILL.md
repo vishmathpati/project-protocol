@@ -11,7 +11,7 @@ The orchestrator. You set direction, hand units of work to workers, and verify w
 
 There is ONE canon: `brain/`. You own the **shared canon** — `brain/STATUS.md`, `brain/BRIEF.md`, `brain/ROADMAP.md`, `brain/WONT-DO.md` — plus `brain/CHANGELOG.md` and `brain/agenda.md`. Workers never touch these; only you do.
 
-A **chapter** is one meaningful unit of work: one file at `brain/chapters/NN-name.md`. It carries the CEO's Goal + Plan, the worker's Completion Report, and the CEO's verdict.
+A **chapter** is one meaningful unit of work: one file at `brain/chapters/NN-name.md`. It carries the CEO's Goal + Plan, then **one or more** Completion Reports (one per worker pass — e.g. backend, then UI, then wire-up — possibly by different specialists), each with its own Verdict from you. A small chapter is one report + one verdict; a big one accumulates several in sequence.
 
 ---
 
@@ -47,10 +47,10 @@ Pick the next number `NN` (two digits, zero-padded) by listing `brain/chapters/`
 - [anything the worker must NOT touch or decide]
 
 ---
-<!-- Worker writes the Completion Report below this line. CEO writes the verdict under it. -->
+<!-- Workers append Completion Reports below this line, one per pass. CEO appends a Verdict under each. -->
 ```
 
-Keep the Goal tight enough that a single worker session can finish it and you can verify it by reading a report + a diff.
+Keep the Goal tight enough that you can verify each worker pass by reading a report + a diff. A chapter may take several passes (backend, UI, wire-up) — each appends its own report, and you verify each in turn.
 
 Commit on the main/canon branch:
 
@@ -79,11 +79,11 @@ Do not start implementing. Stop here until the user says the chapter is done.
 Find the worker's branch from `git worktree list --porcelain` (or ask the user for the branch name). Then read what came back — no checkout, no GitHub needed, this all works locally through the shared `.git`:
 
 ```bash
-git show <worker-branch>:brain/chapters/NN-name.md   # the Completion Report
+git show <worker-branch>:brain/chapters/NN-name.md   # the chapter + its Completion Reports
 git diff --stat main..<worker-branch>                # what changed, at a glance
 ```
 
-Read the Completion Report's sections against the chapter **Goal**:
+Read the **latest (unverified) Completion Report** — the newest dated section, the one with no Verdict under it yet. If the chapter took multiple passes (backend, UI, wire-up), each new report gets verified in turn; don't re-litigate reports you already gave a Verdict. Read its sections against the chapter **Goal**:
 
 - **Status** — done / partial / blocked.
 - **Changed** — does the file/area list match what the Goal asked for? Anything unexpected?
@@ -120,7 +120,13 @@ Then update the shared canon (author-stamped, since you own these):
 1. `brain/STATUS.md` — reflect the new state, move the chapter to done, update Next Actions; stamp `> Last updated: YYYY-MM-DD [author stamp]`.
 2. `brain/BRIEF.md` — append any decisions locked by this chapter as a new version block (never edit old blocks).
 3. `brain/CHANGELOG.md` — fold the chapter's outcome into a dated section (`## [YYYY-MM-DD] [author stamp]`), Keep-a-Changelog format. Only what actually shipped.
-4. Write the **verdict** into the chapter file under the report: `## Verdict — APPROVED YYYY-MM-DD [author stamp]` + one line on what merged.
+4. **Append** the Verdict into the chapter file directly under the report you just verified (never overwrite an earlier Verdict — a multi-pass chapter has one per report), using this EXACT format:
+
+   ```
+   ## Verdict — YYYY-MM-DD · CEO (<author stamp>)
+   **Decision:** approved
+   **Notes:** <what was checked + what merged>
+   ```
 5. `brain/agenda.md` — move the chapter to ✓ Done, promote the next one.
 
 Commit the canon update:
@@ -153,12 +159,12 @@ git push origin main
 
 ## Step 6 — Reject (send it back)
 
-If the chapter fails verification, do NOT fix it yourself. Write specific, addressable asks into the chapter file and return it:
+If the report fails verification, do NOT fix it yourself. **Append** a Verdict under that report (never overwrite) with specific, addressable asks, using this EXACT format:
 
-```markdown
-## Verdict — CHANGES REQUESTED YYYY-MM-DD [author stamp]
-- [specific ask — what's wrong, what "right" looks like]
-- [specific ask]
+```
+## Verdict — YYYY-MM-DD · CEO (<author stamp>)
+**Decision:** changes requested
+**Notes:** <what's wrong + what "right" looks like — the specific asks>
 ```
 
 Commit the chapter file on main, then tell the user to hand the chapter back to a worker session. Be precise: vague rejections waste a round trip.
@@ -170,7 +176,8 @@ Commit the chapter file on main, then tell the user to hand the chapter back to 
 - You own the shared canon (BRIEF / STATUS / ROADMAP / WONT-DO + CHANGELOG / agenda). Workers never edit these.
 - Stay worktree-aware: read worker output via `git show`/`git diff` against the worker branch; never assume their uncommitted local files are visible.
 - Trust the report by default; deep-check only on a trigger (Step 4).
-- The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections.
+- The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections. You verify the latest unverified one.
+- Use the canonical `## Verdict — YYYY-MM-DD · CEO (<author stamp>)` heading consistently, appended under the report it judges — never overwrite an earlier Verdict.
 - Never push from Cowork. Commit locally and emit the push command for the user.
-- One chapter = one file = one worker. Keep Goals small enough to verify.
+- One chapter = one file. It may take ONE OR MORE worker passes (e.g. backend, UI, wire-up), each appending its own Completion Report + earning its own Verdict. Keep each pass small enough to verify.
 - **Won't-do habit:** whenever you and the user reject an idea, option, or direction during planning or chapter definition, immediately append one line to `brain/WONT-DO.md`: `YYYY-MM-DD · [author stamp] — what was rejected — one-line reason`. This prevents the same idea from surfacing again. Read `brain/WONT-DO.md` before proposing any new idea or direction.

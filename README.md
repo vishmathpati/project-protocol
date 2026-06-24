@@ -38,14 +38,35 @@ claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 ## What you get
 
-16 skills + 9 hook events that turn every AI coding session into a disciplined operation. As of v2.5.0, the plugin is built on a three-layer architecture: **Rules** (root `CLAUDE.md` is the always-loaded brain — skill index, hooks index, situation router, non-negotiable rules), **Enforcement** (hooks fire deterministically on tool events), **Workflow** (skills are invokable, with explicit `Skill()` calls between them — no more description-match guessing).
+24 skills + hook events that turn every AI coding session into a disciplined operation. As of v3.0.0, all project context lives in a single `brain/` folder. The root `CLAUDE.md` is the always-loaded brain — skill index, hooks index, situation router, non-negotiable rules. Hooks fire deterministically on tool events. Skills are invokable via explicit `Skill()` calls — no description-match guessing.
+
+### Role model (new in v3.0.0)
+
+Work is organized around three roles:
+
+- **CEO** — plans the work, breaks it into chapters, reviews and merges completed work.
+- **Worker** — picks up one chapter, executes it in a git worktree, writes a Completion Report, then calls `handoff`.
+- **Solo** — single-agent mode for smaller tasks that don't need the CEO/worker split.
+
+Invoke a role with `/ceo`, `/worker`, or `/solo` at the start of a session. The CEO defines chapters in `brain/chapters/`. Each chapter is a scoped unit of work executed by a worker in an isolated git worktree; the CEO verifies the Completion Report and merges. The `handoff` skill (model-invoked) signals the end of a worker session and packages the report for CEO review.
 
 ### Session lifecycle (the core 4)
 
-- **`init-project`** — Bootstrap or audit a project. Creates the standard three-folder layout (`cowork/`, `agents/`, `human/`).
-- **`save-session`** — Close cleanly: WORKLOG → CHANGELOG, update STATUS, clear WORKLOG. Tier-aware.
+- **`init-project`** — Bootstrap or audit a project. Creates the `brain/` layout and root `CLAUDE.md`.
+- **`save-session`** — Close cleanly: WORKLOG → CHANGELOG, update STATUS, clear WORKLOG.
 - **`session-recap`** — Mid-session snapshot: what's been done, what's still open.
 - **`add-context`** — Add extended context files (data contracts, domain reference, integrations).
+
+### Role skills (new in v3.0.0)
+
+- **`ceo`** — CEO mode: plan chapters, review Completion Reports, merge worker branches.
+- **`worker`** — Worker mode: claim a chapter, execute in a git worktree, write a Completion Report.
+- **`solo`** — Solo mode: single-agent execution without the CEO/worker split.
+- **`handoff`** *(model-invoked)* — Worker session teardown: write Completion Report, clean worktree state, signal to CEO.
+- **`git`** — Git operations gate. Validates branch state, enforces commit message discipline, guards against unintended force-pushes.
+- **`grill`** — Adversarial review: stress-tests a plan, implementation, or decision before it ships.
+- **`bug-fixing`** — Structured bug investigation: reproduce → isolate → fix → verify, with WORKLOG entries at each step.
+- **`migrate-to-brain`** *(temporary)* — One-time structural migration from the old three-folder layout (`cowork/`, `agents/`, `human/`) to `brain/`. Merges duplicates, confirms before writing, removes `agents/.session-type`.
 
 ### Discipline skills
 
@@ -55,52 +76,49 @@ Auto-fire on description match, also invokable via slash command.
 - **`verify-by-reading`** — Open the file before answering questions about it. Catches memory drift.
 - **`audit-before-close`** — Spec-vs-implementation check before any chapter or task is marked done.
 - **`discussion-mode`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
-- **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix. v1.3 adds a design-system raw-value / cardinal-sin scan.
-- **`design-check`** *(new in v1.3)* — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Fires on any visual change. *v2.0 adds Step 8: auto-fix for mechanical violations (raw hex matching tokens, missing dimensions, ellipsis, nbsp, etc.) with user confirmation. Human-judgment violations (indigo accent, banned words, invented metrics) are still surfaced for user input only.*
-- **`edit-plugin`** *(new in v1.4; v2.5.0 adds Step 5 manifest discipline — version bumps must ship with a `migrations/vX.Y.Z.md` file)* — Self-discipline gate for changes to this plugin's own source (skills, hooks, manifests, README). Chains commit + push to every edit so changes always reach `origin/main` on GitHub.
-- **`migrate-project`** *(new in v2.5.0)* — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Refuses to run in Cowork (Cowork can't `git push`); user runs it from Claude Code or terminal. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
-- **`design-direction`** *(new in v1.5)* — Deep brand-direction diagnostic. Takes a raw brand dump, silently extracts 9 taste axes (trust, frequency, density, culture, archetype, tribe, surface, tempo, refusals), proposes 3 named directions with a moodboard, and writes a rich `BRAND.md` + `DESIGN.md` Overview + brand-specific refusal list. Sits one layer upstream of `init-project` Phase 4 — or runs standalone on already-initiated projects to re-anchor brand.
-- **`build-component`** *(new in v2.0)* — Per-component build skill. Reads `agents/STRUCTURE.md` and the relevant canon, scans for reusable existing components, proposes a strategy (compose existing primitives, extend, or build new primitive), generates the component, then fires `design-check`. Tier-aware (Generic / Marketing / App), surface-aware (hides Marketing tier on dashboard-only projects), supports adopt-external and recreate-from-inspiration sub-modes.
-- **`marketing-brief`** *(new in v2.0)* — One-time deep marketing-site brief. Reads existing canon, builds an `agents/marketing/CONTENT.md` content registry (FEATURES, AUDIENCES, COMPARISONS, TESTIMONIALS, FAQS, LEGAL_PAGES), proposes a sitemap, writes per-page briefs, copy, media manifest, and layout sketches. Auto-skips on dashboard-only / internal-tool projects.
-- **`build-page`** *(new in v2.2, redesigned in v2.3)* — Compositional sibling to `build-component`. For whole pages (marketing or dashboard), not atomic components. Long iterative conversation: asks which page, reads the brief and canon, surfaces an analysis, proposes a starting plan, then iterates with the user — section by section — accepting external references (Stripe / Aceternity / shadcn URLs, pasted code, screenshots) and cross-checking them against `DESIGN.md` + `BRAND.md` before adoption. Calls `build-component` inline as a subroutine for every net-new primitive, so each component gets its own focused conversation instead of one 400-line page-wide code drop. Writes the actual page file directly when the conversation gets there. Copy is inlined verbatim from `agents/marketing/copy/<slug>.md` — no intermediate `marketing-content.ts` or runtime mirror file ever created. Marketing pages enforce RSC + `generateMetadata` for SEO. Follows the same protocols as every other skill (WORKLOG entries on decisions, BRIEF appends on locks, INDEX update on new routes); no state files, no scratch folders, no special mode machinery.
+- **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix.
+- **`design-check`** — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Step 8 auto-fixes mechanical violations (raw hex matching tokens, missing dimensions, ellipsis, nbsp, etc.) with user confirmation. Human-judgment violations are surfaced for user input only.
+- **`edit-plugin`** — Self-discipline gate for changes to this plugin's own source (skills, hooks, manifests, README). Chains commit + push to every edit. Version bumps must ship with a `migrations/vX.Y.Z.md` file (Step 5 manifest discipline).
+- **`migrate-project`** — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Refuses to run in Cowork. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
 
-### Hooks (8 total)
+### Build skills
 
-| Hook | What it does |
-|---|---|
-| `SessionStart` | Inject required reading context |
-| `UserPromptSubmit` | Pre-task classification reminder |
-| `PreToolUse` (Edit\|Write) | Warn if WORKLOG is in cleared state |
-| `PreCompact` | Back up WORKLOG before context compaction |
-| `PostCompact` | Re-orient context after compaction |
-| `SubagentStart` / `SubagentStop` | Log sub-agent invocations to WORKLOG |
-| `Stop` | Warn if WORKLOG has unsaved lines |
+- **`build-component`** — Per-component build skill. Reads `brain/STRUCTURE.md` and relevant canon, scans for reusable existing components, proposes a strategy, generates the component, then fires `design-check`.
+- **`build-page`** — Compositional sibling to `build-component`. For whole pages (marketing or dashboard). Long iterative conversation: asks which page, reads the brief and canon, proposes a plan section by section, accepts external references. Calls `build-component` inline for net-new primitives.
+- **`design-direction`** — Deep brand-direction diagnostic. Extracts 9 taste axes, proposes 3 named directions with a moodboard, and writes `BRAND.md` + `DESIGN.md` Overview.
+- **`marketing-brief`** — One-time deep marketing-site brief. Builds a content registry, proposes a sitemap, writes per-page briefs, copy, media manifest, and layout sketches. Auto-skips on dashboard-only / internal-tool projects.
 
 ---
 
 ## Project layout
 
-When `init-project` runs, it creates this structure in your project:
+When `init-project` runs on v3.0.0, it creates this structure in your project:
 
 ```
 project-root/
-├── CLAUDE.md              ← rules + folder map (always loaded)
+├── CLAUDE.md              ← rules + skill index + hooks index (always loaded)
 ├── README.md              ← file-and-dependency map
-├── cowork/                ← orchestration tier
-│   └── CLAUDE.md, STATUS.md, BRIEF.md, WORKLOG.md, CHANGELOG.md
-├── agents/                ← project canon tier (Codex / Claude Code read here)
-│   ├── STATUS.md, BRIEF.md, ROADMAP.md, BRAND.md, FUNDAMENTALS.md,
-│   │   TOOLING.md (Node only), DESIGN.md, STRUCTURE.md, DISCOVERIES.md,
-│   │   WORKLOG.md, CHANGELOG.md
-│   ├── marketing/         ← CONTENT.md, SITEMAP.md, briefs/, copy/, MEDIA.md, layouts/
-│   └── docs/
-│       ├── INDEX.md
-│       └── detail/
-└── human/
-    └── agenda.md          ← daily steering file
+└── brain/                 ← single canon folder (all tiers merged here)
+    ├── STATUS.md
+    ├── BRIEF.md
+    ├── WONT-DO.md
+    ├── ROADMAP.md
+    ├── WORKLOG.md
+    ├── CHANGELOG.md
+    ├── agenda.md          ← daily steering file
+    ├── BRAND.md
+    ├── FUNDAMENTALS.md
+    ├── TOOLING.md         ← (Node projects only)
+    ├── DESIGN.md
+    ├── STRUCTURE.md
+    ├── DISCOVERIES.md
+    ├── docs/
+    │   ├── INDEX.md
+    │   └── detail/
+    └── chapters/          ← one .md per chapter (CEO defines, worker executes)
 ```
 
-Each tier serves one audience. The root `CLAUDE.md` is the brain — non-negotiable rules + a map of where everything lives. The root `README.md` is the file-and-dependency map you consult before any non-trivial edit.
+The root `CLAUDE.md` is the brain — non-negotiable rules, skill index, hooks index, and a map of where everything lives. Every significant write to `BRIEF.md`, `STATUS.md`, `DISCOVERIES.md`, or `CHANGELOG.md` carries an author stamp (`· Cowork` / `· Claude Code` / `· Codex`) so the next agent can see who decided what. The old `.session-type` file is gone; author stamps carry that signal instead.
 
 ---
 
@@ -108,11 +126,13 @@ Each tier serves one audience. The root `CLAUDE.md` is the brain — non-negotia
 
 AI agents forget everything between sessions. This plugin fixes that by keeping all context in plain markdown files the agent reads at session start.
 
-`WORKLOG.md` is the discipline engine: every response that changes something appends one line. By session end, you have a full real-time audit trail. `save-session` distills it into `CHANGELOG.md` and `STATUS.md` so the next session starts from solid ground.
+`brain/WORKLOG.md` is the discipline engine: every response that changes something appends one line. By session end, you have a full real-time audit trail. `save-session` distills it into `brain/CHANGELOG.md` and `brain/STATUS.md` so the next session starts from solid ground.
 
 The **discipline skills** add a second layer: gates that fire automatically when their description matches the conversation. They force the agent to verify before acting, read before answering, and audit before closing — the patterns that fail in untrained agent sessions.
 
-**Handoff between agents.** Cowork seeds the project with the always-loaded files (`CLAUDE.md`, `BRAND.md`, the first `BRIEF.md` version block signed `· Cowork`). Claude Code / Codex bootstrap the rest of the canon (`STATUS.md`, `ROADMAP.md`, `FUNDAMENTALS.md`, `DESIGN.md`, `DISCOVERIES.md`, `docs/INDEX.md`, worklogs, changelogs) via `init-project` on the first coding session. When the project returns to Cowork mid-flight, Cowork re-reads the canon, then appends a new `BRIEF.md` version block signed `· Cowork` before handing back. **One agent at a time** — either Claude Code or Codex is active on a project, never both simultaneously. Every significant write to BRIEF / STATUS / DISCOVERIES / CHANGELOG carries an agent label (`· Cowork` / `· Claude Code` / `· Codex`) so the next agent can see who decided what.
+**CEO/worker/solo model.** For non-trivial work the CEO breaks the project into chapters, each chapter is a scoped unit a worker picks up in an isolated git worktree. The worker executes, writes a Completion Report, and calls `handoff`. The CEO reviews and merges. This keeps individual sessions small and the audit trail clean. Solo mode collapses the model to a single agent for simpler work.
+
+**One agent at a time.** Either Claude Code or Codex is active on a project, never both simultaneously. Author stamps on every significant write record which agent made each decision.
 
 ---
 

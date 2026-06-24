@@ -28,7 +28,7 @@ Call this value the **author stamp**. Apply it to the CHANGELOG dated section an
 
 Read `brain/WORKLOG.md`. This is your real-time log of what happened.
 
-If WORKLOG is empty or in cleared state (`# Worklog — cleared after each session.`), reconstruct from session memory.
+If WORKLOG is empty or in cleared state (its only content is the line `> WORKLOG cleared — last session closed cleanly.`), reconstruct from session memory.
 
 ---
 
@@ -70,12 +70,7 @@ If nothing shipped: `- No changes shipped this session.`
 CHANGELOG header (created once, never overwritten):
 
 ```markdown
-# Changelog
-
-All notable changes are documented here.
-Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
-
-## [Unreleased]
+# brain/CHANGELOG.md — Project history
 ```
 
 **CHANGELOG.md is never cleared.**
@@ -158,11 +153,15 @@ Otherwise: skip.
 
 ## Step 8 — Clear `brain/WORKLOG.md`
 
-Replace contents with:
+Do **not** replace the entire file. Instead:
+
+1. Read the current contents of `brain/WORKLOG.md`.
+2. Determine the **author stamp** from Step 0 (one of `· Cowork`, `· Claude Code`, `· Codex`).
+3. Remove every entry (line or block) that is stamped with the current author stamp. Leave all entries stamped with other authors intact — those authors have not yet folded their work into CHANGELOG.
+4. If, after removing the current author's entries, no substantive entries remain (the file is empty or contains only whitespace/blank lines), write the canonical cleared-state marker as the file's sole content:
 
 ```
-# Worklog
-> Cleared after each session.
+> WORKLOG cleared — last session closed cleanly.
 ```
 
 ---

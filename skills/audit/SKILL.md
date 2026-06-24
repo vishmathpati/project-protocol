@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Periodic consistency check across canon files (CLAUDE.md, STATUS.md, BRIEF.md, ROADMAP.md, etc.). Reports drift by severity. Does not auto-fix. Run when drift is suspected.
+description: Periodic consistency check across canon files (brain/CLAUDE.md, brain/STATUS.md, brain/BRIEF.md, brain/ROADMAP.md, etc.). Reports drift by severity. Does not auto-fix. Run when drift is suspected.
 allowed-tools: Read, Glob, Grep
 ---
 
@@ -23,19 +23,25 @@ Cross-file consistency check. Surfaces drift, does not fix.
 
 **1. Read the canon files.**
 - `CLAUDE.md` (rules, agent split)
-- `STATUS.md` (current state, next actions)
-- `BRIEF.md` (decisions, all version blocks)
-- `ROADMAP.md` (direction, phases, slots)
-- `DESIGN.md` (brand tokens)
-- `FUNDAMENTALS.md` (universal craft rules + pre-ship checklist)
+- `brain/STATUS.md` (current state, next actions)
+- `brain/BRIEF.md` (decisions, all version blocks)
+- `brain/ROADMAP.md` (direction, phases, slots)
+- `brain/DESIGN.md` (brand tokens)
+- `brain/FUNDAMENTALS.md` (universal craft rules + pre-ship checklist)
+- `brain/WONT-DO.md` (deferred / declined items with reasons)
+- `brain/agenda.md` (active chapter agenda / open questions)
+- `brain/chapters/*` (all chapter files — read each one)
 - `docs/INDEX.md` (file dependency map)
 - Any project-specific canon files referenced from `CLAUDE.md`.
 
 **2. Cross-check.** For each pair of canon files, look for contradictions:
-- Does `STATUS.md`'s "Next Actions" reference anything `ROADMAP.md` doesn't acknowledge?
-- Does any `BRIEF.md` decision contradict the latest `STATUS.md` state?
+- Does `brain/STATUS.md`'s "Next Actions" reference anything `brain/ROADMAP.md` doesn't acknowledge?
+- Does `brain/STATUS.md` point at a chapter (by name or slug) that actually exists in `brain/chapters/`? A pointer to a missing chapter is a category (A) violation.
+- Does any `brain/BRIEF.md` decision contradict the latest `brain/STATUS.md` state?
 - Does `CLAUDE.md` describe rules that the actual project structure violates?
 - Does `docs/INDEX.md` list features that no longer exist? Miss features that do?
+- Do chapter files in `brain/chapters/` reference canon concepts (stack, surfaces, brand tokens) that contradict `brain/BRIEF.md` or `brain/STRUCTURE.md`? Any mismatch is a category (A) violation.
+- Does `brain/WONT-DO.md` contain entries that lack a stated reason? Missing reasons are category (B) — should fix.
 - Does `brain/STRUCTURE.md`'s declared surfaces match the actual codebase? (Marketing surface declared but no `(marketing)` route group on disk → drift. New `(dashboard)` folder added but STRUCTURE.md doesn't mention it → drift.) Surfaces with file-system mismatch are category (A) violations.
 
 **3. Design-system scan** (UI projects only — skip if no `components/` or equivalent).
@@ -48,12 +54,12 @@ First, determine where to scan:
 4. Always exclude from all grep commands: `node_modules/`, `.git/`, `dist/`, `build/`, `.next/`, `.turbo/`, `coverage/`. Pass these as exclusions to grep: `--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=build --exclude-dir=.next --exclude-dir=.turbo --exclude-dir=coverage`.
 5. For monorepos, scan each app's component paths separately and label findings with the app path (e.g. `apps/web/src/components/ui/button.tsx`).
 
-Run the pre-ship checklist from `FUNDAMENTALS.md` against the scoped paths:
+Run the pre-ship checklist from `brain/FUNDAMENTALS.md` against the scoped paths:
 
 - **Raw values:** grep component files for hex literals (`#[0-9a-fA-F]{3,8}`), raw px outside utility classes, raw `font-family` strings. Any hit = token rule violation.
 - **Cardinal sins:** grep for any indigo / violet Tailwind hex from FUNDAMENTALS.md's list. Grep for emoji characters inside `<button>`, `<h*>`, `<li>`. Grep for two-stop gradients on hero elements.
 - **Accessibility floor:** grep for `outline: none` without `:focus-visible` nearby. Grep for `<img>` without `alt` or `width`/`height`. Grep for `<div onClick>`.
-- **Banned words:** grep shipped copy (page files, marketing components) for the banned-words list from FUNDAMENTALS.md.
+- **Banned words:** grep shipped copy (page files, marketing components) for the banned-words list from `brain/FUNDAMENTALS.md`.
 
 Findings here are category (A) — real violations.
 
@@ -88,11 +94,14 @@ Findings here are category (B) — stale files. No fix required if the user choo
 **6. Report.** Output each finding with category and source files. Example:
 
 ```
-[A] STATUS.md Next Action #3 references "ChannelTypes audit" but ROADMAP §7 slot 5 is named "Channel Types CRUD". Names disagree.
+[A] brain/STATUS.md Next Action #3 references "ChannelTypes audit" but brain/ROADMAP.md §7 slot 5 is named "Channel Types CRUD". Names disagree.
 [A] src/components/Pricing.tsx:42 uses raw hex #1a1a1a — token rule violation. Should be var(--surface).
 [A] src/components/Hero.tsx:28 has emoji 🚀 inside <button> — cardinal sin #3.
-[A] STRUCTURE.md declares Marketing surface at app/(marketing)/ but that route group does not exist on disk. Either drop the surface row or create the folder.
-[B] CLAUDE.md "Tech stack" still says "Next.js" but BRIEF v1.4 locked "React + Vite". Wording is stale.
+[A] brain/STRUCTURE.md declares Marketing surface at app/(marketing)/ but that route group does not exist on disk. Either drop the surface row or create the folder.
+[A] brain/STATUS.md points at chapter "onboarding-v2" but brain/chapters/onboarding-v2.md does not exist.
+[A] brain/chapters/billing.md references stack "Next.js + Prisma" but brain/BRIEF.md v1.4 locked "React + Vite + Supabase". Stack mismatch.
+[B] brain/WONT-DO.md entry "Dark mode" has no reason stated.
+[B] CLAUDE.md "Tech stack" still says "Next.js" but brain/BRIEF.md v1.4 locked "React + Vite". Wording is stale.
 [C] brain/agenda.md uses "you" wording; brain/STATUS.md uses neutral wording. Two-audience rule — no fix.
 ```
 

@@ -12,30 +12,30 @@ Brings a project's protocol files up to the current plugin version by walking th
 
 ## When this fires
 
-- SessionStart drift-detector printed a version-gap warning (`agents/.plugin-version` is behind the current plugin).
+- SessionStart drift-detector printed a version-gap warning (`brain/.plugin-version` is behind the current plugin).
 - User runs `/migrate-project` or says "migrate project" / "apply pending migrations".
 - User is on-boarding an existing project after a plugin update.
 
-**Does NOT fire for:** projects that are already up to date. Does NOT touch any project code (`src/`, `app/`, `components/`, etc.) — only protocol files (`agents/`, `cowork/`, root CLAUDE.md, root README.md).
+**Does NOT fire for:** projects that are already up to date. Does NOT touch any project code (`src/`, `app/`, `components/`, etc.) — only protocol files (`brain/`, root CLAUDE.md, root README.md).
 
 ---
 
 ## Steps
 
-### 1. Refuse in Cowork — hard stop
+### 1. Detect the tool environment
 
-Read `agents/.session-type` (if present). If the value is `cowork`, or if the file is absent and neither `${CLAUDE_PLUGIN_ROOT}` nor `${CODEX_PLUGIN_ROOT}` is set:
+Check environment variables to determine which tool is running this skill:
 
-**Exit immediately** with this message:
+- `$CLAUDE_PLUGIN_ROOT` is set → **Claude Code**
+- `$CODEX_PLUGIN_ROOT` is set → **Codex**
+- Neither is set → **Cowork**
 
-> Migration must be run from Claude Code or your terminal — Cowork can't commit the version bump. Open this project in Claude Code and re-run `/migrate-project`.
-
-Do not continue past this step.
+There is no `.session-type` file — do not look for one.
 
 ### 2. Read the project's recorded plugin version
 
 ```bash
-cat agents/.plugin-version 2>/dev/null || echo "pre-2.5.0"
+cat brain/.plugin-version 2>/dev/null || echo "pre-2.5.0"
 ```
 
 If the file is absent, treat the recorded version as `pre-2.5.0`. This means all manifests from `v2.4.0.md` onward need to be checked.
@@ -58,12 +58,12 @@ If `PROJECT_VERSION` == `PLUGIN_VERSION`: report "Project is up to date on v${PL
 ### 5. Check the per-version skip marker
 
 ```bash
-cat agents/.plugin-version-skip 2>/dev/null
+cat brain/.plugin-version-skip 2>/dev/null
 ```
 
 If the file exists and its contents equal `PLUGIN_VERSION`: the user has deferred this migration. Report:
 
-> Migrations deferred (skip marker found for v${PLUGIN_VERSION}). Nothing applied. Remove `agents/.plugin-version-skip` to re-enable the prompt.
+> Migrations deferred (skip marker found for v${PLUGIN_VERSION}). Nothing applied. Remove `brain/.plugin-version-skip` to re-enable the prompt.
 
 Exit cleanly.
 
@@ -111,7 +111,7 @@ For each delta, run the detection check described in the manifest:
 Ask: "Apply the above deltas for vX.Y.Z? (all / skip-this-version / abort)"
 
 - `all` — proceed with applying all non-skipped deltas.
-- `skip-this-version` — write `PLUGIN_VERSION` into `agents/.plugin-version-skip` and stop. (This skips the entire migration until the next plugin update; per-version only — no permanent skip.)
+- `skip-this-version` — write `PLUGIN_VERSION` into `brain/.plugin-version-skip` and stop. (This skips the entire migration until the next plugin update; per-version only — no permanent skip.)
 - `abort` — stop without writing anything.
 
 **7d. Apply each delta.**
@@ -134,17 +134,41 @@ For each delta marked for application:
 
 - **[RULE] rule added:** if the rule text (or its detection string) is not already present in the target file, append the rule in the correct position. If present, mark as `[SKIP]`.
 
-### 8. Write `agents/.plugin-version`
+### 8. Write `brain/.plugin-version`
 
 After all manifests in the chain have been processed (even if some deltas were skipped by the user):
 
 ```bash
-echo "PLUGIN_VERSION" > agents/.plugin-version
+echo "PLUGIN_VERSION" > brain/.plugin-version
 ```
 
 This advances the project's recorded version to the current plugin version. Skipped deltas are the user's responsibility — they are surfaced in the summary.
 
-### 9. End-of-skill summary
+### 9. Commit the changes
+
+**Claude Code or Codex:** commit and push.
+
+```bash
+git add -A
+git commit -m "chore: migrate protocol files to v${PLUGIN_VERSION}"
+git push
+```
+
+**Cowork:** commit locally, then emit the push command for the user to run.
+
+```bash
+git add -A
+git commit -m "chore: migrate protocol files to v${PLUGIN_VERSION}"
+```
+
+Then print:
+
+> Protocol files committed locally. Run the following to push:
+> `git push`
+
+Do not refuse to run in Cowork. Apply the migration, commit, and hand the push to the user.
+
+### 10. End-of-skill summary
 
 Print a structured summary:
 
@@ -159,20 +183,19 @@ User action needed: K (listed below)
 
 [If K > 0, list each skipped-by-user delta with the file name and why it was skipped.]
 
-agents/.plugin-version updated to v${PLUGIN_VERSION}.
+brain/.plugin-version updated to v${PLUGIN_VERSION}.
 
-Next: run /save-session to commit the protocol file changes to git.
+Next: run /save-session to confirm the protocol file changes are committed.
 ```
 
 ---
 
 ## Strict rules
 
-- **Never touch project code.** Only protocol files under `agents/`, `cowork/`, root `CLAUDE.md`, root `README.md`.
+- **Never touch project code.** Only protocol files under `brain/`, root `CLAUDE.md`, root `README.md`.
 - **Never silent-overwrite a customized file.** Surface the diff; let the user decide.
-- **Cowork hard stop.** If session type is Cowork, exit with the locked message at Step 1. No exceptions.
-- **No permanent skip.** The skip marker in `agents/.plugin-version-skip` stores the current plugin version. It re-prompts on the next plugin update because the new version won't match. There is no "skip forever" option.
-- **Write `agents/.plugin-version` as the last act**, after applying (or user-confirming-skip of) every delta. Do not write it mid-chain.
+- **No permanent skip.** The skip marker in `brain/.plugin-version-skip` stores the current plugin version. It re-prompts on the next plugin update because the new version won't match. There is no "skip forever" option.
+- **Write `brain/.plugin-version` as the last act**, after applying (or user-confirming-skip of) every delta. Do not write it mid-chain.
 - **Manifest chain is version-ordered.** Always walk from oldest-pending to newest. Never skip a manifest in the middle of the chain — each manifest's diff-base depends on the previous one having been applied.
 
 ---
