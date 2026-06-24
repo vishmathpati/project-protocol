@@ -17,7 +17,8 @@ Created:
   Root: CLAUDE.md, README.md
   brain/: .plugin-version, STATUS, BRIEF (stub), WONT-DO (stub), ROADMAP, BRAND ([VERIFY]),
           FUNDAMENTALS (global standard), DESIGN ([VERIFY]), DISCOVERIES, SITUATIONS,
-          WORKLOG, CHANGELOG, agenda (stub), docs/INDEX, docs/detail/README
+          WORKLOG, CHANGELOG, agenda (stub), docs/INDEX, docs/detail/README,
+          chapters/README, chapters/_TEMPLATE
 
 Phase 2 decisions applied:
   [list each brain-docs / merge / reference / leave / skip action taken]

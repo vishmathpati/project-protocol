@@ -1,0 +1,7 @@
+interface:
+  display_name: "CEO"
+  short_description: "Orchestrate work: define a chapter, delegate to a worker, verify the Completion Report against the goal, then merge or send back"
+  brand_color: "#1e3a5f"
+
+policy:
+  allow_implicit_invocation: false

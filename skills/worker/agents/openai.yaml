@@ -1,0 +1,7 @@
+interface:
+  display_name: "Worker"
+  short_description: "Execute one delegated chapter in a worktree, then write the Completion Report into the chapter file (code + own chapter only)"
+  brand_color: "#0f766e"
+
+policy:
+  allow_implicit_invocation: false

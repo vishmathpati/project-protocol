@@ -5,7 +5,64 @@ Create the root files + the single `brain/` folder + protocol files. Apply Phase
 ## 3a. Create folders and the plugin-version marker
 
 ```bash
-mkdir -p brain/docs/detail brain/preview
+mkdir -p brain/docs/detail brain/preview brain/chapters
+```
+
+### Write `brain/chapters/README.md`
+
+```markdown
+# brain/chapters/ — Delegated-Work Units
+
+One file per chapter, named `NN-name.md` (e.g. `01-auth.md`).
+
+## Lifecycle
+
+1. **CEO** opens a new file, fills in `## Goal` and `## Plan`, then hands it off.  
+   (Use the `ceo` skill — it scaffolds the file and delegates to a worktree.)
+2. **Worker** executes the work on a branch, then appends `## Completion Report`.  
+   (Use the `worker` skill — it defines the exact report format.)
+3. **CEO** reads the report and fills in `## CEO Verdict` (approved → merge, or returned → reason).
+
+## Template
+
+Copy `_TEMPLATE.md` when creating a new chapter.
+```
+
+### Write `brain/chapters/_TEMPLATE.md`
+
+```markdown
+# Chapter NN — [name]
+
+## Goal
+<!-- CEO: one sentence — what done looks like. -->
+
+## Plan
+<!-- CEO: ordered steps the worker should follow. -->
+
+## Completion Report
+<!-- Worker: append this section after finishing. Use the `worker` skill for the exact format. -->
+
+### Goal echo
+<!-- Restate the goal as you understood it. -->
+
+### Status
+<!-- DONE / PARTIAL / BLOCKED — one line. -->
+
+### Changed
+<!-- Files added, modified, or deleted. -->
+
+### Verified
+<!-- How you confirmed it works (tests run, screenshots, manual check). -->
+
+### Flags
+<!-- Anything the CEO should know: surprises, scope creep, follow-up items. -->
+
+### Commit
+<!-- Branch name and commit hash(es). -->
+
+## CEO Verdict
+<!-- approved — merged to main on YYYY-MM-DD -->
+<!-- returned — [reason]; worker to address before re-submit -->
 ```
 
 ### Write `brain/.plugin-version` marker
@@ -74,6 +131,9 @@ fi
 
 | Skill | When to use it | How to invoke |
 |---|---|---|
+| `ceo` | Orchestrate a chapter: define goal/plan, delegate to a worktree, verify the worker's report, merge on approval. | `/ceo` · "start a chapter", "define chapter", "delegate work" |
+| `worker` | Execute one chapter in a worktree, write the Completion Report, commit on its branch. | `/worker` · "work on chapter", "execute chapter" |
+| `solo` | Plan and do small self-contained work in a single session, skipping the CEO/worker handoff. | `/solo` · "solo session", "quick task", "do it myself" |
 | `add-context` | Adding a deep-reference doc (integration, API, design notes) to the project. | `/add-context` · "add context", "add context file" |
 | `audit` | Periodic consistency check across all canon files to surface drift. | `/audit` · "run audit", "check canon consistency" |
 | `audit-before-close` | Verification gate before marking any chapter, task, or feature complete. | `/audit-before-close` · "audit before close", before any chapter close |
@@ -115,6 +175,7 @@ See `brain/SITUATIONS.md` for the full routing table.
 ## Folder map
 
 - `brain/` — the single canon folder. Every agent reads here. Every protocol file (STATUS, BRIEF, ROADMAP, WORKLOG, CHANGELOG, agenda, design system, docs) lives here, once.
+- `brain/chapters/` — one file per unit of delegated work (CEO goal + worker report + verdict).
 
 ## Pre-task classification (mandatory before any code change)
 
@@ -163,6 +224,7 @@ Check `brain/docs/INDEX.md` dependency entries before classifying.
 - **docs/detail/** — deep reference. When changed: relevant feature contracts may need re-reading.
 - **preview/** — design-direction preview HTML files. Gitignored. Garbage-collected by `audit` (keeps most recent 2 per direction-slug).
 - **marketing/** — marketing-brief output (CONTENT registry, sitemap, per-page briefs/copy, media manifest). Consumed by build-page.
+- **chapters/** — one file per unit of delegated work (CEO goal + worker report + verdict).
 
 ## Cascade summary (rule of thumb)
 
@@ -183,6 +245,9 @@ If you change anything upstream, check everything downstream.
 
 | If the user says or you're about to do X | Use skill | Read first |
 |---|---|---|
+| Starting a new unit of work — need to define goal, plan, and delegate to a worktree | `ceo` | `brain/ROADMAP.md`, `brain/BRIEF.md` |
+| Picked up a chapter to execute in a worktree — need to do the work and write a report | `worker` | the chapter file in `brain/chapters/` |
+| Quick self-contained task — no delegation needed, doing it all in one session | `solo` | `brain/BRIEF.md`, `brain/STATUS.md` |
 | Any UI work — editing a component, page, or styles file | `design-check` | `brain/DESIGN.md`, `brain/FUNDAMENTALS.md` |
 | Design feels wrong / palette off / looks too generic | `design-direction` | `brain/BRAND.md` |
 | Raw hex / px / font-family values found in a component | `design-check` | `brain/FUNDAMENTALS.md` (Token Rule section) |
