@@ -127,6 +127,22 @@ fi
 9. **UI components — shadcn first when shadcn is in `package.json`.** Default: always use the shadcn primitive (`<Button>`, `<Input>`, `<Select>`, `<Dialog>`, `<Popover>`, `<Tooltip>`, `<Sheet>`, `<Drawer>`, `<Tabs>`, `<Accordion>`, `<DropdownMenu>`, `<Command>`, `<Toast>`, `<Alert>`, `<Checkbox>`, `<Radio>`, `<Switch>`, `<Slider>`, `<Textarea>`). Never silently fall back to the native element because it's faster to type. Allowed native elements: `<a href>` for navigation, `<button type="submit">` inside a `<form>` when no styled `<Button>` is needed, `<input type="hidden">`. If a needed primitive doesn't exist in shadcn (e.g. date-range picker), stop and ask: build one in `components/ui/` following shadcn conventions, install a community block, or use another library.
 10. Use the skill index below. Don't improvise a workflow when a skill exists for it.
 
+## Git rules
+
+**Commit format:** `type(scope): summary [ch-NN] · Agent` — Agent is `· Cowork`, `· Codex`, or `· Claude Code`.
+
+**Branches:** CEO works on `main` / the canon branch. Worker branches are named `ch-NN-name` (e.g. `ch-03-auth`).
+
+**Worktree sync is local:** to bring canon into a worktree, run `git merge main` inside the worktree — never push-then-pull through GitHub. GitHub is a backup, not the sync mechanism.
+
+**Push policy:** push at session close (end of chat) or as a manual backup anytime. The CEO↔worker loop does not require a push.
+
+**Write boundary:** workers edit code files and their own chapter file only. The CEO owns the shared canon: `brain/STATUS.md`, `brain/BRIEF.md`, `brain/ROADMAP.md`, `brain/WONT-DO.md`.
+
+**Cowork:** can commit locally but cannot push — it emits the push command for the human to run.
+
+Full per-tool procedures + Cowork git setup: see the `git` skill.
+
 ## Skill index — what's available and when to use it
 
 | Skill | When to use it | How to invoke |
@@ -144,6 +160,7 @@ fi
 | `discipline` | Pre-action gate before any non-trivial change — forces pause, declares cascades, verifies canon. | `/discipline` · "before I do this", "I'm about to edit Y" |
 | `discussion-mode` | No-edit conversation mode — prevents file edits during thinking or planning. | `/discussion-mode` · "discuss", "let's talk", "brainstorm", "explore" |
 | `edit-plugin` | Mandatory gate when editing this plugin's own source files. | `/edit-plugin` · "edit the plugin", "update the X skill" |
+| `git` | Commit/branch conventions, local worktree sync, push policy, Cowork git setup. | model-invoked |
 | `init-project` | Initialize or re-initialize a project with the brain/ protocol. | `/init-project` · "init project", "bootstrap project" |
 | `marketing-brief` | Deep marketing-site brief that writes canonical `brain/marketing/` files consumed by build-page. | `/marketing-brief` · "marketing brief", "write marketing site", "build marketing copy" |
 | `migrate-to-brain` | Convert an OLD three-folder or flat-root project to the single `brain/` layout. | `/migrate-to-brain` · "migrate to brain", "consolidate folders" |
@@ -252,6 +269,7 @@ If you change anything upstream, check everything downstream.
 | Design feels wrong / palette off / looks too generic | `design-direction` | `brain/BRAND.md` |
 | Raw hex / px / font-family values found in a component | `design-check` | `brain/FUNDAMENTALS.md` (Token Rule section) |
 | Want to commit, update WORKLOG, and close the session | `save-session` | `brain/STATUS.md` |
+| Committing, branching, syncing a worktree, or pushing — need git conventions or Cowork git setup | `git` | `brain/STATUS.md` (for branch context) |
 | Setting up a brand new project or re-initializing | `init-project` | nothing (this is the entry point) |
 | Converting an old three-folder / flat-root project to the brain layout | `migrate-to-brain` | nothing (the migration entry point) |
 | Migrating an existing project to the current plugin version | `migrate-project` | `brain/.plugin-version` |

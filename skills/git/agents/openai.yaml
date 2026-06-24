@@ -1,0 +1,7 @@
+interface:
+  display_name: "Git"
+  short_description: "Git under the protocol: commit conventions, ch-NN branches, local worktree sync (merge, no push), per-tool worktree setup, push policy, Cowork git setup, CEO verify-by-reading"
+  brand_color: "#f05133"
+
+policy:
+  allow_implicit_invocation: true
