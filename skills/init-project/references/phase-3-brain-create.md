@@ -126,6 +126,8 @@ fi
 8. **UI work uses the design system. No hardcoded values, ever.** Before editing any `.tsx` / `.jsx` / `.vue` / `.svelte` / `.swift` / styles file: read `brain/DESIGN.md` for tokens and `brain/FUNDAMENTALS.md` for the Token Rule. Run the `design-check` skill before writing and again after. Raw hex, raw px, raw `font-family` strings, emoji-as-icon, and other cardinal sins from `FUNDAMENTALS.md` in component files are violations — not preferences. If a needed token doesn't exist in `DESIGN.md`: stop and propose adding it. Do not improvise.
 9. **UI components — shadcn first when shadcn is in `package.json`.** Default: always use the shadcn primitive (`<Button>`, `<Input>`, `<Select>`, `<Dialog>`, `<Popover>`, `<Tooltip>`, `<Sheet>`, `<Drawer>`, `<Tabs>`, `<Accordion>`, `<DropdownMenu>`, `<Command>`, `<Toast>`, `<Alert>`, `<Checkbox>`, `<Radio>`, `<Switch>`, `<Slider>`, `<Textarea>`). Never silently fall back to the native element because it's faster to type. Allowed native elements: `<a href>` for navigation, `<button type="submit">` inside a `<form>` when no styled `<Button>` is needed, `<input type="hidden">`. If a needed primitive doesn't exist in shadcn (e.g. date-range picker), stop and ask: build one in `components/ui/` following shadcn conventions, install a community block, or use another library.
 10. Use the skill index below. Don't improvise a workflow when a skill exists for it.
+11. **Won't-do:** when any idea or option is rejected, append one author-stamped line to `brain/WONT-DO.md` (format: `YYYY-MM-DD · [stamp] — what — why`). Read `brain/WONT-DO.md` before proposing new ideas so nothing is re-litigated.
+12. **Change-tracking:** note every change as it happens — one author-stamped WORKLOG line or Completion Report entry per action. No version numbers. Never reconstruct the log at the end of a session.
 
 ## Git rules
 
@@ -161,6 +163,9 @@ Full per-tool procedures + Cowork git setup: see the `git` skill.
 | `discussion-mode` | No-edit conversation mode — prevents file edits during thinking or planning. | `/discussion-mode` · "discuss", "let's talk", "brainstorm", "explore" |
 | `edit-plugin` | Mandatory gate when editing this plugin's own source files. | `/edit-plugin` · "edit the plugin", "update the X skill" |
 | `git` | Commit/branch conventions, local worktree sync, push policy, Cowork git setup. | model-invoked |
+| `grill` | Relentless interview to sharpen a chapter's goal or feature intent before building. | model-invoked |
+| `bug-fixing` | Repro-first bug discipline: reliable red/green reproduction, ranked hypotheses, fix, regression test. | model-invoked |
+| `handoff` | Write a Carry-over note into the active chapter when a session fills up, so the next session continues cleanly. | model-invoked |
 | `init-project` | Initialize or re-initialize a project with the brain/ protocol. | `/init-project` · "init project", "bootstrap project" |
 | `marketing-brief` | Deep marketing-site brief that writes canonical `brain/marketing/` files consumed by build-page. | `/marketing-brief` · "marketing brief", "write marketing site", "build marketing copy" |
 | `migrate-to-brain` | Convert an OLD three-folder or flat-root project to the single `brain/` layout. | `/migrate-to-brain` · "migrate to brain", "consolidate folders" |
@@ -277,6 +282,9 @@ If you change anything upstream, check everything downstream.
 | Want a recap of where the project stands right now | `session-recap` | nothing (reads WORKLOG + STATUS itself) |
 | Writing a feature spec or locking a product decision | `discipline` then `brain/BRIEF.md` append | `brain/BRIEF.md`, `brain/ROADMAP.md` |
 | Rejecting an option / killing an idea | append to `brain/WONT-DO.md` | `brain/BRIEF.md` |
+| A chapter's goal feels fuzzy or the scope is unclear before work starts | `grill` | the chapter file in `brain/chapters/` |
+| Investigating or fixing a bug | `bug-fixing` | `brain/STATUS.md` (for known bugs) |
+| Session is filling up and work isn't done — need to preserve state for the next session | `handoff` | the active chapter file in `brain/chapters/` |
 | Running a full marketing site build | `marketing-brief` then `build-page` | `brain/BRIEF.md`, `brain/BRAND.md` |
 | Writing or composing a full page (marketing or dashboard) | `build-page` | `brain/marketing/briefs/<slug>.md`, `brain/DESIGN.md` |
 | Building a UI component or adopting one from an external source | `build-component` | `brain/STRUCTURE.md`, `brain/DESIGN.md` |

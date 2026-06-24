@@ -1,0 +1,7 @@
+interface:
+  display_name: "Bug-fixing"
+  short_description: "Repro-first bug discipline: build a red/green reproduction before theorizing, rank 3–5 falsifiable hypotheses, test one variable at a time, fix, keep the repro as a regression test, clean up, record a one-line lesson"
+  brand_color: "#dc2626"
+
+policy:
+  allow_implicit_invocation: true

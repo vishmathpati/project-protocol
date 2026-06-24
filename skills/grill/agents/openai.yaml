@@ -1,0 +1,7 @@
+interface:
+  display_name: "Grill"
+  short_description: "A relentless one-question-at-a-time interview that sharpens a chapter's Goal + Plan before building — walk the decision tree, recommend each answer, explore the codebase instead of asking, then write Goal/Plan into the chapter"
+  brand_color: "#b91c1c"
+
+policy:
+  allow_implicit_invocation: true

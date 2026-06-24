@@ -173,3 +173,4 @@ Commit the chapter file on main, then tell the user to hand the chapter back to 
 - The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections.
 - Never push from Cowork. Commit locally and emit the push command for the user.
 - One chapter = one file = one worker. Keep Goals small enough to verify.
+- **Won't-do habit:** whenever you and the user reject an idea, option, or direction during planning or chapter definition, immediately append one line to `brain/WONT-DO.md`: `YYYY-MM-DD · [author stamp] — what was rejected — one-line reason`. This prevents the same idea from surfacing again. Read `brain/WONT-DO.md` before proposing any new idea or direction.
