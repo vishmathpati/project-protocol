@@ -43,6 +43,8 @@ A few lines is enough — what you're going to change and how. No formal Plan do
 
 Make the change directly. Read the slice of canon you need; edit the code files. You wear both hats here, so you MAY touch the shared canon if the small job legitimately calls for it (e.g. a STATUS line) — but keep it minimal and stay honest about it in the report.
 
+When building a feature or fixing a bug, invoke `test-driven-development` for the implementation (RED-GREEN-REFACTOR); for a bug, `bug-fixing` provides the structured repro that becomes the RED test.
+
 ---
 
 ## Step 4 — Write a short Completion Report

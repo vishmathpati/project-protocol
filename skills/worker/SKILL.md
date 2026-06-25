@@ -43,6 +43,8 @@ If this conflicts, STOP and report it under Flags — do not guess your way thro
 
 Read `brain/chapters/NN-name.md` — its **Goal**, **Plan**, and **Constraints / out of scope**. Read only the slice of canon (`brain/STATUS.md`, `brain/BRIEF.md`, relevant docs) you actually need to do this one job. Do not read the whole project. Do ONLY what this chapter asks.
 
+When the chapter is building a feature or fixing a bug, invoke `test-driven-development` for the implementation (RED-GREEN-REFACTOR); for bug chapters, the repro step is the RED test — use `bug-fixing` alongside it for structured investigation.
+
 ---
 
 ## Step 3 — Write boundary (strict)

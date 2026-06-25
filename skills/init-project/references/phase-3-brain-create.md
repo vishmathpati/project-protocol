@@ -171,6 +171,7 @@ Full per-tool procedures + Cowork git setup: see the `git` skill.
 | `session-recap` | Mid-session snapshot — reads WORKLOG + STATUS and reports current state. | `/session-recap` · "recap", "where are we", "what have we done", "catch me up" |
 | `advisor` | Expert research + recommendation — researches before opining, forms an independent view, never just reflects. | model-invoked |
 | `verify-by-reading` | Read-before-answer enforcement — opens actual files before answering questions about content. | `/verify-by-reading` · "what does X say", "is Y implemented", before answering any file-content question |
+| `test-driven-development` | Implementing a feature or bugfix test-first — RED-GREEN-REFACTOR cycle. | model-invoked |
 
 ## Hooks index — what runs automatically
 
@@ -282,6 +283,7 @@ If you change anything upstream, check everything downstream.
 | Rejecting an option / killing an idea | append to `brain/WONT-DO.md` | `brain/BRIEF.md` |
 | A chapter's goal feels fuzzy or the scope is unclear before work starts | `grill` | the chapter file in `brain/chapters/` |
 | Investigating or fixing a bug | `bug-fixing` | `brain/STATUS.md` (for known bugs) |
+| Implementing a feature or bugfix test-first (TDD / red-green-refactor) | `test-driven-development` | the chapter file or task description |
 | Session is filling up and work isn't done — need to preserve state for the next session | `handoff` | the active chapter file in `brain/chapters/` |
 | Running a full marketing site build | `marketing-brief` then `build-page` | `brain/BRIEF.md`, `brain/BRAND.md` |
 | Writing or composing a full page (marketing or dashboard) | `build-page` | `brain/marketing/briefs/<slug>.md`, `brain/DESIGN.md` |
