@@ -6,6 +6,21 @@ This phase is read + collect + plan. It does NOT create files. Phase 3 onwards u
 
 ---
 
+## Ideation-stage exception
+
+If the founder is still deciding the name, direction, or positioning — no clear product yet, the "project name" answer is uncertain, or question 1 or 2 is unanswerable — **do NOT rush to generate canon files from the short form.** The templates would be full of `[VERIFY]` placeholders that don't help.
+
+Instead:
+
+1. **Invoke `advisor`** — to research and recommend on name, domain, and direction. The advisor will search, form an independent view, surface trade-offs and risks the founder hasn't raised, and present findings in whatever form helps most (table, comparison chart, artifact).
+2. **Invoke `grill`** — to sharpen the founder's thinking: stress-test the direction, probe assumptions, surface the real constraints.
+3. Help the founder decide. Only when they have a clear project name and one-sentence description should you proceed.
+4. **Then continue Phase 0a normally** — collect the remaining answers and hand off to Phase 3.
+
+For projects that already have a clear direction (the founder can answer questions 1 and 2 confidently), skip this detour and proceed directly to the question batch below.
+
+---
+
 ## What you collect
 
 Use `AskUserQuestion`. Ask in a single batch if the tool supports multiple-choice + free-text in one call; otherwise ask one question at a time but keep momentum — no preamble, no commentary between questions.

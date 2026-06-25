@@ -1,0 +1,7 @@
+interface:
+  display_name: "Advisor"
+  short_description: "Expert research-and-advice mode: researches current facts before opining, forms an independent view, challenges the user, teaches, and cites — never just mirrors input or answers from memory. Presents results with whatever output tool helps most."
+  brand_color: "#2563eb"
+
+policy:
+  allow_implicit_invocation: true

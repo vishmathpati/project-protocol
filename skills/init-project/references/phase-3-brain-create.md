@@ -124,6 +124,7 @@ fi
 10. Use the skill index below. Don't improvise a workflow when a skill exists for it.
 11. **Won't-do:** when any idea or option is rejected, append one author-stamped line to `brain/WONT-DO.md` (format: `YYYY-MM-DD · [stamp] — what — why`). Read `brain/WONT-DO.md` before proposing new ideas so nothing is re-litigated.
 12. **Change-tracking:** note every change as it happens — one author-stamped WORKLOG line or Completion Report entry per action. No version numbers. Never reconstruct the log at the end of a session.
+13. **Research, don't reflect.** When the user asks for an opinion, a recommendation, or expert input, you must (a) research current facts first — search, don't answer from memory — and (b) give an independent, reasoned view with trade-offs and at least one risk they didn't raise. Never end by simply restating the user's own input as the answer. For non-trivial decisions, invoke the `advisor` skill. Present findings in whatever form helps most — table, diagram, chart, HTML, form, artifact — using any available tool.
 
 ## Git rules
 
@@ -168,6 +169,7 @@ Full per-tool procedures + Cowork git setup: see the `git` skill.
 | `migrate-project` | Apply version-by-version plugin deltas to bring a project up to the current plugin version. | `/migrate-project` · "migrate project", "update plugin files" |
 | `save-session` | Save and close a project session — updates WORKLOG → CHANGELOG, STATUS, BRIEF. | `/save-session` · "save", "save session", "close session", "done for today" |
 | `session-recap` | Mid-session snapshot — reads WORKLOG + STATUS and reports current state. | `/session-recap` · "recap", "where are we", "what have we done", "catch me up" |
+| `advisor` | Expert research + recommendation — researches before opining, forms an independent view, never just reflects. | model-invoked |
 | `verify-by-reading` | Read-before-answer enforcement — opens actual files before answering questions about content. | `/verify-by-reading` · "what does X say", "is Y implemented", before answering any file-content question |
 
 ## Hooks index — what runs automatically
@@ -288,6 +290,7 @@ If you change anything upstream, check everything downstream.
 | Adding a long reference doc (API spec, integration notes) | `add-context` | `brain/docs/INDEX.md` |
 | About to mark a feature, chapter, or task as done | `audit-before-close` | the relevant spec or contract file |
 | Need to verify what a file actually says (not memory) | `verify-by-reading` | the file in question |
+| User asks for an opinion, recommendation, or expert input on a non-trivial decision | `advisor` | nothing (advisor researches first) |
 ```
 
 ## 3c. brain/ protocol files
