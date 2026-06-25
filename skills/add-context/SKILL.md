@@ -1,6 +1,6 @@
 ---
 name: add-context
-description: Add an extended-context doc to `brain/docs/` and cross-reference it in root CLAUDE.md + brain/docs/INDEX.md. Triggers — "add context", "add context file", "create an integration doc".
+description: Add an extended-context doc (data contract, domain reference, integration notes) to a project's `brain/docs/`. Use when supporting reference material needs a permanent home in the project's knowledge base. Triggers — "add context", "add context file", "create an integration doc".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(mkdir:*,ls:*,cat:*)
 ---
 

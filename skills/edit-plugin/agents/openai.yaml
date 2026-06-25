@@ -1,6 +1,6 @@
 interface:
   display_name: "Edit Plugin"
-  short_description: "Self-discipline gate: edits to this plugin's source always commit + push"
+  short_description: "Mandatory discipline gate whenever this plugin's own source (skills, hooks, templates, manifest) is being changed"
   brand_color: "#7C2D12"
 
 policy:

@@ -1,6 +1,6 @@
 interface:
   display_name: "Grill"
-  short_description: "A relentless one-question-at-a-time interview that sharpens a chapter's Goal + Plan before building — walk the decision tree, recommend each answer, explore the codebase instead of asking, then write Goal/Plan into the chapter"
+  short_description: "A relentless one-question-at-a-time interview that sharpens a chapter's Goal + Plan before building — when scope is fuzzy and requirements need pressure-testing first"
   brand_color: "#b91c1c"
 
 policy:

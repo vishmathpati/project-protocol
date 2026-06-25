@@ -1,6 +1,6 @@
 interface:
   display_name: "Advisor"
-  short_description: "Expert research-and-advice mode: researches current facts before opining, forms an independent view, challenges the user, teaches, and cites — never just mirrors input or answers from memory. Presents results with whatever output tool helps most."
+  short_description: "Expert research-and-advice mode for when an independent, well-grounded view matters more than agreement — opinions, recommendations, decisions, naming/direction/strategy/tool-choice questions"
   brand_color: "#2563eb"
 
 policy:

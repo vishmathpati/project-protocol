@@ -1,6 +1,6 @@
 ---
 name: worker
-description: Execute one delegated chapter in a worktree — sync canon, do exactly the chapter's job, write the Completion Report into the chapter file, commit. Triggers — "/worker", "work this chapter", "pick up chapter N".
+description: Execute one delegated chapter in a worktree, doing exactly that chapter's scoped job. Reach for it to pick up a chapter handed down by the CEO. Triggers — "/worker", "work this chapter", "pick up chapter N".
 disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*)
 ---

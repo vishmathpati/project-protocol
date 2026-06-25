@@ -1,6 +1,6 @@
 ---
 name: build-component
-description: Build a new component (or adopt an external one) into the project's existing design system and folder structure. Picks the right tier (Generic / Marketing / App), scans for reuse, normalizes against DESIGN.md tokens, and writes to the location dictated by STRUCTURE.md. Triggers — "build component", "create component", "new component", "make a button/card/hero/dashboard tile", "I want to use this Aceternity/Magic UI piece", "I want a component like X from Mantine/Chakra/MUI".
+description: Build a new component, or adopt an external one, into the project's existing design system and folder structure. Use when a net-new UI primitive is needed or an outside component must be normalized to the project's tokens and conventions. Triggers — "build component", "create component", "new component", "make a button/card/hero/dashboard tile", "I want to use this Aceternity/Magic UI piece", "I want a component like X from Mantine/Chakra/MUI".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*,find:*,cat:*,grep:*,test:*,mkdir:*), AskUserQuestion, Task
 ---
 

@@ -1,6 +1,6 @@
 interface:
   display_name: "Handoff"
-  short_description: "Mid-task context carry-over note (where/done/next/open threads, secrets redacted) appended as a ## Carry-over section to the active chapter — distinct from Codex's built-in Handoff and the worker→CEO Completion Report"
+  short_description: "Mid-task context carry-over note for when a session runs long or context fills up — distinct from Codex's built-in Handoff and the worker→CEO Completion Report"
   brand_color: "#7c3aed"
 
 policy:

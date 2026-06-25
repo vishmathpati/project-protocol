@@ -1,6 +1,6 @@
 ---
 name: design-check
-description: Pre-action gate for any UI work. Reads DESIGN.md + FUNDAMENTALS.md, searches existing components for reuse, identifies tokens needed, halts on missing tokens, scans diff for raw hex/px/font values. Fires on — "edit UI", "change styles", "add page", any visual change; also auto-chains after build-component finishes writing a new component.
+description: Pre-action gate for any UI work, run before changing anything visual to keep changes on-system. Fires on — "edit UI", "change styles", "add page", any visual change; also auto-chains after build-component finishes writing a new component.
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 

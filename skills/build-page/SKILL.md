@@ -1,6 +1,6 @@
 ---
 name: build-page
-description: Compose a whole page (marketing or dashboard) by reading the already-locked brief + canon and working with the user through a long iterative conversation — analyze, propose, iterate, decide section by section, call build-component for net-new primitives, write the actual page file. Use when the user says "build the homepage", "build the pricing page", "build the about page", "compose page X", "wire up the X page", "build the dashboard overview page", "build the settings page", or invokes "/build-page".
+description: Compose a whole page (marketing or dashboard) through a long iterative conversation against the already-locked brief and canon. Use when an entire page needs to be designed and written section by section. Use when the user says "build the homepage", "build the pricing page", "build the about page", "compose page X", "wire up the X page", "build the dashboard overview page", "build the settings page", or invokes "/build-page".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*,find:*,cat:*,grep:*,test:*,mkdir:*), AskUserQuestion, Task, Skill, WebFetch
 ---
 

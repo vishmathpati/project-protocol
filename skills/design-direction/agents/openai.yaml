@@ -1,6 +1,6 @@
 interface:
   display_name: "Design Direction"
-  short_description: "Deep brand diagnostic: extract 9 taste axes from a raw brand dump, propose 3 design directions with a moodboard, write a rich BRAND.md + DESIGN.md Overview + brand-specific refusal list"
+  short_description: "Deep brand-direction diagnostic — when a project's brand and design system need to be established or re-anchored from a raw brand dump"
   brand_color: "#475569"
 
 policy:

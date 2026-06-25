@@ -1,6 +1,6 @@
 interface:
   display_name: "Marketing Brief"
-  short_description: "End-of-project marketing-site planning pass: writes CONTENT registry, sitemap, per-page briefs/copy/layouts, media manifest to agents/marketing/ — consumed primarily by build-page (per-page execution) and secondarily by build-component (net-new primitives called inline by build-page)"
+  short_description: "End-of-project marketing-site planning pass — when the project is ready to plan its marketing site and needs canonical content, sitemap, copy, and layout briefs before any marketing pages are built"
   brand_color: "#475569"
 
 policy:

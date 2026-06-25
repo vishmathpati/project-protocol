@@ -1,6 +1,6 @@
 interface:
   display_name: "Init Project"
-  short_description: "Bootstrap, audit, or upgrade a project with the single-folder brain protocol. Runs in four modes: fresh (existing codebase), empty (no markdown yet), audit (already on brain/ layout), or modernize (populated brain/, upgrade pass). Old three-folder or flat-root projects are handed off to the migrate-to-brain skill instead of migrated inline. Writes root CLAUDE.md/README.md plus brain/BRIEF.md, brain/STATUS.md, brain/WONT-DO.md, brain/WORKLOG.md, brain/CHANGELOG.md, brain/ROADMAP.md, brain/STRUCTURE.md, brain/DESIGN.md, brain/BRAND.md, brain/FUNDAMENTALS.md, brain/TOOLING.md."
+  short_description: "Bootstrap, audit, or upgrade a project onto the single-folder brain protocol — when a project has no root CLAUDE.md or needs its brain/ layout established"
   brand_color: "#475569"
 
 policy:

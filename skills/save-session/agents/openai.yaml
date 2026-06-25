@@ -1,6 +1,6 @@
 interface:
   display_name: "Save Session"
-  short_description: "Close a session: brain/WORKLOG to CHANGELOG, update STATUS/BRIEF, clear WORKLOG (single brain/ canon)"
+  short_description: "Save and close a project session, persisting the session's work into canon — for the end of a working session"
   brand_color: "#475569"
 
 policy:

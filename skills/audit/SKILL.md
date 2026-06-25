@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Periodic consistency check across canon files (brain/CLAUDE.md, brain/STATUS.md, brain/BRIEF.md, brain/ROADMAP.md, etc.). Reports drift by severity. Does not auto-fix. Run when drift is suspected.
+description: Periodic consistency check across canon files (brain/CLAUDE.md, brain/STATUS.md, brain/BRIEF.md, brain/ROADMAP.md, etc.). Read-only — does not auto-fix. Run when canon may have drifted out of sync or before relying on it for a decision.
 allowed-tools: Read, Glob, Grep
 ---
 

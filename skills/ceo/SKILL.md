@@ -1,6 +1,6 @@
 ---
 name: ceo
-description: Orchestrate work as the boss — define a chapter, delegate it to a worker, verify the worker's Completion Report against the goal, then merge/approve or send it back. Triggers — "/ceo", "new chapter", "delegate this", "chapter N done, check".
+description: Orchestrate work as the boss who defines chapters, delegates them to workers, and verifies the results before approving. Reach for this to run the CEO/worker delegation loop. Triggers — "/ceo", "new chapter", "delegate this", "chapter N done, check".
 disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, mkdir:*, git:*)
 ---

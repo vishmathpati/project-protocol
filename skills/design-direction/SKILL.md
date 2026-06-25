@@ -1,6 +1,6 @@
 ---
 name: design-direction
-description: Deep brand-direction diagnostic for a project. Takes a raw brand dump, silently extracts taste axes (trust, frequency, density, culture, archetype, tribe, surface, tempo, refusals), proposes 3 directions with a moodboard, and writes a richer BRAND.md + DESIGN.md Overview + brand-specific refusal list. Triggers — "design direction", "design diagnostic", "set up the design system", "re-anchor brand", "I don't know which design to pick".
+description: Deep brand-direction diagnostic for a project, for turning a raw brand dump into a chosen visual direction. Reach for it when the project's brand and design system need to be established or re-anchored. Triggers — "design direction", "design diagnostic", "set up the design system", "re-anchor brand", "I don't know which design to pick".
 allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion, Task, WebSearch
 ---
 

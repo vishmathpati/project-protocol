@@ -1,6 +1,6 @@
 ---
 name: grill
-description: A relentless one-question-at-a-time interview that sharpens a chapter's Goal + Plan BEFORE any building starts — walk the decision tree branch by branch, resolve dependencies between decisions, recommend an answer for each, and explore the codebase instead of asking whenever the answer is discoverable. Reads brain/WONT-DO.md first so it never re-proposes something already rejected, then writes the sharpened goal + plan into the chapter file. The /ceo and /solo roles call this during chapter planning. Triggers — "grill me", "sharpen this goal", "pressure-test this plan", "interrogate the requirements", "what am I not thinking about", "before we build this", "scope this chapter".
+description: A relentless one-question-at-a-time interview that sharpens a chapter's Goal + Plan BEFORE any building starts. The /ceo and /solo roles call this during chapter planning. Use when a chapter's scope is fuzzy and the requirements need to be pressure-tested before work begins. Triggers — "grill me", "sharpen this goal", "pressure-test this plan", "interrogate the requirements", "what am I not thinking about", "before we build this", "scope this chapter".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*)
 ---
 

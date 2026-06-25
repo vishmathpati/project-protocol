@@ -1,6 +1,6 @@
 ---
 name: advisor
-description: Expert research-and-advice mode — researches current facts before opining, forms an independent view, challenges the user, teaches the reasoning, and cites sources, instead of mirroring the user's input or answering from stale memory. Model- or user-reachable. Use when the user asks for an opinion, a recommendation, or expert input — "what do you think", "your opinion", "help me decide", "advise me", "is X a good idea", "which should I pick", "research and recommend", or any naming / domain / direction / strategy / tool-choice question.
+description: Expert research-and-advice mode for when an independent, well-grounded view matters more than agreement. Use when the user asks for an opinion, a recommendation, or expert input — "what do you think", "your opinion", "help me decide", "advise me", "is X a good idea", "which should I pick", "research and recommend", or any naming / domain / direction / strategy / tool-choice question.
 allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Write, Edit, Bash
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Mid-task continuity for a long-running session — write a short Carry-over note (where we are, what's done, what's next, open threads/decisions still pending, secrets redacted) and append it as a "## Carry-over" section to the ACTIVE chapter file so the next session reads chapter + carry-over together. Distinct from the worker→CEO Completion Report and from Codex's built-in "Handoff"; this is a context carry-over note. Any role uses it when a session runs long or context fills up. Triggers — "context is filling up", "running low on context", "carry over", "hand off to the next session", "write a continuation note", "pick this up later", "I'm about to run out of room", "save state to continue".
+description: Mid-task continuity for a long-running session — captures a context carry-over note so the next session can pick up where this one left off. Distinct from the worker→CEO Completion Report and from Codex's built-in "Handoff". Any role uses it when a session runs long or context fills up. Triggers — "context is filling up", "running low on context", "carry over", "hand off to the next session", "write a continuation note", "pick this up later", "I'm about to run out of room", "save state to continue".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*)
 ---
 

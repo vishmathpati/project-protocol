@@ -1,6 +1,6 @@
 interface:
   display_name: "Solo"
-  short_description: "Both hats for small work: plan lightly, do it yourself, write a short Completion Report (chapter or WORKLOG), commit — no worktree, no handoff"
+  short_description: "Wear both CEO and worker hats for small work done in one pass — for quick changes that don't warrant the full delegation loop"
   brand_color: "#6d28d9"
 
 policy:

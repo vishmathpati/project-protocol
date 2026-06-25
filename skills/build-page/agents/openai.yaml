@@ -1,6 +1,6 @@
 interface:
   display_name: "Build Page"
-  short_description: "Compose a whole page (marketing or dashboard) in a long iterative conversation. Reads the brief and canon, proposes a starting plan, iterates with the user, works section by section, calls build-component for net-new primitives, writes the actual page file. Copy is inlined directly from agents/marketing/copy/<slug>.md — no content-mirror file ever created."
+  short_description: "Compose a whole page (marketing or dashboard) in a long iterative conversation — when an entire page needs to be designed and written against the locked brief and canon"
   brand_color: "#475569"
 
 policy:

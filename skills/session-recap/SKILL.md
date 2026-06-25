@@ -1,6 +1,6 @@
 ---
 name: session-recap
-description: Mid-session snapshot. Reads WORKLOG.md + STATUS.md and reports current state. Not a save. Triggers — "recap", "where are we", "what have we done", "catch me up".
+description: Mid-session snapshot of where the project currently stands. Not a save. Reach for it to get oriented on current state. Triggers — "recap", "where are we", "what have we done", "catch me up".
 allowed-tools: Read, Glob, Bash(ls:*, pwd:*, date:*, git status:*, git worktree:*, git log:*)
 ---
 

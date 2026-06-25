@@ -1,6 +1,6 @@
 interface:
   display_name: "Worker"
-  short_description: "Execute one delegated chapter in a worktree, then write the Completion Report into the chapter file (code + own chapter only)"
+  short_description: "Execute one delegated chapter in a worktree, doing exactly that chapter's scoped job — for picking up a chapter handed down by the CEO"
   brand_color: "#0f766e"
 
 policy:

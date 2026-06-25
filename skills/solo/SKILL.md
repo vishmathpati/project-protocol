@@ -1,6 +1,6 @@
 ---
 name: solo
-description: Wear both hats for small work — plan lightly, do it yourself, write a short Completion Report (chapter or WORKLOG), commit. No worktree, no handoff. Triggers — "/solo", "small fix", "just do this", "quick change".
+description: Wear both CEO and worker hats for small work done in one pass, with no worktree and no handoff. Reach for it on quick changes that don't warrant the full delegation loop. Triggers — "/solo", "small fix", "just do this", "quick change".
 disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, mkdir:*, git:*)
 ---

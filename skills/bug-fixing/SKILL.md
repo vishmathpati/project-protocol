@@ -1,6 +1,6 @@
 ---
 name: bug-fixing
-description: Repro-first bug discipline — build a reliable red/green reproduction BEFORE theorizing, list 3–5 ranked falsifiable hypotheses, test one variable at a time against the signal, fix, keep the repro as a regression test, clean up debug instrumentation, and record a one-line lesson in the chapter's Completion Report. The /worker and /solo roles call this on bug chapters. Triggers — "fix this bug", "it's broken", "this throws", "stack trace", "intermittent failure", "flaky test", "regression", "this used to work", "why is this happening", "reproduce the bug", "debug this".
+description: Repro-first bug discipline for diagnosing and fixing defects. The /worker and /solo roles call this on bug chapters. Use when a bug needs to be reproduced, isolated, and fixed without guess-and-check. Triggers — "fix this bug", "it's broken", "this throws", "stack trace", "intermittent failure", "flaky test", "regression", "this used to work", "why is this happening", "reproduce the bug", "debug this".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*)
 ---
 

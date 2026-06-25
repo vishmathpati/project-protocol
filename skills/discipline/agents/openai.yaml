@@ -1,6 +1,6 @@
 interface:
   display_name: "Discipline"
-  short_description: "Pre-action gate: pause, declare, cascade, verify, confirm"
+  short_description: "Pre-action gate before any non-trivial change — when a file edit, locked decision, or structural change could cascade"
   brand_color: "#475569"
 
 policy:

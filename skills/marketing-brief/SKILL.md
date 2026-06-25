@@ -1,6 +1,6 @@
 ---
 name: marketing-brief
-description: Deep marketing-site brief that runs ONCE near the end of a project, after features are built. Writes a comprehensive set of canonical files to `brain/marketing/` (CONTENT registry, SITEMAP, per-page briefs, per-page copy, MEDIA manifest, layout sketches) that the `build-component` skill consumes when implementing marketing-tier components. Triggers — "marketing brief", "write marketing site", "build marketing copy", "create marketing pages", "set up the marketing site", "/marketing-brief".
+description: Deep marketing-site brief that runs ONCE near the end of a project, after features are built. Use when the project is ready to plan its marketing site and needs canonical content, sitemap, copy, and layout briefs before any marketing pages are built. Triggers — "marketing brief", "write marketing site", "build marketing copy", "create marketing pages", "set up the marketing site", "/marketing-brief".
 allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion, Task
 ---
 

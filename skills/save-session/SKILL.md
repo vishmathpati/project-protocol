@@ -1,6 +1,6 @@
 ---
 name: save-session
-description: Save and close a project session. Updates brain/WORKLOG → CHANGELOG, STATUS, BRIEF. Triggers — "save", "save session", "close session", "end session", "done for today".
+description: Save and close a project session, persisting the session's work into the project's canon. Reach for it at the end of a working session. Triggers — "save", "save session", "close session", "end session", "done for today".
 allowed-tools: Read, Write, Edit, Glob, Bash(ls:*,date:*,wc:*,git:*)
 ---
 

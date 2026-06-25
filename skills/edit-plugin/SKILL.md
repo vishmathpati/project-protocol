@@ -1,6 +1,6 @@
 ---
 name: edit-plugin
-description: Mandatory discipline gate when editing this plugin's own source (skills, hooks, manifest, templates, README, build scripts). Forces edit → commit → push → verify on every change. Triggers — "edit the plugin", "update the X skill", "change the X hook", "modify the protocol", "fix the plugin", "edit save-session", or any change to files under skills/, hooks/, templates/, .claude-plugin/, .codex-plugin/.
+description: Mandatory discipline gate when editing this plugin's own source (skills, hooks, manifest, templates, README, build scripts). Use whenever this plugin's own files are being changed. Triggers — "edit the plugin", "update the X skill", "change the X hook", "modify the protocol", "fix the plugin", "edit save-session", or any change to files under skills/, hooks/, templates/, .claude-plugin/, .codex-plugin/.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git:*,ls:*,cat:*,date:*,wc:*)
 ---
 
