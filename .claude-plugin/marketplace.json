@@ -1,0 +1,18 @@
+{
+  "name": "project-protocol",
+  "owner": {
+    "name": "Vish Mathpati"
+  },
+  "description": "Project session discipline for Claude Code, Codex, and Cowork.",
+  "plugins": [
+    {
+      "name": "project-protocol",
+      "source": "./",
+      "description": "Project session discipline. One brain canon replaces the old three-folder layout, with a CEO, worker, and solo role model, git-worktree handoffs, and 26 skills for planning, building, verifying, and shipping consistently.",
+      "author": {
+        "name": "Vish Mathpati"
+      },
+      "license": "MIT"
+    }
+  ]
+}

@@ -6,32 +6,44 @@ Install once. Every project gets a shared system that works the same way no matt
 
 ---
 
-## Install
+## Install & updates
 
-### One command (recommended)
+The repo ships its own plugin marketplace (`.claude-plugin/marketplace.json`), so the marketplace is the primary install path on every tool. The built `.zip` in `dist/` is the manual fallback.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/vishmathpati/project-protocol/main/install.sh | bash
-```
+### Claude Code (recommended)
 
-Downloads the latest release and installs it directly into Claude Code.
-
-### Homebrew
+Add this repo as a marketplace, then install the plugin from it:
 
 ```bash
-brew install --cask vishmathpati/project-protocol/project-protocol
+/plugin marketplace add vishmathpati/project-protocol
+/plugin install project-protocol@project-protocol
 ```
 
-### Manual
+The first command registers the catalog (the `owner/repo` shorthand clones the repo over git, which is what makes the same-repo relative `source` resolve). The second installs the plugin; the name is `project-protocol@project-protocol` (plugin name `@` marketplace name).
 
-Download the latest `.zip` file from [Releases](https://github.com/vishmathpati/project-protocol/releases), then:
+**Updates.** Claude Code refreshes marketplaces and bumps installed plugins at startup when auto-update is on for the marketplace — enable it under `/plugin` → **Marketplaces** → select `project-protocol` → **Enable auto-update**. After an update you'll be prompted to run `/reload-plugins`. To pull a refresh by hand: `/plugin marketplace update project-protocol`.
+
+How a new version is detected: Claude Code resolves the plugin version from `version` in `plugin.json` first, then the marketplace entry, then the git commit SHA. This plugin sets `version` in `.claude-plugin/plugin.json`, so existing installs see a new version when that field is bumped on a release. (If the `version` field were omitted, every new commit on the default branch would count as a new version instead.)
+
+### Cowork (Claude desktop)
+
+**Team / Enterprise org.** Connect this repo as a GitHub-synced org marketplace in admin settings and turn on "sync automatically." Members then receive updates on their next session after a PR merges to the default branch. Org sync requires the repo to be **private** and the marketplace plugin `source` entries to be **relative paths within the repo** — this plugin's entry uses `"source": "./"`, which satisfies that.
+
+**Personal (no org features).** Either add the marketplace from the repository (same flow as Claude Code), or drag the built zip `dist/project-protocol-vX.Y.Z.zip` into the Cowork chat window. The zip is the manual fallback — re-drag the newer zip to update.
+
+### Codex
+
+Install via the co-located Codex manifest at `.codex-plugin/plugin.json`. Codex updates are manual — restart or re-sync after pulling a newer version. See [Compatibility](#compatibility) for the one-time `~/.codex/config.toml` setup that lets Codex read `CLAUDE.md` automatically.
+
+### Manual zip fallback (any tool)
+
+Download the latest `.zip` from [Releases](https://github.com/vishmathpati/project-protocol/releases), or build it yourself (see [Build from source](#build-from-source)), then:
 
 ```bash
 # Claude Code
 claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
-# Cowork (Claude desktop)
-# Drag the .zip file into the Cowork chat window
+# Cowork (Claude desktop) — drag the .zip into the chat window
 ```
 
 ---
@@ -162,9 +174,9 @@ cd project-protocol
 ./build.sh
 ```
 
-Outputs `project-protocol-vX.Y.Z.zip` in the `dist/` folder.
+Outputs `project-protocol-vX.Y.Z.zip` in the `dist/` folder. This zip is the manual fallback documented under [Install & updates](#install--updates); the repo marketplace is the primary install path.
 
-To release: bump `version` in `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`, then run `./build.sh`.
+To release: bump `version` in `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`, then run `./build.sh`. Bumping `version` in `plugin.json` is also what signals a new version to marketplace installs.
 
 ---
 

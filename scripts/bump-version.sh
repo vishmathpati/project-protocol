@@ -4,7 +4,8 @@
 # Usage:
 #   bump-version.sh <new-version>   Set version in all declared files (semver validated)
 #   bump-version.sh --check         Print each file's version; exit 1 if they disagree
-#   bump-version.sh --audit         --check + stale-string grep + skill-count verification
+#   bump-version.sh --audit         --check + stale-string grep + skill-count + description validation
+#   bump-version.sh --validate      Scan descriptions for Cowork-forbidden content (< > and URLs)
 #
 # Config is read from .version-bump.json at the repo root (python3, no jq required).
 
@@ -256,8 +257,129 @@ cmd_audit() {
   else
     echo "  ✓ Skill count consistent across all sources."
   fi
+  echo ""
+
+  # Step 4 — description validation (Cowork-forbidden content: < > and URLs)
+  if ! cmd_validate; then
+    exit_code=1
+  fi
 
   return $exit_code
+}
+
+# ── MODE: --validate ──────────────────────────────────────────────────────────
+# Scan every description field across the repo for Cowork-forbidden content.
+# Cowork's plugin validator silently rejects an upload if any "description"
+# contains '<' or '>' (HTML-sanitized away) or a URL (http:// or https://).
+# This catches those BEFORE upload. Read-only; exits 1 if any are found.
+#
+# Scans:
+#   1. Every plugin.json / marketplace.json (except dist/, .git/, node_modules/):
+#        - top-level "description"
+#        - plugins[].description  (marketplace.json shape; handled if present)
+#   2. Every skills/*/SKILL.md frontmatter "description:" line
+cmd_validate() {
+  echo "Description validation (Cowork-forbidden content: < > and URLs):"
+
+  # Gather every description (STATUS<TAB>...fields) via python3, then flag.
+  # os.walk discovers plugin.json / marketplace.json anywhere in the repo, so a
+  # marketplace.json is picked up automatically when it appears; SKILL.md
+  # frontmatter descriptions are parsed in python too.
+  local report
+  report=$(
+    python3 - "$REPO_ROOT" <<'PYEOF'
+import sys, os, json, glob
+
+repo_root = sys.argv[1]
+forbidden = ['<', '>', 'http://', 'https://']
+prune = {'dist', '.git', 'node_modules'}
+
+# (relative_path, label, value) tuples to check
+descriptions = []
+
+# 1. JSON manifests anywhere in the repo (except dist/, .git/, node_modules/)
+for dirpath, dirnames, filenames in os.walk(repo_root):
+    # prune excluded directories in-place so os.walk does not descend into them
+    dirnames[:] = [d for d in dirnames if d not in prune]
+    for fname in filenames:
+        if fname not in ('plugin.json', 'marketplace.json'):
+            continue
+        abs_path = os.path.join(dirpath, fname)
+        rel = os.path.relpath(abs_path, repo_root)
+        try:
+            with open(abs_path) as f:
+                data = json.load(f)
+        except (OSError, ValueError):
+            continue
+        if isinstance(data, dict):
+            if isinstance(data.get('description'), str):
+                descriptions.append((rel, 'description', data['description']))
+            # marketplace.json shape: a "plugins" array of objects
+            plugins = data.get('plugins')
+            if isinstance(plugins, list):
+                for i, plug in enumerate(plugins):
+                    if isinstance(plug, dict) and isinstance(plug.get('description'), str):
+                        descriptions.append((rel, 'plugins[%d].description' % i, plug['description']))
+
+# 2. skills/*/SKILL.md frontmatter description: line
+for skill_md in sorted(glob.glob(os.path.join(repo_root, 'skills', '*', 'SKILL.md'))):
+    rel = os.path.relpath(skill_md, repo_root)
+    try:
+        with open(skill_md) as f:
+            lines = f.readlines()
+    except OSError:
+        continue
+    # Frontmatter is the leading '---' fenced block
+    if not lines or lines[0].strip() != '---':
+        continue
+    for line in lines[1:]:
+        if line.strip() == '---':
+            break
+        if line.startswith('description:'):
+            value = line[len('description:'):].strip()
+            descriptions.append((rel, 'description', value))
+            break
+
+# Flag forbidden content; emit "STATUS\tpath\tlabel\ttoken\tvalue" rows
+fail = False
+for rel, label, value in descriptions:
+    for tok in forbidden:
+        if tok in value:
+            fail = True
+            print('FAIL\t%s\t%s\t%s\t%s' % (rel, label, tok, value))
+
+print('TOTAL\t%d' % len(descriptions))
+sys.exit(1 if fail else 0)
+PYEOF
+  ) || true
+
+  local validate_fail=0
+  local total=0
+  while IFS=$'\t' read -r status f1 f2 f3 f4; do
+    case "$status" in
+      FAIL)
+        # f1=path f2=label f3=token f4=value
+        local snippet="$f4"
+        if [[ ${#snippet} -gt 80 ]]; then
+          snippet="${snippet:0:77}..."
+        fi
+        echo "  ✗ $f1 $f2 contains '$f3': \"$snippet\"" >&2
+        validate_fail=1
+        ;;
+      TOTAL)
+        total="$f1"
+        ;;
+    esac
+  done <<< "$report"
+
+  if [[ $validate_fail -eq 0 ]]; then
+    echo "  ✓ No forbidden content found in $total descriptions."
+  else
+    echo "" >&2
+    echo "  ✗ Forbidden content in descriptions — Cowork will silently reject this upload." >&2
+  fi
+
+  return $validate_fail
 }
 
 # ── MODE: <new-version> ───────────────────────────────────────────────────────
@@ -287,18 +409,21 @@ if [[ $# -eq 0 ]]; then
   echo "Usage:"
   echo "  bump-version.sh <new-version>   — bump version in all declared files"
   echo "  bump-version.sh --check         — verify all files agree on version"
-  echo "  bump-version.sh --audit         — --check + stale-string grep + skill count"
+  echo "  bump-version.sh --audit         — --check + stale-string grep + skill count + description validation"
+  echo "  bump-version.sh --validate      — scan descriptions for Cowork-forbidden content (< > and URLs)"
   exit 0
 fi
 
 case "$1" in
-  --check)  cmd_check  ;;
-  --audit)  cmd_audit  ;;
+  --check)     cmd_check     ;;
+  --audit)     cmd_audit     ;;
+  --validate)  cmd_validate  ;;
   --help|-h)
     echo "Usage:"
     echo "  bump-version.sh <new-version>   — bump version in all declared files"
     echo "  bump-version.sh --check         — verify all files agree on version"
-    echo "  bump-version.sh --audit         — --check + stale-string grep + skill count"
+    echo "  bump-version.sh --audit         — --check + stale-string grep + skill count + description validation"
+    echo "  bump-version.sh --validate      — scan descriptions for Cowork-forbidden content (< > and URLs)"
     ;;
   -*)
     echo "ERROR: unknown flag '$1'" >&2
