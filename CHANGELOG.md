@@ -9,6 +9,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **DESIGN.md template — `archetype:` field + `## Archetype` section.** The single classification (dashboard / marketing / content / commerce / app) that selects the design rulebook: component source, composition grammar, motion class, era-sensitivity. Replaces the implicit dashboard-first assumption with an explicit per-project decision.
 - **DESIGN.md template — `motion:` block + `## Motion` section.** Motion register per brand (still → cinematic), duration bands, easing order, frequency law, replay-on-rescroll, reduced-motion. Motion was previously undefined outside a single tempo axis.
 - **DESIGN.md template — `icon:` field + `## Icons` section.** One family chosen at lock time, matched to the letterforms; the icon law (Lucide default, no emoji, label rules) promoted from STRUCTURE conventions into the brand layer.
+- **`TASTE.md` template (new).** A confidence-scored learned-preferences ledger — per-project (client identity) and global (the owner's accumulating eye), fed by `save-session` from ratings / accept / reject / edit signals, read by `build-page` and `design-check` so high-confidence preferences apply before the user re-asks. Scaffolded by `init-project`; wiring lands in a later v4.0.0 commit.
 
 ## [2.5.0] — 2026-05-26
 
