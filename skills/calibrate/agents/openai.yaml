@@ -1,0 +1,7 @@
+interface:
+  display_name: "Calibrate"
+  short_description: "Turns brand + register + archetype into an annotated moodboard and a follow/deviate/refuse conventions audit — the calibration bridge before the three-directions step"
+  brand_color: "#475569"
+
+policy:
+  allow_implicit_invocation: true

@@ -10,6 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **DESIGN.md template — `motion:` block + `## Motion` section.** Motion register per brand (still → cinematic), duration bands, easing order, frequency law, replay-on-rescroll, reduced-motion. Motion was previously undefined outside a single tempo axis.
 - **DESIGN.md template — `icon:` field + `## Icons` section.** One family chosen at lock time, matched to the letterforms; the icon law (Lucide default, no emoji, label rules) promoted from STRUCTURE conventions into the brand layer.
 - **`TASTE.md` template (new).** A confidence-scored learned-preferences ledger — per-project (client identity) and global (the owner's accumulating eye), fed by `save-session` from ratings / accept / reject / edit signals, read by `build-page` and `design-check` so high-confidence preferences apply before the user re-asks. Scaffolded by `init-project`; wiring lands in a later v4.0.0 commit.
+- **`calibrate` skill (27th skill).** The calibration bridge between `design-direction` Phase 4 (reference list) and Phase 5 (three directions): builds a mission file from brand + register + archetype, walks a tiered inspiration source map, captures an annotated moodboard via the Aside browser (tested runbook), and writes a FOLLOW / DEVIATE / REFUSE conventions audit to `DESIGN.md`. Hands back to `design-direction` via an explicit `Skill()` call. `design-direction` invocation of `calibrate` is wired in a later v4.0.0 commit.
 
 ## [2.5.0] — 2026-05-26
 

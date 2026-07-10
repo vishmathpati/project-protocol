@@ -50,7 +50,7 @@ claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 ## What you get
 
-26 skills + hook events that turn every AI coding session into a disciplined operation. As of v3.0.0, all project context lives in a single `brain/` folder. The root `CLAUDE.md` is the always-loaded brain — skill index, hooks index, situation router, non-negotiable rules. Hooks fire deterministically on tool events. Skills are invokable via explicit `Skill()` calls — no description-match guessing.
+27 skills + hook events that turn every AI coding session into a disciplined operation. As of v3.0.0, all project context lives in a single `brain/` folder. The root `CLAUDE.md` is the always-loaded brain — skill index, hooks index, situation router, non-negotiable rules. Hooks fire deterministically on tool events. Skills are invokable via explicit `Skill()` calls — no description-match guessing.
 
 ### Role model (new in v3.0.0)
 
@@ -98,6 +98,7 @@ Auto-fire on description match, also invokable via slash command.
 - **`build-component`** — Per-component build skill. Reads `brain/STRUCTURE.md` and relevant canon, scans for reusable existing components, proposes a strategy, generates the component, then fires `design-check`.
 - **`build-page`** — Compositional sibling to `build-component`. For whole pages (marketing or dashboard). Long iterative conversation: asks which page, reads the brief and canon, proposes a plan section by section, accepts external references. Calls `build-component` inline for net-new primitives.
 - **`design-direction`** — Deep brand-direction diagnostic. Extracts 9 taste axes, proposes 3 named directions with a moodboard, and writes `BRAND.md` + `DESIGN.md` Overview.
+- **`calibrate`** — Calibration bridge inside `design-direction` (Phase 4→5). Builds a mission file from brand + register + archetype, walks a tiered inspiration source map, captures an annotated moodboard via the Aside browser, and writes a FOLLOW / DEVIATE / REFUSE conventions audit to `DESIGN.md`. Hands back via an explicit `Skill()` call.
 - **`marketing-brief`** — One-time deep marketing-site brief. Builds a content registry, proposes a sitemap, writes per-page briefs, copy, media manifest, and layout sketches. Auto-skips on dashboard-only / internal-tool projects.
 
 ---
