@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Added
+- **DESIGN.md template — `archetype:` field + `## Archetype` section.** The single classification (dashboard / marketing / content / commerce / app) that selects the design rulebook: component source, composition grammar, motion class, era-sensitivity. Replaces the implicit dashboard-first assumption with an explicit per-project decision.
+- **DESIGN.md template — `motion:` block + `## Motion` section.** Motion register per brand (still → cinematic), duration bands, easing order, frequency law, replay-on-rescroll, reduced-motion. Motion was previously undefined outside a single tempo axis.
+- **DESIGN.md template — `icon:` field + `## Icons` section.** One family chosen at lock time, matched to the letterforms; the icon law (Lucide default, no emoji, label rules) promoted from STRUCTURE conventions into the brand layer.
+
 ## [2.5.0] — 2026-05-26
 
 Major release. Three-layer architectural redesign. The biggest single release since the three-folder protocol shipped.

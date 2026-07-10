@@ -1,6 +1,13 @@
 ---
 version: alpha
 name: "[Project Name]"
+archetype: "[dashboard | marketing | content | commerce | app]"
+# The ONE classification that selects the rulebook. Set once at init; drives component source, composition, motion class, era-sensitivity.
+#   dashboard / app → consistency wins · shadcn primitives · repeat one composition grammar · functional motion only · low era-sensitivity
+#   marketing       → expression wins · bespoke expressive components · vary grammar per section · register-driven motion · high era-sensitivity (dated is fatal)
+#   content         → reading comfort wins · one strong column · minimal motion
+#   commerce        → conversion + trust · product-grid patterns · restrained motion
+# A project may host two archetypes (app + its marketing site); identity (fonts, palette) stays shared, expression tier differs — see per-surface overrides at the bottom.
 
 # UNIVERSAL TOKENS — applied to all surfaces (marketing, dashboard, desktop, etc.)
 
@@ -17,6 +24,11 @@ font:
   mono:                          # data / code
     family: "[font]"             # e.g. "JetBrains Mono", "Geist Mono", "Berkeley Mono"
     role: "code, numeric data, tabular"
+
+icon:                            # ONE family, chosen at design-direction lock, matched to the letterforms
+  family: "[library]"            # default "Lucide"; alternatives "Phosphor", "Radix Icons", or a custom set
+  style: "[stroke/weight]"       # e.g. "line, 1.5px stroke, rounded" — must echo the display/body character
+  # never mix families · never emoji-as-icon (see DO NOT) · currentColor, sized on the 16/20/24 grid
 
 type_scale:                       # optional but recommended — picked per surface tier
   base: 16                        # px — page body baseline
@@ -103,6 +115,13 @@ shadow:
   sm: "[value]"
   md: "[value]"
 
+motion:                          # the motion REGISTER — how much, how fast, what character. A dial per brand, not a doctrine.
+  register: "[still | subtle | lively | cinematic]"  # still=law firm · subtle=clinic · lively=consumer app · cinematic=luxury/hospitality
+  ui_duration: "150-300ms"       # functional UI moves — never exceed 300ms for UI (dashboard/app leans 70-240ms)
+  expressive_duration: "[ms]"    # brand/hero moments — marketing only, up to 700ms; leave blank for dashboard/app
+  easing: "[curve]"              # entrances ease-out (e.g. cubic-bezier(0.23,1,0.32,1)); exits accelerate; never ease-in on UI
+  rules: "[one line]"            # e.g. "soft & brief, nothing bounces, nothing loops" · or "slow & ceremonial, one signature moment"
+
 components:
   button-primary:
     backgroundColor: "{accent.primary}"
@@ -162,6 +181,21 @@ A one-paragraph description of the visual identity — tone, era, references.
 Example: "Editorial, warm, considered. Slightly formal. References: Stripe Press, A24, Notion editorial pages."
 
 [VERIFY — fill from BRAND.md or user direction]
+
+---
+
+## Archetype
+
+The single classification that selects everything below. Set once, at init.
+
+| Archetype | Component source | Composition | Motion | Era-sensitivity | "Done" feels like |
+|---|---|---|---|---|---|
+| **dashboard / app** | shadcn primitives, re-skinned | repeat one grammar (repetition = usability) | functional micro-motion only | low — patterns are stable | invisible, zero friction |
+| **marketing / brand** | bespoke expressive components; libraries are craft *references*, never installed aesthetics | vary grammar per section (repetition = boredom) | register-driven, still → cinematic | **high — dated is fatal** | a feeling the visitor can name |
+| **content / editorial** | typography system + a few patterns | one strong column, rhythmic breaks | minimal; never between reader and text | medium | reader forgets the interface |
+| **commerce** | product-grid + trust patterns | scannable, consistent | restrained | medium | frictionless path to buy |
+
+The identity layer (fonts, palette, tokens) is shared across a project's surfaces. What the archetype switches is *expression* — how loud, how varied, how much motion. A product and its marketing site can be two archetypes over one identity (the Adobe Consonant model): same atoms underneath, different expression tier above.
 
 ---
 
@@ -320,6 +354,33 @@ No `rounded-full` / pill shapes unless explicitly intentional and named as an ex
 | `--shadow-md` | Modals, dropdowns, popovers |
 
 Single-layer shadows only. No multi-layer "elevation" stacks unless brand explicitly calls for it.
+
+---
+
+## Motion
+
+Motion is a **register dial set per brand**, not a fixed rule — a law firm is nearly still, a clinic is subtle, a consumer app is lively, a luxury property is cinematic. The `motion:` frontmatter block records this project's setting.
+
+- **UI motion stays under 300ms** (dashboard/app leans 70–240ms). Brand/hero moments (marketing only) may run up to ~700ms.
+- **Entrances ease-out; exits accelerate; never ease-in on UI.** One easing family so everything feels related.
+- **Frequency law:** the more often an action fires, the less it animates. Keyboard-initiated / 100×-a-day actions get no animation.
+- **Never `scale(0)`** — enter from `scale(0.95)` + opacity. Press feedback `scale(0.97)`.
+- **Scroll reveals replay** on re-entry — they are not one-shot. A page that goes static after first scroll reads dead.
+- **`prefers-reduced-motion` = gentler, not zero.** Keep opacity/color, drop transform movement and parallax.
+- **Animate `transform` / `opacity` only.** Never `transition: all`.
+
+The productive-vs-expressive split maps to the archetype: dashboard = productive curves + fast tokens; marketing = expressive curves + moderate/slow tokens.
+
+---
+
+## Icons
+
+One family for the whole project, chosen at design-direction lock and matched to the letterforms — geometric type takes geometric icons, humanist type takes softer ones. Default **Lucide**; alternatives Phosphor / Radix / a custom set.
+
+- One library only — mixed sets betray themselves via stroke weight and corner radius.
+- Stroke weight matches the type; size on the 16 / 20 / 24 grid; `currentColor`.
+- Icons need visible text labels (only home / search / cart are truly universal); never hide the label behind hover.
+- Never emoji-as-icon (see DO NOT).
 
 ---
 
