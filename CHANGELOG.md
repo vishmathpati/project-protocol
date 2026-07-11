@@ -5,6 +5,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [4.0.0] — 2026-07-11
+
+The design-engine release. Adds an archetype-driven design rulebook, a calibration/moodboard step (`calibrate`, the 27th skill), a confidence-scored taste ledger (`TASTE.md`), motion/image/build-order/done-checklist craft canon, and fixes the orchestration wire so UI chapters actually route through the design skills. Also fixes Codex skill discovery.
+
 ### Fixed
 - **Codex loaded zero skills — fixed.** `.codex-plugin/plugin.json` was missing the `"skills": "./skills/"` pointer; Codex does not auto-discover a plugin's root `skills/` the way Claude Code does (only `hooks/hooks.json` is auto-checked), so no skills reached Codex users. Added the `skills` + `hooks` pointers per the official openai/codex plugin spec. Also declared calibrate's Aside MCP dependency (`dependencies.tools`) in its `agents/openai.yaml` so Codex auto-installs and wires it.
 
