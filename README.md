@@ -50,7 +50,7 @@ claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
 
 ## What you get
 
-27 skills + hook events that turn every AI coding session into a disciplined operation. As of v3.0.0, all project context lives in a single `brain/` folder. The root `CLAUDE.md` is the always-loaded brain — skill index, hooks index, situation router, non-negotiable rules. Hooks fire deterministically on tool events. Skills are invokable via explicit `Skill()` calls — no description-match guessing.
+26 skills + hook events that turn every AI coding session into a disciplined operation. As of v3.0.0, all project context lives in a single `brain/` folder. The root `CLAUDE.md` is the always-loaded brain — skill index, hooks index, situation router, non-negotiable rules. Hooks fire deterministically on tool events. Skills are invokable via explicit `Skill()` calls — no description-match guessing.
 
 ### Role model (new in v3.0.0)
 
@@ -90,7 +90,6 @@ Auto-fire on description match, also invokable via slash command.
 - **`discussion-mode`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
 - **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix.
 - **`design-check`** — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Step 8 auto-fixes mechanical violations (raw hex matching tokens, missing dimensions, ellipsis, nbsp, etc.) with user confirmation. Human-judgment violations are surfaced for user input only.
-- **`edit-plugin`** — Self-discipline gate for changes to this plugin's own source (skills, hooks, manifests, README). Chains commit + push to every edit. Version bumps must ship with a `migrations/vX.Y.Z.md` file (Step 5 manifest discipline).
 - **`migrate-project`** — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Refuses to run in Cowork. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
 
 ### Build skills
@@ -182,6 +181,10 @@ cd project-protocol
 Outputs `project-protocol-vX.Y.Z.zip` in the `dist/` folder. This zip is the manual fallback documented under [Install & updates](#install--updates); the repo marketplace is the primary install path.
 
 To release: bump `version` in `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`, then run `./build.sh`. Bumping `version` in `plugin.json` is also what signals a new version to marketplace installs.
+
+### Developing this plugin
+
+Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when you open *this* repo in Claude Code, and it never ships to users (the installed plugin loads `skills/`, and the built zip copies `skills/` only). It chains commit + push to every source edit and enforces manifest discipline on version bumps. End users never edit this plugin, so they never see it.
 
 ---
 

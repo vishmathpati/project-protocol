@@ -21,6 +21,9 @@ The research-engine release. `calibrate` grows from a single moodboard capture i
 - **`design-direction` Phase 4/5 wired to the two-round pass.** Phase 5 also reads `brain/research/concepts.md` and `brain/research/teardowns/`; Rule 7 made explicit — ≥1 direction departs from every concept found.
 - **`marketing-brief` gains an optional per-page convention check** at brief-writing time, sourced from a targeted saturation-driven Aside call scoped to one page type.
 
+### Removed
+- **`edit-plugin` no longer ships to users** — it moved from `skills/edit-plugin/` to the repo's workshop-only `.claude/skills/edit-plugin/`. It is a plugin-*developer* tool (the discipline gate for editing this plugin's own source); end users who install project-protocol to build their own product never edit the plugin, so shipping it was noise. It still auto-loads when a developer opens this repo. Shipped skill count is now **26** (was 27). `init-project`'s generated skill index + situation router no longer list `edit-plugin`.
+
 ## [4.0.0] — 2026-07-11
 
 The design-engine release. Adds an archetype-driven design rulebook, a calibration/moodboard step (`calibrate`, the 27th skill), a confidence-scored taste ledger (`TASTE.md`), motion/image/build-order/done-checklist craft canon, and fixes the orchestration wire so UI chapters actually route through the design skills. Also fixes Codex skill discovery.

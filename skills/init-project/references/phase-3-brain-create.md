@@ -159,7 +159,6 @@ Full per-tool procedures + Cowork git setup: see the `git` skill.
 | `calibrate` | Capture an annotated moodboard + follow/deviate/refuse conventions audit — the bridge inside design-direction, before the three directions. | `/calibrate` · "build the moodboard", "annotate references", "conventions audit" |
 | `discipline` | Pre-action gate before any non-trivial change — forces pause, declares cascades, verifies canon. | `/discipline` · "before I do this", "I'm about to edit Y" |
 | `discussion-mode` | No-edit conversation mode — prevents file edits during thinking or planning. | `/discussion-mode` · "discuss", "let's talk", "brainstorm", "explore" |
-| `edit-plugin` | Mandatory gate when editing this plugin's own source files. | `/edit-plugin` · "edit the plugin", "update the X skill" |
 | `git` | Commit/branch conventions, local worktree sync, push policy, Cowork git setup. | model-invoked |
 | `grill` | Relentless interview to sharpen a chapter's goal or feature intent before building. | model-invoked |
 | `bug-fixing` | Repro-first bug discipline: reliable red/green reproduction, ranked hypotheses, fix, regression test. | model-invoked |
@@ -290,7 +289,6 @@ If you change anything upstream, check everything downstream.
 | Running a full marketing site build | `marketing-brief` then `build-page` | `brain/BRIEF.md`, `brain/BRAND.md` |
 | Writing or composing a full page (marketing or dashboard) | `build-page` | `brain/marketing/briefs/<slug>.md`, `brain/DESIGN.md` |
 | Building a UI component or adopting one from an external source | `build-component` | `brain/STRUCTURE.md`, `brain/DESIGN.md` |
-| Editing this plugin's own skills, hooks, or templates | `edit-plugin` | plugin `SKILL.md` for the skill being changed |
 | Adding a long reference doc (API spec, integration notes) | `add-context` | `brain/docs/INDEX.md` |
 | About to mark a feature, chapter, or task as done | `audit-before-close` | the relevant spec or contract file |
 | Need to verify what a file actually says (not memory) | `verify-by-reading` | the file in question |
