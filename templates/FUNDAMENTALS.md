@@ -272,6 +272,58 @@ Skeletons must mirror the final layout exactly — same element count, same appr
 
 A button in loading state shows an indicator AND keeps the original label. "Save" becomes "Save…" with a spinner — never replaced by just a spinner. Users need the label to remember which action is in flight.
 
+---
+
+## Image Pipeline (source → treatment → performance)
+
+The Images craft rules above (`width`/`height`, `fetchpriority`, `alt`, `lazy`) are the per-tag mechanics. This is where the images come from and how they earn their place.
+
+### The source ladder (in preference order)
+
+1. **Client's real photography.** Always first choice. Real beats perfect.
+2. **A planned shoot.** When the client can shoot but hasn't yet, the media manifest becomes a **shot list** — one line per needed image (subject, crop, orientation, where it lands). Hand that list to the client; don't invent around it.
+3. **Interim stand-ins** (licensed stock, renders). Allowed to unblock a build, but: **stand-ins stay small and framed. Only real photography earns full-bleed.** (The Aman lesson: minimalism amplifies photography — a full-bleed frame magnifies whatever fills it, so a generic stand-in at full-bleed magnifies the generic.)
+4. **NEVER:** watermarked images, upscaled low-res, generic smiling-model stock, or any competitor's images.
+
+### Treatment (consistency is the product)
+
+- **One grade across every image.** One color/contrast treatment, applied to all. Mixed grades read as a scrapbook, not a brand.
+- **One fixed aspect-ratio per role.** Cards share a ratio; heroes share a ratio; thumbnails share a ratio. Never let the source file's native ratio decide.
+- **Engineer text-over-image contrast.** A scrim, gradient, or plate — measured at the image's **worst point** (its lightest region under light text), not its average. "Looks fine on this photo" is not a system.
+
+### Performance (rules, not taste)
+
+- **Format ladder:** AVIF → WebP → JPEG. Serve the best the browser accepts; JPEG is the floor, not the default.
+- **LCP / hero image:** `fetchpriority="high"`, **never `loading="lazy"`.**
+- **Everything below the fold:** `loading="lazy"`.
+- **Always declare `width`/`height`** (or a fixed aspect-ratio box) — undeclared dimensions = cumulative layout shift.
+
+---
+
+## Build Order (the doctrine)
+
+Build a site in this sequence. The order is not preference — each step exists so the next one has something to stand on. Out of order means rework.
+
+1. **Tokens.** Locked in `design-direction` before any component exists. Nothing gets built against unlocked tokens.
+2. **Global shell.** Nav, footer, page skeleton, base primitives — built once, used by every page. **The nav gets the strictest review of anything on the site, because it appears on — and breaks on — every page.**
+3. **Home page — hardest first.** It births the reusable kit and sets the quality bar every other page inherits.
+4. **Internal pages — mostly reuse.** Each is composed largely from the kit the home page produced. **An internal page may introduce at most 1–2 new component shapes** — more means the kit is too small (fix the kit) or the page is showing off (rein it in).
+5. **Polish pass — whole-site, last.** Motion tuning, performance, mobile, accessibility — swept across the entire site at once, not per-page as you go.
+
+Why: shell before pages (else you rebuild the page when the shell lands); home before internal (else there's no kit to reuse); polish last (else every later structural change invalidates it).
+
+---
+
+## Definition of Done (three scopes)
+
+"Done" is not a feeling. Each scope has an explicit checklist — nothing is called done until every box is checked (this is what `audit-before-close` enforces).
+
+**Component-done:** preview approved · scans clean (no design-scan violations) · all 5 states exist (loading, empty, error, populated, edge) · tokens only · correct tier folder.
+
+**Page-done:** every section locked · copy verbatim from `copy/*.md` · self-critique screenshot pass · owner rating ≥ 8 · promise-vs-built audit (briefed matches built, no drift).
+
+**Site-done:** every sitemap page live · shell coherent everywhere · fast on mobile (measured) · accessible (focus, semantics, contrast, targets) · facts verified (every claim, number, name, link checked — no invented metrics survive to launch).
+
 ### Tooltip timing
 
 - First tooltip in a group has a delay (~500 ms hover) — prevents accidental tooltip storms.
