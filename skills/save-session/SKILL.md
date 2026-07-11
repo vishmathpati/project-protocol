@@ -141,6 +141,19 @@ Never clear or reorganize. Append only.
 
 ---
 
+## Step 6.5 — Update `brain/TASTE.md` from taste signals
+
+If `brain/TASTE.md` exists and this session produced design **taste signals** — a rating on a render, a rejected option ("no, not that"), or an edit the owner made to your output — fold them into the ledger. `save-session` is the **only** writer of confidence values.
+
+For each signal:
+- **New preference** → append an entry: category, one-line statement, a confidence set from the signal strength (a decisive rating or a hands-on edit is stronger than a hesitant pick), and an evidence line `YYYY-MM-DD · <the rating / reject / edit>`.
+- **Recurs a standing entry** → add an evidence line and raise its confidence (+0.1 to +0.2, capped 1.0). Do not create a duplicate — find the existing entry and reinforce it.
+- **Contradicts a standing entry** → lower its confidence and re-date it with the contradicting evidence.
+
+Scope discipline: a preference that would hold on *any* client goes to the **global** ledger (`~/.claude/TASTE.md`); a preference tied to *this* client's identity stays in `brain/TASTE.md`. Never fabricate — every entry and every confidence bump must trace to a real signal in its evidence trail. If TASTE.md is absent (older project not yet migrated), skip this step.
+
+---
+
 ## Step 7 — Update `brain/agenda.md` if relevant
 
 If a chapter completed: move it to ✓ Done in `brain/agenda.md`, promote next chapter to Up Next.
@@ -312,6 +325,7 @@ Capture for the final confirmation:
 ✅ brain/WORKLOG.md cleared
 ✅ audit-before-close: ran (Step 9) — [findings or "clean"]
 ✅ brain/DISCOVERIES.md appended — [Y/N]
+✅ brain/TASTE.md updated — [N entries added/reinforced, or "no taste signals"]
 ✅ brain/agenda.md updated — [Y/N]
 ✅ Git: committed N file(s) · pushed <branch> → GitHub · merged into main · main pushed
    Your local folder is now up to date.
