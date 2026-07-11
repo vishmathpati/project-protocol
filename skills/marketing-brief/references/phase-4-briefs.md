@@ -8,6 +8,12 @@ This separation exists because copy without a brief drifts into list-of-features
 
 ---
 
+## Optional — per-page convention check (saturation-driven)
+
+When writing a page brief you MAY pose one light convention question for that page type — e.g. "most <page-type> pages open with X, some lead with Y — FOLLOW or DEVIATE?" — to anchor the story arc against what the category actually does. Source it from a small, targeted Aside design-research call scoped to ONE page type (not a niche-wide sweep), and only when that page type carries a convention strong enough to be worth naming. This step is optional and saturation-driven: ask once, stop the moment the convention is clear, and skip it entirely when the arc is already obvious or the user has stated a direction. No target number of examples — a convention earns the question by being real, never by a quota.
+
+---
+
 ## Brief shape — every brief has these sections
 
 ```markdown
