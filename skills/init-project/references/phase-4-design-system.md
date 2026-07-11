@@ -6,6 +6,31 @@ Never silently overwrite. Always read first, ask before replacing.
 
 ---
 
+## Step 0 — Classify the archetype (do this first, before either path)
+
+Before any BRAND / DESIGN work, ask the one classification that selects the entire design rulebook. Via `AskUserQuestion`:
+
+```
+What kind of thing is this project, primarily?
+
+A — Dashboard / app   (a tool people work in)
+B — Marketing / brand (a site that persuades and expresses)
+C — Content / editorial (mostly reading)
+D — Commerce          (a store)
+E — Mixed             (e.g. a product + its marketing site — name the primary surface)
+```
+
+The answer fills the **`archetype:`** field in `brain/DESIGN.md`'s frontmatter (`dashboard | marketing | content | commerce | app`) when DESIGN.md is written below. It drives:
+
+- **component source** — shadcn-first for `dashboard`/`app`; bespoke expressive components for `marketing` (libraries become craft references, not installed aesthetics);
+- **composition** — repeat one grammar (dashboard) vs vary per section (marketing);
+- **motion class** — productive vs expressive (see FUNDAMENTALS Motion Spec);
+- **era-sensitivity** — low for tools, high for marketing (where "dated" is fatal).
+
+For a **mixed** project, set the primary archetype and use the per-surface overrides at the bottom of DESIGN.md for the secondary (the Adobe Consonant model: shared identity, different expression tier). This runs for BOTH paths below — if you pick the deep path, `design-direction` reads this `archetype:` field at its Phase 2.
+
+---
+
 ## Optional handoff to `design-direction` (deep flow)
 
 Before running the standard A/B/C flow for BRAND.md and DESIGN.md below, offer the user the deeper alternative — the `design-direction` skill produces a much richer BRAND.md by extracting 9 taste axes from a raw brand dump and proposing 3 named directions to choose from.
@@ -327,6 +352,20 @@ No linter is shipped with project-protocol. The `@google/design.md` package is n
 
 ## Log
 (empty — add entries as you build)
+```
+
+---
+
+## `brain/TASTE.md`
+
+The learned-preferences ledger — confidence-scored entries the owner's design taste accumulates across sessions. `save-session` writes to it; `build-page` and `design-check` read it so high-confidence preferences apply before the user has to re-ask.
+
+**If exists:** keep as-is. It accumulates across sessions — never overwrite.
+
+**If missing:** copy the template from `${CLAUDE_PLUGIN_ROOT:-${CODEX_PLUGIN_ROOT}}/templates/TASTE.md` to `brain/TASTE.md` (or Read → Write if the env var is unset). Replace `[Project Name]`. The ledger starts effectively empty and fills from real session signals — never fabricate entries; the example entries in the template are illustration only.
+
+```bash
+cp "${CODEX_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/TASTE.md" brain/TASTE.md
 ```
 
 ---
