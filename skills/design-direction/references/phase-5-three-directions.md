@@ -4,7 +4,7 @@ Propose exactly 3 directions. They must be **meaningfully different** — sit at
 
 v2.1 adds anti-convergence rules at proposal time. The old version drifted toward Inter + neutral grey + soft shadow on every direction. The rules below force material-first thinking and category diversity so each direction is distinctive enough to be remembered.
 
-**Before proposing, read `brain/moodboard/notes.md` and the FOLLOW / DEVIATE / REFUSE conventions audit `calibrate` appended to `brain/DESIGN.md`** (both produced at the end of Phase 4; skip if the user skipped calibrate). FOLLOW items feed "Borrows from moodboard"; DEVIATE and REFUSE items sharpen "Departs from moodboard" and the distinctive asset. Do NOT re-invoke `calibrate` — it already ran.
+**Before proposing, read `brain/research/concepts.md`, the `brain/research/teardowns/` files, `brain/moodboard/notes.md`, and the FOLLOW / DEVIATE / REFUSE conventions audit `calibrate` appended to `brain/DESIGN.md`** (all produced by calibrate's two-round pass at the end of Phase 4; skip if the user skipped calibrate). The named concepts and teardown evidence describe the field the chosen concept lives in; FOLLOW items feed "Borrows from moodboard"; DEVIATE and REFUSE items sharpen "Departs from moodboard" and the distinctive asset. The concepts map the field — they never cap ambition: Rule 7 below still forces at least one direction to depart from everything found. Do NOT re-invoke `calibrate` — it already ran.
 
 ---
 

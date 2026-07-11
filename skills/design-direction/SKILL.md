@@ -115,13 +115,13 @@ Propose 3–5 real sites that satisfy the locked axes. For each: name, URL, one-
 
 Use `WebSearch` if the host supports it; otherwise list from knowledge. If you cannot reach the live sites for screenshots, list them with their URLs and one-line descriptions — the user can open them themselves.
 
-**Then hand off to `calibrate` — exactly once.** After the moodboard is presented, make an explicit `Skill("calibrate")` call. `calibrate` captures + annotates the moodboard sites, writes `brain/moodboard/notes.md`, and appends a FOLLOW / DEVIATE / REFUSE conventions audit to `brain/DESIGN.md`. It then hands back with "resume design-direction at Phase 5." Invoke it **once** — Phase 5 reads its outputs but must NOT call `calibrate` again (that would loop). Skip path: if the user says "skip calibrate," go straight to Phase 5 with the moodboard as-is.
+**Then hand off to `calibrate` — exactly once.** After the moodboard is presented, make an explicit `Skill("calibrate")` call. `calibrate` now runs a **two-round** research pass, not a single capture: Round 1 sweeps the niche into named concepts (`brain/research/concepts.md`), you pick or blend one, then Round 2 tears down that concept's best real examples (`brain/research/teardowns/`). It folds the returns into `brain/moodboard/notes.md` and appends a FOLLOW / DEVIATE / REFUSE conventions audit to `brain/DESIGN.md`. It then hands back with "resume design-direction at Phase 5." Invoke it **once** — Phase 5 reads its outputs but must NOT call `calibrate` again (that would loop). Skip path: if the user says "skip calibrate," go straight to Phase 5 with the moodboard as-is.
 
 → See `references/phase-4-moodboard.md` for the heuristic mapping (which axis-combinations point at which reference sites).
 
 ### Phase 5 — Three named directions
 
-First read `brain/moodboard/notes.md` and the FOLLOW / DEVIATE / REFUSE conventions audit `calibrate` appended to `brain/DESIGN.md` (skip both if the user skipped calibrate). Do NOT re-invoke `calibrate` — it already ran at the end of Phase 4.
+First read `brain/research/concepts.md`, the `brain/research/teardowns/` files, `brain/moodboard/notes.md`, and the FOLLOW / DEVIATE / REFUSE conventions audit `calibrate` appended to `brain/DESIGN.md` (skip all if the user skipped calibrate). Do NOT re-invoke `calibrate` — it already ran at the end of Phase 4.
 
 Propose exactly 3 directions. Each must be **meaningfully different** — they sit at different points on the design space. Not 3 flavours of minimalist black.
 

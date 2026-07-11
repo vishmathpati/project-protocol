@@ -118,11 +118,11 @@ Read these to calibrate the ceiling, then we'll go to directions.
 
 ## Handoff to calibrate (once, before Phase 5)
 
-After presenting the moodboard, make an explicit `Skill("calibrate")` call. `calibrate`:
+After presenting the moodboard, make an explicit `Skill("calibrate")` call. `calibrate` now runs a **two-round** sweep→concept→teardown pass, not a single capture:
 
-- captures + annotates the moodboard sites,
-- writes `brain/moodboard/notes.md` (per-site observations Phase 5 reads), and
-- appends a FOLLOW / DEVIATE / REFUSE conventions audit to `brain/DESIGN.md`.
+- **Round 1 (sweep)** — discovers the niche's field and groups it into named concepts, written to `brain/research/concepts.md`. You pick or blend one concept.
+- **Round 2 (deep teardown)** — tears down the chosen concept's best real examples, written to `brain/research/teardowns/`.
+- It then folds both rounds' returns into `brain/moodboard/notes.md` (per-site observations Phase 5 reads) and appends a FOLLOW / DEVIATE / REFUSE conventions audit to `brain/DESIGN.md`.
 
 It hands back with "resume design-direction at Phase 5." Call it **exactly once** — Phase 5 consumes its outputs but must never re-invoke `calibrate` (that would loop). Skip path: if the user says "skip calibrate," proceed straight to Phase 5 with the moodboard as-is.
 
