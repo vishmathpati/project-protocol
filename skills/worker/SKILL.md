@@ -45,6 +45,8 @@ Read `brain/chapters/NN-name.md` — its **Goal**, **Plan**, and **Constraints /
 
 When the chapter is building a feature or fixing a bug, invoke `test-driven-development` for the implementation (RED-GREEN-REFACTOR); for bug chapters, the repro step is the RED test — use `bug-fixing` alongside it for structured investigation.
 
+When the chapter creates or modifies any page or UI component — files under a `components/`, `app/`, `pages/`, or `marketing/` path, or a Goal that is visual — do NOT hand-author the UI. Route it explicitly, the same way a feature routes through `test-driven-development`: call `Skill("build-page")` for a whole page and/or `Skill("build-component")` for a component. The `design-check` gate then fires per the existing PostToolUse hook. Hand-rolling UI and skipping the design skills is a Flag (Step 5), not a shortcut.
+
 ---
 
 ## Step 3 — Write boundary (strict)

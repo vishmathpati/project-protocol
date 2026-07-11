@@ -143,6 +143,7 @@ Open the actual code (`git diff main..<worker-branch>` in full, or `git show <wo
 2. The report **doesn't match the Goal** (wrong files, missing pieces, scope creep).
 3. The **Verified** section is thin, vague, or missing.
 4. The change touches a **sensitive area** — auth, money/payments, data deletion, security.
+5. The report covers **UI work** — a page or component was created or modified. Confirm the report gives evidence the work went through `Skill("build-page")` and/or `Skill("build-component")` and passed `design-check`. UI hand-authored in bypass of the design skills is a fail: send it back (Step 6, changes requested), the same way you'd reject a missing test.
 
 Otherwise, **trust the report.** Do NOT line-by-line re-read clean work that matches the Goal — that defeats the point of delegation. The report is the contract; only break the seal when a trigger tells you to.
 
