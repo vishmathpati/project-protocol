@@ -51,7 +51,14 @@ Ask the user one free-text prompt: *"In one sentence, what are you building?"* T
 
 ### Phase 3 — Reuse scan
 
-Glob the components folder for the locked tier. List every existing component that solves the same or a similar problem. Propose a strategy:
+Glob the components folder for the locked tier. List every existing component that solves the same or a similar problem.
+
+**First classify what KIND of component this is — it decides buy-vs-build before the A/B/C strategy:**
+
+- **Commodity primitive** (accordion, tabs, combobox, date-picker, dialog, tooltip, dropdown) — a solved, accessibility-critical pattern. **Prefer reuse or a proven base**: the shadcn primitive, or `recreate-from-inspiration` on a headless library (Radix / React Aria / Headless UI) for the a11y behavior. Do NOT hand-roll accessibility for these.
+- **Brand-expressive component** (hero, editorial band, gallery, scroll sequence, feature showcase) — the pieces that carry the brand. On a `marketing` / `content` archetype these are **built bespoke** to the brand: study external references (Aceternity, Magic UI, an Awwwards site) for *craft level*, but never install their aesthetic as-is — that is how second-order slop spreads. On a `dashboard` / `app` archetype most components are commodity — bias hard to reuse.
+
+Then propose a strategy:
 
 - **(A) Compose** existing components into the new thing — recommended for Marketing / App tiers. No cva triplet needed, just `cn` for className merging.
 - **(B) Extend** an existing component with a new variant — when one existing primitive is close but missing a flag.
@@ -113,6 +120,7 @@ This threshold does NOT apply to normal single-component builds. It applies when
 - **Convention is detected, not asked.** If `shadcn-ui` / `class-variance-authority` is in `package.json` → cva+forwardRef+cn. If `styled-components` → styled-components. If `*.module.css` files exist → CSS modules. If none detected → ask the user, default to vanilla CSS-with-tokens.
 - **`design-check` is explicitly invoked after Phase 5** via `Skill("design-check")` in section 5.5. The PostToolUse hook backs this up (double-fire accepted; design-check is idempotent). Don't duplicate its 8 steps here — `build-component` is the path-of-build, `design-check` is the gate-of-correctness. They chain.
 - **Never modify `DESIGN.md` or `FUNDAMENTALS.md` from this skill.** Missing tokens route through `design-check` Step 4.
+- **Buy-vs-build by kind (Phase 3 classification).** Commodity / accessibility-critical widgets → reuse or a proven headless base, never hand-rolled a11y. Brand-expressive components on `marketing` / `content` archetypes → built bespoke; external references inform craft level only, never installed as the aesthetic. Set by DESIGN.md `archetype:`.
 
 ---
 
