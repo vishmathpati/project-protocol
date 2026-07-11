@@ -64,7 +64,7 @@ When this skill fires:
 
 2. **Detect tier** from the slug location in STRUCTURE.md + user wording. Confirm once if ambiguous.
 
-3. **Read everything for that page.** Full canon for the tier — see "Required canon" above. Sub-delegate the read to a fast Task agent so the orchestration context stays lean.
+3. **Read everything for that page.** Full canon for the tier — see "Required canon" above. **Also read `brain/TASTE.md` (if present) and the global ledger (`~/.claude/TASTE.md`):** apply entries at or above `apply_threshold` (default 0.8) to the first-draft plan and every section — the whitespace, the accent choice, the voice, the beloved elements — so the owner sees their taste already applied instead of correcting it a fifth time. Mid-band entries (0.4–0.8) become questions to ask up front. Sub-delegate the read to a fast Task agent so the orchestration context stays lean.
 
 4. **Append the session-open line to WORKLOG.** Single line in the canonical format:
    ```
@@ -103,6 +103,8 @@ When this skill fires:
    …
    ```
    Marketing pages use calm/loud rhythm tags. Dashboard pages use scan/focus/meta density tags.
+
+   **Composition-variety rule (marketing archetype):** no two adjacent sections may share the same layout grammar. Vary across the vocabulary — split (text/media two-col) · full-bleed band · bento/grid · editorial-centered · sticky/scroll-linked — and alternate direction (image-left → image-right → centered). Two identical section shapes back-to-back read as monotone (the "bootstrap-era" tell). The `layouts/<slug>.md` rhythm rules (container width, background, direction) already encode this — honor them. **Dashboard archetype is the opposite:** repeat one grammar for scannability. (Which applies is set by DESIGN.md `archetype:`.)
 
 7. **Iterate freely with the user.** No phase gates. No 5-iteration cap. The conversation goes as long as it needs to. Push-back examples: *"drop §6"*, *"swap §5 and §6"*, *"split §4 into two sections"*, *"add a logo wall after the hero"*. Revise the plan, re-show it, ask again.
 
@@ -145,6 +147,11 @@ When this skill fires:
 
 12. **`design-check` is explicitly invoked** after the page file is written via `Skill("design-check")` (backed by the PostToolUse hook — double-fire accepted, design-check is idempotent). Let it run its 8 steps. Surface any flagged tokens, banned words, or cross-tier violations to the user. Fix in place where mechanical; ask where it's a judgment call.
 
+12.5. **Self-critique gate — look at it before the user does.** Before closing, review your own output against the design *intent*, not just the token scan.
+    - **If a render/preview is available** (the Aside browser per `calibrate`'s detection, the Claude Code preview pane, or the Codex browser): render the page, screenshot it, and critique the screenshot against `brain/moodboard/` and the page brief — hierarchy, spacing, rhythm (did two adjacent sections come out the same shape?), text-over-image contrast, whether it delivers the register. Fix what you find **before** surfacing to the user.
+    - **If no render capability:** do a structured self-review against the brief, the `FUNDAMENTALS.md` pre-ship checklist, and `brain/moodboard/notes.md`.
+    This is the gate between "compiles + token-clean" (design-check, step 12) and the owner's own reaction. Report what you caught and fixed — don't hand over output you haven't looked at.
+
 13. **Closing.** Print the end-of-skill summary (see "Output shape" below). The session ends when the user closes the chat or types "save" / "save session". No special handoff machinery — STATUS.md Next Actions + WORKLOG carry whatever a future session needs.
 
 ---
@@ -179,6 +186,8 @@ Normal single-page builds with a plan-lock BRIEF append do NOT trigger this gate
 - **Canon protection — explicit list.** The following files are read-only from this skill: `brain/DESIGN.md`, `brain/STRUCTURE.md`, `brain/BRAND.md`, `brain/FUNDAMENTALS.md`, and all files under `brain/marketing/` (CONTENT.md, SITEMAP.md, briefs/, copy/, MEDIA.md, layouts/). If any of these need to change, halt and tell the user: they update canon, we resume. **Permitted writes from this skill:** appending a version block to `brain/BRIEF.md` (Step 8 plan-lock), and updating `brain/docs/INDEX.md` with the new route (Step 11). These are not "canon modifications" — they are the expected output of this skill.
 - **The conversation is the state.** No state file. No scratch folder. If the session is interrupted, WORKLOG entries + STATUS Next Actions are the only resume mechanism — same as every other skill in the plugin.
 - **`design-check` is explicitly invoked after wire-up** via `Skill("design-check")` and after each per-section build. Don't duplicate its 8 steps here.
+- **Composition varies per section (marketing).** No two adjacent sections share a layout grammar; honor the `layouts/<slug>.md` rhythm rules. Dashboards repeat one grammar instead. Set by DESIGN.md `archetype:`.
+- **Self-critique before the user sees it.** After wire-up, render + screenshot (or structured self-review if no render is available), critique against the moodboard + brief, fix, then surface. Never hand over output you haven't looked at.
 - **Skip the marketing-content.ts pattern entirely.** Phase rule worth repeating: if it already exists, do not write to it.
 
 ---
