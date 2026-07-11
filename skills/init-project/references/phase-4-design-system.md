@@ -29,6 +29,20 @@ The answer fills the **`archetype:`** field in `brain/DESIGN.md`'s frontmatter (
 
 For a **mixed** project, set the primary archetype and use the per-surface overrides at the bottom of DESIGN.md for the secondary (the Adobe Consonant model: shared identity, different expression tier). This runs for BOTH paths below — if you pick the deep path, `design-direction` reads this `archetype:` field at its Phase 2.
 
+### Then ask the research-depth dial (same kickoff, right after archetype)
+
+Immediately after the archetype answer, ask the one depth question that tunes the design-research sweep. Via `AskUserQuestion`:
+
+```
+How deep should the design research go?
+
+A — Quick    (fast map of the field, a few concepts confirmed)
+B — Standard (default — map the field, then tear down the chosen concept's best examples)
+C — Deep     (exhaustive field map, thorough teardowns)
+```
+
+The answer fills the **`research_depth:`** field in `brain/DESIGN.md`'s frontmatter (`quick | standard | deep`) when DESIGN.md is written below. It tunes how much appetite `calibrate`'s Aside sweep and teardowns carry — it is a thoroughness dial, **NOT a hard count of sites**. This also runs for BOTH paths; the deep flow reads `research_depth:` when it hands to `calibrate`.
+
 ---
 
 ## Optional handoff to `design-direction` (deep flow)
@@ -101,6 +115,7 @@ C — Skip for now (blank stub)
 - Name:
 - Domain:
 - One sentence:
+- Niche: (industry in plain words — e.g. "luxury hospitality — hotel, fine-dine, banquet, rooftop"; the design-research sweep keys off this)
 
 ## User
 - Who it's for:

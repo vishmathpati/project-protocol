@@ -8,6 +8,8 @@ archetype: "[dashboard | marketing | content | commerce | app]"
 #   content         → reading comfort wins · one strong column · minimal motion
 #   commerce        → conversion + trust · product-grid patterns · restrained motion
 # A project may host two archetypes (app + its marketing site); identity (fonts, palette) stays shared, expression tier differs — see per-surface overrides at the bottom.
+research_depth: "[quick | standard | deep]"   # tunes Aside sweep appetite + teardown thoroughness; NOT a count
+# Asked once at init (Phase 4, alongside archetype). quick = fast map, few concepts confirmed; standard = default; deep = exhaustive field map.
 
 # UNIVERSAL TOKENS — applied to all surfaces (marketing, dashboard, desktop, etc.)
 

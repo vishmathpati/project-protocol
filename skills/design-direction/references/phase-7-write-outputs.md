@@ -17,6 +17,7 @@ token alignment is now Phase 6.5's job, not an end-of-skill afterthought.
 2. **Universal anti-patterns in DESIGN.md are sacred.** The DO NOT section's existing items (no indigo, no two-stop gradients, no emoji-as-icons, etc.) are never deleted. Only the bottom `[Add brand-specific anti-patterns here]` placeholder is replaced.
 3. **Token frontmatter is read-only UNLESS Phase 6.5 returned new token values with user approval.** In that case, write the full token block — including role-split fonts (`display`/`body`/`mono`), material surfaces (`paper`/`ash`/`ink`), and separate `light_mode` + `dark_mode` blocks — using the values from Phase 6.5's `new_token_values`. Never regenerate tokens without that explicit Phase 6.5 handoff.
 4. **No invented details.** Every fact in BRAND.md must trace to the dump or a confirmed correction.
+5. **Populate `Niche:` under `## Product`.** Write the plain-words industry line from the brand dump / Phase 2 axis extraction (e.g. "luxury hospitality — hotel, fine-dine, banquet, rooftop"). The sweep in `calibrate` keys off this line, so it is load-bearing. If it had to be auto-detected rather than stated by the user, tag it `[VERIFY]`.
 
 ---
 
@@ -30,6 +31,7 @@ token alignment is now Phase 6.5's job, not an end-of-skill afterthought.
 ## Product
 - Name: <name>
 - One sentence: <product description from dump>
+- Niche: <industry in plain words — e.g. "luxury hospitality — hotel, fine-dine, banquet, rooftop">
 - Surfaces: <web / app / email / docs / mobile — comma list>
 - Monetisation: <free / subscription / per-event / etc>
 
