@@ -13,10 +13,10 @@ It runs a **two-round research engine** whose thinking is done by an Aside brows
 1. **Round 1 — SWEEP.** Aside discovers the field for the niche and groups it into **named concepts**. Calibrate ingests the summary and runs a **checkpoint with the user** — pick one concept, or blend at the component level.
 2. **Round 2 — DEEP TEARDOWN.** Aside autopsies the chosen concept's best real examples with DevTools (real fonts, real palette, real motion stack). Calibrate folds the returns into an annotated moodboard and a follow/deviate/refuse conventions audit.
 
-This skill is the **plugin-side orchestrator**. Aside is the researcher — its whole brain is the static `design-research` skill in `references/aside-research-skill.md`, which the user installs into Aside once. Calibrate never does the browsing thinking; it composes the per-round mission prompts from canon, hands them to the user to paste, ingests what comes back, and writes canon. It does not pick a direction and does not write tokens — it calibrates the taste inputs, then hands back to `design-direction` Phase 5.
+This skill is the **plugin-side orchestrator**. Aside is the researcher — its whole brain is the static `design-research` skill in `aside-skill/design-research/SKILL.md`, which the user installs into Aside once. Calibrate never does the browsing thinking; it composes the per-round mission prompts from canon, hands them to the user to paste, ingests what comes back, and writes canon. It does not pick a direction and does not write tokens — it calibrates the taste inputs, then hands back to `design-direction` Phase 5.
 
 **Reference files (do not duplicate — this skill points into them):**
-- `references/aside-research-skill.md` — the static skill the user installs into Aside (rounds, saturation law, tier map, teardown checklist, technical-detection cheatsheet, the two summary-block formats, disk-write paths, comms protocol).
+- `aside-skill/design-research/SKILL.md` — the static skill the user installs into Aside (rounds, saturation law, tier map, teardown checklist, technical-detection cheatsheet, the two summary-block formats, disk-write paths, comms protocol).
 - `references/mission-prompt-template.md` — the per-project prompt template calibrate fills from canon (Round-1 and Round-2 variants, `<placeholders>` mapped to canon sources).
 - `references/round-formats.md` — the shared block + file formats (single source of truth for both calibrate and the Aside skill).
 
@@ -63,7 +63,7 @@ Token frontmatter, direction lock, and `BRAND.md` restructuring stay owned by `d
 
 **1b. Confirm the Aside `design-research` skill is installed.** The engine's thinking lives in a static skill the user installs into Aside **once**. Check whether Aside is present at all — look for the `aside` CLI (`which aside`) or the `mcp__aside__repl` tool.
 
-- **Aside present, skill status unknown** → ask the user once, plainly: "Have you installed the `design-research` skill into Aside? If not, install `references/aside-research-skill.md` into your Aside skills once — it's the browser's whole brain for this and never changes per project." Point them at the file; do not paste its contents inline.
+- **Aside present, skill status unknown** → ask the user once, plainly: "Have you installed the `design-research` skill into Aside? If not, install `aside-skill/design-research/SKILL.md` into your Aside skills once — it's the browser's whole brain for this and never changes per project." Point them at the file; do not paste its contents inline.
 - **Aside present, skill installed** → proceed to Step 2 (Primary transport: manual skill + prompt relay).
 - **Aside absent** → offer a fallback (below). This is the only browser question this skill asks — do not offer a broad menu of drivers.
 
@@ -207,7 +207,7 @@ Tell `design-direction` to resume at **Phase 5 (three named directions)**, now r
 
 - **No hardcoded numbers — the governing law.** Nowhere in the prompts calibrate generates may a fixed count appear as a target: not "20–40 sites", not "5–8 teardowns", not "3 concepts". Every quantity is **saturation-driven** — a site earns its place only by adding a concept, a better example of one, or a convention data point. The depth dial tunes appetite, not counts. Duration is never our concern; state this in the prompts.
 - **Two rounds, human-relayed. Aside sweeps → user picks/blends → Aside tears down.** Calibrate never chooses the concept for the user, and never does the browsing thinking itself except under Fallback A.
-- **Reference the sibling files; never duplicate them.** Formats live in `references/round-formats.md`; the prompts in `references/mission-prompt-template.md`; Aside's brain in `references/aside-research-skill.md`.
+- **Reference the sibling files; never duplicate them.** Formats live in `references/round-formats.md`; the prompts in `references/mission-prompt-template.md`; Aside's brain in `aside-skill/design-research/SKILL.md`.
 - **The paste blocks are the guaranteed channel.** Files on disk are an optimization; if disk is unreachable, reconstruct all canon from the self-sufficient blocks (Fallback C).
 - **Fallback A runbook is verbatim** — daemon on `127.0.0.1:21420`, launch-and-wait, never fullPage, never `page.evaluate()` scroll, one action per REPL call, `./artifacts/` → `cp`, re-attach on disconnect.
 - **Extracted values are evidence, never tokens to copy.** `design-check` enforces this.

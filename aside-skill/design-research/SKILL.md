@@ -1,9 +1,21 @@
-# Design Research — the skill text to install into Aside
+---
+name: design-research
+description: Two-round design-research skill for the Aside browser. Sweep a niche into named design concepts, then forensically tear down the chosen concept's best real sites (real fonts, real palette, real motion stack). Install this into Aside; a per-project mission prompt drives each run.
+runtime: aside-browser
+managed-by: project-protocol
+---
 
-> This is the STATIC skill you upload into the Aside browser (aside.com) ONCE. It is Aside's
-> whole brain for design research: how rounds work, the saturation law, the tier map, the
-> traversal moves, the technical-detection cheatsheet, the teardown checklist, robustness
-> rules, disk-write paths, and the two output blocks it must print.
+# Design Research — a STANDALONE Aside skill
+
+> **This is a standalone skill you upload into the Aside browser (aside.com) ONCE.** It is not a
+> Claude Code / Codex skill — it runs inside Aside, not inside the project-protocol plugin. The
+> plugin **ships and versions** this file (the plugin's `calibrate` skill points at it and keeps it
+> current), but the file itself lives in Aside once installed. Update path: when the plugin bumps
+> this skill, re-upload the new version into Aside.
+>
+> It is Aside's whole brain for design research: how rounds work, the saturation law, the tier map,
+> the traversal moves, the technical-detection cheatsheet, the teardown checklist, robustness rules,
+> disk-write paths, and the two output blocks it must print.
 >
 > It carries ZERO project specifics on purpose. The niche, register, refusals, depth dial, and
 > disk paths all arrive in a per-project **mission prompt** that the studio pastes into your

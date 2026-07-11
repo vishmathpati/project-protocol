@@ -1,7 +1,7 @@
 # Mission-prompt template — what calibrate renders for Vish to paste into Aside
 
 > This is the **dynamic** half of the research engine (the static half is the installed
-> `aside-research-skill.md`). `calibrate` fills these templates from project canon and hands Vish
+> `aside-skill/design-research/SKILL.md`). `calibrate` fills these templates from project canon and hands Vish
 > a clean prompt to paste into the Aside chat — one variant per round.
 >
 > **How to use this file (calibrate, plugin side):**

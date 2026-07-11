@@ -23,6 +23,6 @@ dependencies:
                        # never fullPage, never page.evaluate() scroll, one action per call,
                        # ./artifacts -> cp to brain/moodboard/, re-attach on CDP disconnect.
   references:
-    - "references/aside-research-skill.md"   # static skill the user installs into Aside once
+    - "aside-skill/design-research/SKILL.md"   # static skill the user installs into Aside once
     - "references/mission-prompt-template.md" # Round-1 / Round-2 prompt templates filled from canon
     - "references/round-formats.md"           # shared block + file formats (single source of truth)

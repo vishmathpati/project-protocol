@@ -98,8 +98,10 @@ Auto-fire on description match, also invokable via slash command.
 - **`build-component`** — Per-component build skill. Reads `brain/STRUCTURE.md` and relevant canon, scans for reusable existing components, proposes a strategy, generates the component, then fires `design-check`.
 - **`build-page`** — Compositional sibling to `build-component`. For whole pages (marketing or dashboard). Long iterative conversation: asks which page, reads the brief and canon, proposes a plan section by section, accepts external references. Calls `build-component` inline for net-new primitives.
 - **`design-direction`** — Deep brand-direction diagnostic. Extracts 9 taste axes, proposes 3 named directions with a moodboard, and writes `BRAND.md` + `DESIGN.md` Overview.
-- **`calibrate`** — Calibration bridge inside `design-direction` (Phase 4→5). Builds a mission file from brand + register + archetype, walks a tiered inspiration source map, captures an annotated moodboard via the Aside browser, and writes a FOLLOW / DEVIATE / REFUSE conventions audit to `DESIGN.md`. Hands back via an explicit `Skill()` call.
+- **`calibrate`** — The two-round design-research engine inside `design-direction` (Phase 4→5). Generates a per-project mission prompt from brand + register + archetype + niche; a **SWEEP** run maps the field into named concepts; the user picks or blends one; a **DEEP TEARDOWN** run forensically autopsies the chosen concept's best real sites (real fonts, real palette, real motion stack). Folds the returns into an annotated moodboard + an evidence-backed FOLLOW / DEVIATE / REFUSE conventions audit. Thinking is done by the Aside browser and relayed through the user as paste blocks; hands back via an explicit `Skill()` call.
 - **`marketing-brief`** — One-time deep marketing-site brief. Builds a content registry, proposes a sitemap, writes per-page briefs, copy, media manifest, and layout sketches. Auto-skips on dashboard-only / internal-tool projects.
+
+The research engine's browser half is a **standalone Aside skill** at `aside-skill/design-research/SKILL.md` — shipped and versioned by this plugin, but uploaded once into the [Aside browser](https://aside.com), where it actually runs. See `aside-skill/README.md`.
 
 ---
 
@@ -125,6 +127,8 @@ project-root/
     ├── DESIGN.md
     ├── STRUCTURE.md
     ├── DISCOVERIES.md
+    ├── moodboard/         ← captured reference screenshots + notes.md (from calibrate)
+    ├── research/          ← concepts.md + teardowns/ (from the Aside research engine)
     ├── docs/
     │   ├── INDEX.md
     │   └── detail/

@@ -46,6 +46,7 @@ trap "rm -rf '$STAGE_FULL' '$STAGE_COWORK'" EXIT
 #   .codex-plugin/plugin.json
 #   hooks/
 #   templates/
+#   aside-skill/                     (standalone skills the user uploads to Aside)
 #   skills/<name>/SKILL.md           (allowed-tools: frontmatter intact)
 #   skills/<name>/agents/openai.yaml (Codex sidecars)
 #   skills/<name>/references/        (if present)
@@ -62,6 +63,12 @@ fi
 
 if [ -d templates ]; then
   cp -r templates "$STAGE_FULL/"
+fi
+
+# Standalone Aside skills — shipped so `calibrate` can point users at the file to
+# upload into the Aside browser. NOT loaded as a Claude/Codex skill (lives outside skills/).
+if [ -d aside-skill ]; then
+  cp -r aside-skill "$STAGE_FULL/"
 fi
 
 # Copy skills as-is — preserve SKILL.md frontmatter, agents/openai.yaml,
@@ -225,6 +232,12 @@ if [ -f templates/CONTENT.md ]; then
       's|templates/CONTENT.md|references/CONTENT.md|g' {} \;
     find "$STAGE_COWORK/skills/marketing-brief/references" -type f -name '*.md.bak' -delete
   fi
+fi
+
+# Ship the standalone Aside skills in the Cowork build too — same deliverable the
+# user uploads to Aside regardless of which tool drives the plugin.
+if [ -d aside-skill ]; then
+  cp -r aside-skill "$STAGE_COWORK/"
 fi
 
 (cd "$STAGE_COWORK" && zip -r "$OUTPUT_COWORK" . -x "*.DS_Store" > /dev/null)

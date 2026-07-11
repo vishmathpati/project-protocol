@@ -1,9 +1,9 @@
 # Round formats — the shared block & file contract
 
 > Single source of truth for the relay/file formats used by the research engine.
-> `calibrate` (plugin side) and `aside-research-skill.md` (Aside side) both point HERE so they
+> `calibrate` (plugin side) and `aside-skill/design-research/SKILL.md` (Aside side) both point HERE so they
 > never diverge. These shapes come from the Interface Spec v4.1 (Sections 3 + 5) and match
-> `aside-research-skill.md` verbatim. If a format changes, it changes in the Interface Spec first,
+> `aside-skill/design-research/SKILL.md` verbatim. If a format changes, it changes in the Interface Spec first,
 > then here, then in both consumers.
 >
 > **Fill the `<...>` slots; keep the headers, fences, and field names exactly.** Do not rename a
