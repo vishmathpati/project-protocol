@@ -69,6 +69,55 @@ Vercel, Linear, and every premium product follow this ratio intentionally. Their
 
 ---
 
+## Motion Spec (archetype, easing, frequency)
+
+The Motion Principles above are the floor. This is the rest of the system. Motion has two archetypes — pick one per surface before you animate anything.
+
+### The two archetypes
+
+| | **Productive** | **Expressive** |
+|---|---|---|
+| Where | Dashboards, apps, tools — anything used repeatedly | Marketing, landing, brand, first-impression moments |
+| Job | Get out of the way; confirm, don't perform | Be seen; carry brand feeling |
+| Duration | **70–240 ms** | up to **700 ms** |
+| Feel | Efficient, nearly subliminal | Deliberate, choreographed |
+
+A dashboard that animates like a landing page feels slow. A landing page that animates like a dashboard feels cheap. Match the archetype to the surface (it's the `archetype:` field in `DESIGN.md`).
+
+### Representative easing curves
+
+```css
+/* Productive — IBM Carbon */
+--ease-productive: cubic-bezier(0.2, 0, 0.38, 0.9);
+/* Expressive — IBM Carbon */
+--ease-expressive: cubic-bezier(0.4, 0.14, 0.3, 1);
+/* Strong ease-out for reveals — Kowalski */
+--ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+```
+
+### Easing decision order
+
+1. **Entrances** → ease-out (decelerate into place).
+2. **Exits** → accelerate out.
+3. **Never ease-in on UI** — a slow start with no payoff reads as lag.
+4. **Moving on-screen, staying on-screen** (reorder, reflow) → ease-in-out.
+
+### The frequency law
+
+- An action performed **100+ times a day** gets **no animation.** Frequency turns delight into friction.
+- A **keyboard-initiated** action is **never** animated. Keyboard = they want speed, not choreography.
+
+### Rules, not taste
+
+- **Never `scale(0)`.** Enter from `scale(0.95)` + `opacity: 0` — zero-scale pops in like a glitch.
+- **Press feedback:** `scale(0.97)` on `:active`. Registers touch without bouncing.
+- **Stagger** grouped reveals **30–80 ms** apart. More reads as a slideshow.
+- **Replay on re-scroll.** Scroll reveals must re-fire when the element re-enters, not one-shot — a reveal that fires once then shows nothing on scroll-back looks broken.
+- **`prefers-reduced-motion` = gentler, not zero.** Cut travel and duration; keep a short opacity fade.
+- **Animate `transform` and `opacity` only.** Never `transition: all`.
+
+---
+
 ## The Token Rule
 
 Every visual value must have a name. No exceptions.
