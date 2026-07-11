@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [4.1.0] — 2026-07-11
+
+The research-engine release. `calibrate` grows from a single moodboard capture into a **two-round, human-relayed design-research engine** driven by an Aside browser agent — a SWEEP that maps the field into named concepts, a human checkpoint that picks or blends one, then a DEEP TEARDOWN that forensically autopsies the chosen concept's best real examples (real fonts via `document.fonts`, real palette from `:root`, real motion stack from `window` globals + network). Fixes the deepest remaining gap: directions were proposed from training-data averages; now they are grounded in a swept, forensically-verified field map. Governing law throughout — **no hardcoded counts**; every quantity is saturation-driven.
+
+### Added
+- **Aside `design-research` skill (installed once into Aside).** `skills/calibrate/references/aside-research-skill.md` is Aside's whole brain for research: the two-round model, the saturation law, the tier map (ceiling/skeleton/parts/type-color; Pinterest texture-only), traversal moves (awards + competitors spine; agency-portfolio mining as a bonus), the technical-detection cheatsheet (GSAP/Lenis/Locomotive/Framer/Three.js signatures, `document.fonts`, `:root` palette dump, video-hero-via-network, page-builder tells), the site-autopsy checklist, robustness rules (skip bot walls/CAPTCHAs, decline cookie walls, viewport-by-viewport capture on scroll-jacked sites, incremental disk writes), and the two summary-block output contracts.
+- **`mission-prompt-template.md` + `round-formats.md`.** The per-project prompt `calibrate` fills from canon (Round-1 sweep + Round-2 teardown variants, placeholders mapped to canon sources), and the shared single-source block/file formats.
+- **`brain/research/` canon.** `concepts.md` (Round-1 field map) and `teardowns/<slug>.md` (forensic per-site autopsies), read by `design-direction` Phase 5 and `build-page`'s external-reference cross-check.
+- **`BRAND.md` → `## Product` → Niche field** — the industry the sweep researches (previously only in prose; the engine keys off it).
+- **`DESIGN.md` frontmatter `research_depth` (quick/standard/deep)** — tunes Aside's sweep appetite + teardown thoroughness. Explicitly not a count. Asked at `init-project` Phase 4 beside the archetype question.
+
+### Changed
+- **`calibrate` rewritten as the plugin-side orchestrator** of the two-round engine: generate Round-1 sweep prompt from canon → user relays to Aside → ingest concepts → checkpoint with the user (pick/blend, written to `BRAND.md` Decisions log + Locked-direction seed) → generate Round-2 teardown directive → ingest → fold into `moodboard/notes.md` + an evidence-backed FOLLOW/DEVIATE/REFUSE audit → hand back to `design-direction` Phase 5. Three transports on one file contract (manual relay primary; MCP repl and pure-paste fallbacks). Prereqs gate, skip path, sub-agent routing, and Rule 7 all preserved. Extracted reference values are evidence *for* tokens, never copied *as* tokens.
+- **`design-direction` Phase 4/5 wired to the two-round pass.** Phase 5 also reads `brain/research/concepts.md` and `brain/research/teardowns/`; Rule 7 made explicit — ≥1 direction departs from every concept found.
+- **`marketing-brief` gains an optional per-page convention check** at brief-writing time, sourced from a targeted saturation-driven Aside call scoped to one page type.
+
 ## [4.0.0] — 2026-07-11
 
 The design-engine release. Adds an archetype-driven design rulebook, a calibration/moodboard step (`calibrate`, the 27th skill), a confidence-scored taste ledger (`TASTE.md`), motion/image/build-order/done-checklist craft canon, and fixes the orchestration wire so UI chapters actually route through the design skills. Also fixes Codex skill discovery.

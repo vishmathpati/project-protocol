@@ -1,6 +1,6 @@
 {
   "name": "project-protocol",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Project session discipline for Claude Code, Codex, and Cowork. One brain/ canon (STATUS, BRIEF, ROADMAP, WORKLOG, CHANGELOG, chapters) replaces the old three-folder layout, with a CEO/worker/solo role model, git-worktree handoffs, and 27 skills for planning, building, verifying, and shipping consistently.",
   "author": {
     "name": "Vish Mathpati"

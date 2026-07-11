@@ -8,7 +8,7 @@
     {
       "name": "project-protocol",
       "source": "./",
-      "version": "4.0.0",
+      "version": "4.1.0",
       "description": "Project session discipline. One brain canon replaces the old three-folder layout, with a CEO, worker, and solo role model, git-worktree handoffs, and 27 skills for planning, building, verifying, and shipping consistently.",
       "author": {
         "name": "Vish Mathpati"
