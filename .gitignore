@@ -6,3 +6,7 @@ dist/
 
 # Node (if linting tools get added)
 node_modules/
+
+# Playwright MCP scratch + root design-experiment screenshots
+.playwright-mcp/
+/*.png

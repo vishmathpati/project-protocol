@@ -74,7 +74,7 @@ else
   echo ""
   echo "  To install manually:"
   echo "    Claude Code: claude plugin install \"$DEST\""
-  echo "    Codex:       codex plugin install \"$DEST\""
+  echo "    Codex:       add the repo as a marketplace — Codex has no zip-install path (see README Codex section)"
   echo "    Cowork:      re-run with the --cowork flag to get the Cowork-compatible build:"
   echo "                 curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --cowork"
 fi
