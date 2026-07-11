@@ -26,10 +26,11 @@ If the file does not produce visible UI (config, types, pure utility logic), thi
 ## The 8 steps
 
 **1. Read the canon.**
-- `brain/DESIGN.md` — the brand tokens.
+- `brain/DESIGN.md` — the brand tokens (+ `archetype:`, `motion:`, `icon:`).
 - `brain/FUNDAMENTALS.md` — universal craft rules (token rule, 7 cardinal sins, 5 required states, banned words, icon discipline, pre-ship checklist).
+- `brain/TASTE.md` — the learned-preferences ledger, **if present**. Load entries at or above `apply_threshold` (default 0.8): a change that violates a high-confidence entry — shrinking a "sacred" element, slipping a rejected pattern back in, using a voice the owner has struck — is a violation, surfaced at Step 8 as human-judgment. It is not a preference; it's a standing decision. Also read the global ledger (`~/.claude/TASTE.md`) if it exists; on conflict, project taste wins.
 
-If either file is missing → STOP. Run `init-project` first.
+If DESIGN.md or FUNDAMENTALS.md is missing → STOP. Run `init-project` first. (TASTE.md is optional — skip silently if absent.)
 
 **2. Search existing components — reuse over create.**
 - First, read `brain/STRUCTURE.md` to get the actual component paths for this project:
@@ -99,6 +100,7 @@ After step 7 surfaces violations, do not just halt and hand back. Sort every fin
 - Cardinal sin #2: two-stop trust gradient on hero → user decides (could be intentional brand choice).
 - Cardinal sin #5: AI-dashboard-tile shape (rounded card + colored left-border accent) → user decides.
 - `<img>` missing `alt` AND clearly meaningful (used in a hero, has descriptive surrounding text) → user must write alt text.
+- **High-confidence `TASTE.md` entry violated** (a "sacred" element removed or shrunk below its floor, a rejected pattern reintroduced, a struck voice reused) → surface the entry with its confidence and evidence trail; ask the user to confirm the override or revert. Never silently override a ≥0.8 taste entry.
 
 **Safety rule.** Never auto-fix a finding when the proposed fix can't be verified. Before applying any raw-hex → token replacement, confirm the matching token is actually defined in the `DESIGN.md` frontmatter. If it isn't, that finding moves to human-judgment with the prompt "this raw hex has no matching token — what should this map to?" — not a silent guess.
 
