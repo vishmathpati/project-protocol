@@ -4,6 +4,8 @@ Propose exactly 3 directions. They must be **meaningfully different** — sit at
 
 v2.1 adds anti-convergence rules at proposal time. The old version drifted toward Inter + neutral grey + soft shadow on every direction. The rules below force material-first thinking and category diversity so each direction is distinctive enough to be remembered.
 
+**Before proposing, read `brain/moodboard/notes.md` and the FOLLOW / DEVIATE / REFUSE conventions audit `calibrate` appended to `brain/DESIGN.md`** (both produced at the end of Phase 4; skip if the user skipped calibrate). FOLLOW items feed "Borrows from moodboard"; DEVIATE and REFUSE items sharpen "Departs from moodboard" and the distinctive asset. Do NOT re-invoke `calibrate` — it already ran.
+
 ---
 
 ## Section 1 — Shape of each direction

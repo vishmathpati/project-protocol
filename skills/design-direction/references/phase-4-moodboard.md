@@ -116,4 +116,16 @@ Read these to calibrate the ceiling, then we'll go to directions.
 
 ---
 
+## Handoff to calibrate (once, before Phase 5)
+
+After presenting the moodboard, make an explicit `Skill("calibrate")` call. `calibrate`:
+
+- captures + annotates the moodboard sites,
+- writes `brain/moodboard/notes.md` (per-site observations Phase 5 reads), and
+- appends a FOLLOW / DEVIATE / REFUSE conventions audit to `brain/DESIGN.md`.
+
+It hands back with "resume design-direction at Phase 5." Call it **exactly once** — Phase 5 consumes its outputs but must never re-invoke `calibrate` (that would loop). Skip path: if the user says "skip calibrate," proceed straight to Phase 5 with the moodboard as-is.
+
+---
+
 Phase 5 enforces this with a "mandated departure" rule — see `phase-5-three-directions.md`.

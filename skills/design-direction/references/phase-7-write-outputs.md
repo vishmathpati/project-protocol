@@ -105,6 +105,16 @@ brand. References — Stitch Fix and Vogue India for editorial type and
 photography hierarchy; Aesop for restraint in sensory subject matter.
 ```
 
+**Then add a committed point-of-view.** Below the identity paragraph, write one more paragraph — the POV statement — that says in plain terms why this identity could not be mistaken for anyone else's, and names the ONE aesthetic risk the project deliberately takes (e.g. "maximalist where the category is minimalist," "photography-led where competitors lead with type," "burgundy as a UI background"). The risk must be a real, nameable choice with a downside — not a hedge. Sample:
+
+```markdown
+This identity could not be mistaken for a generic SaaS template or a competitor
+clone: cream parchment + oxblood ink + Migra display is a combination nobody in
+the category owns. Deliberate risk taken — we run warm and editorial where the
+category runs cool and clinical; if execution slips this could read as decorative
+rather than premium, and we accept that exposure in exchange for being memorable.
+```
+
 Keep everything else in the Overview section as-is.
 
 ### Merging into an existing populated Overview
@@ -134,6 +144,20 @@ Replace that placeholder line with the locked refusal list, formatted as bullets
 ```
 
 The universal anti-patterns above this block (no indigo, no two-stop gradients, no emoji-icons, etc.) are **not edited**. Only the placeholder line is replaced.
+
+**Also append a dated anti-cliché list** to the brand-specific block — the current crop of second-order AI clichés that have replaced Inter + grey + soft-shadow as the new tells. Append verbatim with the dated caveat, dropping any item the locked direction legitimately owns:
+
+```markdown
+**Anti-cliché — current second-order AI tells (refresh at calibration time, these date):**
+
+- No "warm cream + serif display + terracotta accent" — the current default AI-editorial look.
+- No near-black canvas with a lone acid / lime-green accent.
+- No "Linear look" — dark canvas + glow gradient + faint grid.
+- No bento grid as the default section layout.
+- No Aceternity-style spotlight / beam / aurora hover effects as decoration.
+```
+
+These date fast. `calibrate` re-checks them against the live moodboard each run — treat the list as a snapshot, not a permanent law.
 
 ### Merging into an existing brand-specific block
 

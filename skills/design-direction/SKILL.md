@@ -1,7 +1,7 @@
 ---
 name: design-direction
 description: Deep brand-direction diagnostic for a project, for turning a raw brand dump into a chosen visual direction. Reach for it when the project's brand and design system need to be established or re-anchored. Triggers — "design direction", "design diagnostic", "set up the design system", "re-anchor brand", "I don't know which design to pick".
-allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion, Task, WebSearch
+allowed-tools: Read, Write, Edit, Glob, Grep, Skill, AskUserQuestion, Task, WebSearch
 ---
 
 # Design Direction
@@ -73,7 +73,7 @@ The agent (not the user) extracts the 9 taste axes from the dump:
 2. **Use frequency** — Daily-hours / Daily-seconds / Weekly / Occasional / One-time. Derived from product nature.
 3. **Information density** — Data-dense / Content-light / Mixed. Derived from primary surfaces.
 4. **Cultural anchor** — Global-tech / Indian-formal / Indian-casual / Japanese-minimal / Western-consumer / etc. Derived from audience and language hints.
-5. **Brand archetype** — One of Sage / Magician / Caregiver / Rebel / Creator / Hero / Explorer / Innocent / Lover / Jester / Ruler / Everyman. Derived from problem + tone.
+5. **Brand archetype** — One of Sage / Magician / Caregiver / Rebel / Creator / Hero / Explorer / Innocent / Lover / Jester / Ruler / Everyman. Derived from problem + tone. If `brain/DESIGN.md` already carries an `archetype:` field (added in v4.0.0), read it as the starting point instead of re-deriving from scratch; Phase 3 confirms it with the user.
 6. **Reference tribe** — 3 sites the audience already trusts (look-like) + 1 incumbent to deliberately look unlike. Derived from category.
 7. **Surface mix** — Single-surface / Marketing+app / Multi-surface. Derived from what the user listed.
 8. **Tempo** — Motion-led / Static / Mixed. Derived from product nature (fashion → motion; finance → static).
@@ -105,6 +105,8 @@ Does this read true? Anything off — say so in plain language and I'll adjust.
 
 The user replies with corrections in plain English ("no, trust is higher than that — these are anxious users", "not Indian-casual, this is global"). The agent updates the locked axes. One pass — do not loop on this step. After the correction, lock and proceed.
 
+Write the confirmed register diagnostic (archetype + cultural anchor + emotional temperature) into `brain/BRAND.md` at this point — that is where `calibrate` reads it during Phase 4. Do not leave it only in chat.
+
 → See `references/phase-3-diagnostic-summary.md` for the prose template + correction-merging rules.
 
 ### Phase 4 — Reference moodboard
@@ -113,9 +115,13 @@ Propose 3–5 real sites that satisfy the locked axes. For each: name, URL, one-
 
 Use `WebSearch` if the host supports it; otherwise list from knowledge. If you cannot reach the live sites for screenshots, list them with their URLs and one-line descriptions — the user can open them themselves.
 
+**Then hand off to `calibrate` — exactly once.** After the moodboard is presented, make an explicit `Skill("calibrate")` call. `calibrate` captures + annotates the moodboard sites, writes `brain/moodboard/notes.md`, and appends a FOLLOW / DEVIATE / REFUSE conventions audit to `brain/DESIGN.md`. It then hands back with "resume design-direction at Phase 5." Invoke it **once** — Phase 5 reads its outputs but must NOT call `calibrate` again (that would loop). Skip path: if the user says "skip calibrate," go straight to Phase 5 with the moodboard as-is.
+
 → See `references/phase-4-moodboard.md` for the heuristic mapping (which axis-combinations point at which reference sites).
 
 ### Phase 5 — Three named directions
+
+First read `brain/moodboard/notes.md` and the FOLLOW / DEVIATE / REFUSE conventions audit `calibrate` appended to `brain/DESIGN.md` (skip both if the user skipped calibrate). Do NOT re-invoke `calibrate` — it already ran at the end of Phase 4.
 
 Propose exactly 3 directions. Each must be **meaningfully different** — they sit at different points on the design space. Not 3 flavours of minimalist black.
 
