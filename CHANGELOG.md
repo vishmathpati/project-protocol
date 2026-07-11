@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Fixed
+- **Codex loaded zero skills — fixed.** `.codex-plugin/plugin.json` was missing the `"skills": "./skills/"` pointer; Codex does not auto-discover a plugin's root `skills/` the way Claude Code does (only `hooks/hooks.json` is auto-checked), so no skills reached Codex users. Added the `skills` + `hooks` pointers per the official openai/codex plugin spec. Also declared calibrate's Aside MCP dependency (`dependencies.tools`) in its `agents/openai.yaml` so Codex auto-installs and wires it.
+
 ### Changed
 - **Orchestration now routes UI work through the design skills (the broken wire, fixed).** `worker` and `solo` must route any page/component work through explicit `Skill("build-page")` / `Skill("build-component")` calls (the UI analog of `test-driven-development`), so `design-check` fires; `ceo` gains a selective-deep-check trigger that refuses to merge UI work that bypassed the design skills — the same way it rejects a missing test. Previously a "UI pass" had no design routing at all.
 
