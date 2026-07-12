@@ -20,7 +20,7 @@ This skill is the **plugin-side orchestrator**. Aside is the researcher — its 
 - `references/mission-prompt-template.md` — the per-project prompt template calibrate fills from canon (Round-1 and Round-2 variants, `<placeholders>` mapped to canon sources).
 - `references/round-formats.md` — the shared block + file formats (single source of truth for both calibrate and the Aside skill).
 
-The interface contract these all obey is the v4.1 Research-Engine Interface Spec — if a format changes, it changes there first.
+The interface contract these all obey is the v4.1 Research-Engine Interface Spec (`docs/interface-spec-research-engine.md` in the plugin repo) — if a format changes, it changes there first.
 
 ---
 

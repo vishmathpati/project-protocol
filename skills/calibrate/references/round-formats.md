@@ -2,9 +2,9 @@
 
 > Single source of truth for the relay/file formats used by the research engine.
 > `calibrate` (plugin side) and `aside-skill/design-research/SKILL.md` (Aside side) both point HERE so they
-> never diverge. These shapes come from the Interface Spec v4.1 (Sections 3 + 5) and match
-> `aside-skill/design-research/SKILL.md` verbatim. If a format changes, it changes in the Interface Spec first,
-> then here, then in both consumers.
+> never diverge. These shapes come from the Interface Spec v4.1 (`docs/interface-spec-research-engine.md`,
+> Sections 3 + 5) and match `aside-skill/design-research/SKILL.md` verbatim. If a format changes,
+> it changes in the Interface Spec first, then here, then in both consumers.
 >
 > **Fill the `<...>` slots; keep the headers, fences, and field names exactly.** Do not rename a
 > field or invent a block shape — the studio parses these.

@@ -71,12 +71,16 @@ When the work is done, **append** the report to `brain/chapters/NN-name.md` as a
 **Goal:** <echo what was asked>
 **Status:** done | partial | blocked
 **Changed:** <one line per file/area>
-**Verified:** <what ran + result>
+**Verified:** <command run> → <result/exit + counts, e.g. "tests 34/34 pass" / "tsc clean">
+**Diff:** <paste of `git diff --stat main..<branch>`>
+**UI evidence:** <only for UI chapters: "via build-page/build-component · design-check PASS" + screenshot path if taken; omit line for non-UI work>
 **Flags:** <deviations / risks / unsure — these are the CEO's drill-down targets>
 **Commit:** <branch · hash>
 ```
 
-Fill **Verified** with real checks, not "looks fine." Fill **Flags** honestly — those are the CEO's drill-down targets, and an empty Flags line on messy work will cost a round trip.
+Fill **Verified** with real checks, not "looks fine" — the command and its actual result/counts, not a vibe. A specific, evidence-rich report (real **Verified** lines, a real **Diff** stat, real **UI evidence** where it applies) is what lets the CEO approve without re-reading your code; a thin **Verified** line forces an expensive deep-check that costs everyone tokens and time. Fill **Flags** honestly — those are the CEO's drill-down targets, and an empty Flags line on messy work will cost a round trip.
+
+When a large shared file was involved, also state in **Changed** what you did NOT touch — e.g. "only the hero section of `page.tsx` changed; the remaining sections untouched." This is the attestation that spares the CEO reading thousands of unchanged lines.
 
 ---
 

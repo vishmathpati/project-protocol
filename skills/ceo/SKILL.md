@@ -127,8 +127,8 @@ git diff --stat main..<worker-branch>                # what changed, at a glance
 Read the **latest (unverified) Completion Report** — the newest dated section, the one with no Verdict under it yet. If the chapter took multiple passes (backend, UI, wire-up), each new report gets verified in turn; don't re-litigate reports you already gave a Verdict. Read its sections against the chapter **Goal**:
 
 - **Status** — done / partial / blocked.
-- **Changed** — does the file/area list match what the Goal asked for? Anything unexpected?
-- **Verified** — did the worker actually run/check something (tests, typecheck, manual)? Is it real, or thin/missing?
+- **Changed** — does the file/area list match what the Goal asked for? Anything unexpected? Does it say what was deliberately left untouched in a large shared file?
+- **Verified** — did the worker actually run/check something (tests, typecheck, manual)? Is it real, or thin/missing? Are the structured evidence lines present (command → result, `Diff:` stat, and `UI evidence:` for UI chapters)?
 - **Flags** — read these first and carefully. They are the worker's own admissions of risk, deviation, or uncertainty — your drill-down targets.
 
 Compare the diff STAT against the Goal: roughly the right files, roughly the right size. A 12-file diff for a one-line Goal is itself a flag.
@@ -137,15 +137,25 @@ Compare the diff STAT against the Goal: roughly the right files, roughly the rig
 
 ## Step 4 — Selective deep-check rule
 
-Open the actual code (`git diff main..<worker-branch>` in full, or `git show <worker-branch>:<path>`) ONLY when one of these triggers fires:
+When a trigger below fires, open evidence **scoped to the diff, per flagged file** — never a whole file:
+
+```bash
+git diff main..<worker-branch> -- <path>   # changed hunks only, for the specific file in question
+```
+
+NEVER pull a whole file via `git show <worker-branch>:<path>` when only part of it changed — the untouched lines are not evidence and reading them burns tokens for nothing.
+
+**Size rule:** if the diff for a file exceeds ~500 lines, do not read it inline. Spawn a fast sub-agent (`Task`) with the specific question to answer — e.g. "does this diff do X per the Goal? any scope creep? any sensitive-area touches?" — and act on its findings. This keeps the CEO's own context small even when a worker touched a large file.
+
+Triggers:
 
 1. A **Flag** is present in the report.
 2. The report **doesn't match the Goal** (wrong files, missing pieces, scope creep).
 3. The **Verified** section is thin, vague, or missing.
 4. The change touches a **sensitive area** — auth, money/payments, data deletion, security.
-5. The report covers **UI work** — a page or component was created or modified. Confirm the report gives evidence the work went through `Skill("build-page")` and/or `Skill("build-component")` and passed `design-check`. UI hand-authored in bypass of the design skills is a fail: send it back (Step 6, changes requested), the same way you'd reject a missing test.
+5. The report covers **UI work** — a page or component was created or modified. **If** the report's Verified/UI evidence lines attest the work went through `Skill("build-page")` and/or `Skill("build-component")` AND that `design-check` passed, with specific detail (not a bare assertion) — treat this trigger as satisfied by a light check: confirm those attestation lines exist and are specific, no diff read needed. Deep-read (per the diff-scoped rule above) only when that evidence is absent, vague, or contradicted by the diff stat. UI hand-authored in bypass of the design skills, or attested vaguely, is a fail: send it back (Step 6, changes requested), the same way you'd reject a missing test.
 
-Otherwise, **trust the report.** Do NOT line-by-line re-read clean work that matches the Goal — that defeats the point of delegation. The report is the contract; only break the seal when a trigger tells you to.
+Otherwise, **trust the report.** Do NOT line-by-line re-read clean work that matches the Goal — that defeats the point of delegation. The report is the contract; only break the seal when a trigger tells you to. The goal of verification is confidence per token, not coverage: read the smallest thing that answers the question.
 
 ---
 
@@ -208,7 +218,7 @@ Commit the chapter file on main, then tell the user to hand the chapter back to 
 - You own the shared canon (BRIEF / STATUS / ROADMAP / WONT-DO + CHANGELOG / agenda). Workers never edit these.
 - Stay worktree-aware: read worker output via `git show`/`git diff` against the worker branch; never assume their uncommitted local files are visible.
 - Trust the report by default; deep-check only on a trigger (Step 4).
-- The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections. You verify the latest unverified one.
+- The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections, including the structured `Verified:` / `Diff:` / (UI chapters only) `UI evidence:` lines. You verify the latest unverified one.
 - Use the canonical `## Verdict — YYYY-MM-DD · CEO (<author stamp>)` heading consistently, appended under the report it judges — never overwrite an earlier Verdict.
 - One chapter = one file. It may take ONE OR MORE worker passes (e.g. backend, UI, wire-up), each appending its own Completion Report + earning its own Verdict. Keep each pass small enough to verify.
 - **Won't-do habit:** whenever you and the user reject an idea, option, or direction during planning or chapter definition, immediately append one line to `brain/WONT-DO.md`: `YYYY-MM-DD · [author stamp] — what was rejected — one-line reason`. This prevents the same idea from surfacing again. Read `brain/WONT-DO.md` before proposing any new idea or direction.
