@@ -89,6 +89,16 @@ def main() -> int:
     for path in (ROOT / "README.md", ROOT / ".claude-plugin/plugin.json", ROOT / ".codex-plugin/plugin.json", ROOT / ".claude-plugin/marketplace.json"):
         if re.search(r"\b\d+\s+skills?\b", path.read_text(), re.I):
             errors.append(f"hardcoded skill count: {path.relative_to(ROOT)}")
+    ownership_sources = [ROOT / "skills/worker/SKILL.md", ROOT / "skills/git/SKILL.md"]
+    forbidden_ownership = (
+        "Workers write code + their own chapter file only",
+        "Never the shared canon",
+    )
+    for path in ownership_sources:
+        text = path.read_text()
+        for statement in forbidden_ownership:
+            if statement.lower() in text.lower():
+                errors.append(f"worker authority contradiction in {path.relative_to(ROOT)}: {statement}")
     debris_roots = (ROOT / "skills", ROOT / "hooks", ROOT / "scripts", ROOT / "templates", ROOT / "aside-skill", ROOT / "tests")
     if (ROOT / ".DS_Store").exists():
         errors.append("packaging debris: .DS_Store")

@@ -30,6 +30,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Codex metadata completed.** Every shipped skill sidecar now includes a default prompt alongside its display name and concise description.
 - **Worker ownership contradiction closed.** The final worker rules now match the governing chapter-scoped authority model: required canon edits are branch proposals, while CEO approval and reconciliation establish shared truth.
 - **Discovery metadata normalized.** Codex skill descriptions are concise and Build Page now advertises the substantial brand-facing lane instead of implying every dashboard page enters that workflow.
+- **Git ownership rule aligned.** The Git gate now preserves chapter-scoped worker authority instead of reintroducing the retired code-plus-chapter-only restriction; the structural audit guards both authority-bearing skills against regression.
 
 ### Removed
 - **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.

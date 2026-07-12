@@ -227,7 +227,7 @@ git worktree remove <worktree-path>     # add --force only after confirming noth
 
 ## Rules
 
-- The canon is one folder, `brain/`. Workers write code + their own chapter file only; the CEO owns the shared canon.
+- The canon is one folder, `brain/`. Workers may propose any chapter-required code or canon change in their isolated branch; the CEO owns approval, merge, and shared-state reconciliation.
 - Worktrees share one local `.git` — sync between them with a **local merge**, never push-then-pull. GitHub is a backup.
 - New worktrees must branch from **local HEAD** of the canon branch (`baseRef: head` in Claude Code; select the canon branch in Codex), or you reintroduce "push first."
 - Don't touch lockfiles/dependencies in two worktrees at once — do them on the canon branch.
