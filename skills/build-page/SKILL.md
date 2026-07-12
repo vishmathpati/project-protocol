@@ -64,7 +64,7 @@ When this skill fires:
 
 2. **Detect tier** from the slug location in STRUCTURE.md + user wording. Confirm once if ambiguous.
 
-3. **Read everything for that page.** Full canon for the tier — see "Required canon" above. **Also read `brain/TASTE.md` (if present) and the global ledger (`~/.claude/TASTE.md`):** apply entries at or above `apply_threshold` (default 0.8) to the first-draft plan and every section — the whitespace, the accent choice, the voice, the beloved elements — so the owner sees their taste already applied instead of correcting it a fifth time. Mid-band entries (0.4–0.8) become questions to ask up front. Sub-delegate the read to a fast Task agent so the orchestration context stays lean.
+3. **Read everything for that page.** Full canon for the tier — see "Required canon" above. **If `brain/STRUCTURE.md` is missing, do not proceed blind:** run `build-component`'s Phase 1 structure detection first (`Skill("build-component")` structure-detection pass, or replicate its detection — glob folders, read tsconfig paths, confirm with user, write STRUCTURE.md), then continue. **Also read `brain/TASTE.md` (if present) and the global ledger (`~/.claude/TASTE.md`):** apply entries at or above `apply_threshold` (default 0.8) to the first-draft plan and every section — the whitespace, the accent choice, the voice, the beloved elements — so the owner sees their taste already applied instead of correcting it a fifth time. Mid-band entries (0.4–0.8) become questions to ask up front. Sub-delegate the read to a fast Task agent so the orchestration context stays lean.
 
 4. **Append the session-open line to WORKLOG.** Single line in the canonical format:
    ```
@@ -152,7 +152,11 @@ When this skill fires:
     - **If no render capability:** do a structured self-review against the brief, the `FUNDAMENTALS.md` pre-ship checklist, and `brain/moodboard/notes.md`.
     This is the gate between "compiles + token-clean" (design-check, step 12) and the owner's own reaction. Report what you caught and fixed — don't hand over output you haven't looked at.
 
-13. **Closing.** Print the end-of-skill summary (see "Output shape" below). The session ends when the user closes the chat or types "save" / "save session". No special handoff machinery — STATUS.md Next Actions + WORKLOG carry whatever a future session needs.
+13. **Closing.** Append the skill-complete line to WORKLOG, matching the canonical phrasing from `references/conversational-shape.md`:
+    ```
+    [HH:MM] decided: build-page complete for /<slug> — N components used (R reused, A adapted, N built)
+    ```
+    Then print the end-of-skill summary (see "Output shape" below). The session ends when the user closes the chat or types "save" / "save session". No special handoff machinery — STATUS.md Next Actions + WORKLOG carry whatever a future session needs.
 
 ---
 

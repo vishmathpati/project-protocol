@@ -65,7 +65,7 @@ Invoke a role with `/ceo`, `/worker`, or `/solo` at the start of a session. The 
 
 ### Discipline skills
 
-Auto-fire on description match, also invokable via slash command.
+Invoked explicitly — via `Skill()` calls from other skills, slash commands, or the hooks that dispatch them.
 
 - **`discipline`** — Pre-action gate: pause, declare files-to-change, cascade-effects, verify canon, confirm, then act.
 - **`verify-by-reading`** — Open the file before answering questions about it. Catches memory drift.
@@ -74,6 +74,8 @@ Auto-fire on description match, also invokable via slash command.
 - **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix.
 - **`design-check`** — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Step 8 auto-fixes mechanical violations (raw hex matching tokens, missing dimensions, ellipsis, nbsp, etc.) with user confirmation. Human-judgment violations are surfaced for user input only.
 - **`migrate-project`** — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
+- **`advisor`** — Research-first expert mode: searches before opining, gives an independent view with trade-offs; model-invoked on "what do you think / recommend" questions.
+- **`test-driven-development`** — RED-GREEN-REFACTOR discipline for features and bugfixes; worker/solo route implementation chapters through it.
 
 ### Build skills
 

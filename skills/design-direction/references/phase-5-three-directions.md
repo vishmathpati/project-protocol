@@ -405,7 +405,7 @@ Notice: A and B both sit inside the moodboard envelope (the user gets a real saf
 
 ## Why these rules exist (research notes)
 
-Short version for the curious — full citations in `brain/research/design-convergence.md` if it exists.
+Short version for the curious — grounded in the field research in `brain/research/` (concepts.md + teardowns/) when calibrate has run.
 
 - **Impeccable benchmark (2025)**: when AI-assisted brand pitches converge on Inter + neutral grey + soft shadow at 70%+ frequency, distinctiveness drops below the threshold for brand recall. The fix is forced category divergence at proposal time, not at refinement time.
 - **Klim Type Foundry case studies**: distinctive brands earn memorability through *display* face character; body face can be utility (Inter is fine). Don't waste the display slot on a convergence default.

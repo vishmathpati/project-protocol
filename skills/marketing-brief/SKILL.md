@@ -194,8 +194,8 @@ Wrote:
 Next step:
   → Invoke build-page per page (start with home).
   → build-page reads SITEMAP + the page's brief + copy + layout + MEDIA + CONTENT,
-    runs 6-phase layout-first composition (architecture → hierarchy → assets →
-    component selection → wire-up), and delegates net-new component creation to
+    runs a conversational, section-by-section composition against the locked
+    brief (see build-page), and delegates net-new component creation to
     build-component inline. design-check fires automatically after wire-up.
 ```
 
@@ -237,7 +237,7 @@ Never the most expensive model. Reasoning tier (Sonnet) is the ceiling.
 ## Difference from related skills
 
 - **`design-direction`** — locks brand identity (BRAND.md + DESIGN.md Overview + refusal list) ONCE at the start of a project. Marketing-brief locks the marketing-site execution plan ONCE at the end. Different file targets, different phase of the project.
-- **`build-page`** *(new in v2.2)* — the per-page execution skill that reads marketing-brief's outputs. Invoked once per page (home, pricing, /features/x, /comparisons/y, etc.). Reads SITEMAP + the page's brief + copy + layout + MEDIA + CONTENT, runs layout-first / code-last 6-phase flow (architecture → hierarchy → assets → component selection → wire-up), delegates net-new component creation to `build-component` inline. Marketing-brief is the planning pass for the whole site; build-page is the execution pass per page.
+- **`build-page`** *(new in v2.2)* — the per-page execution skill that reads marketing-brief's outputs. Invoked once per page (home, pricing, /features/x, /comparisons/y, etc.). Reads SITEMAP + the page's brief + copy + layout + MEDIA + CONTENT, runs a conversational, section-by-section composition against the locked brief (see build-page), delegates net-new component creation to `build-component` inline. Marketing-brief is the planning pass for the whole site; build-page is the execution pass per page.
 - **`build-component`** — atomic. One component at a time. Called inline by build-page when a page section needs a net-new primitive. For one-off component requests (no page context), invoke directly.
 - **`design-check`** — UI-write-time gate. Fires inside every build-component call and after build-page's wire-up.
 - **`init-project`** — bootstraps the three-folder layout. Marketing-brief assumes init-project has already run (`brain/BRAND.md`, `brain/ROADMAP.md`, `brain/STATUS.md` all exist).
