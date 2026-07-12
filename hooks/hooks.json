@@ -115,6 +115,15 @@
             "command": "bash -c 'FILE=\"${TOOL_INPUT_FILE_PATH:-${TOOL_INPUT_PATH:-}}\"; if [ -z \"$FILE\" ]; then exit 0; fi; case \"$FILE\" in */node_modules/*|*/.git/*|*/dist/*|*/build/*|*/.next/*) exit 0 ;; esac; MATCH=0; STRUCTURE=\"brain/STRUCTURE.md\"; if [ -f \"$STRUCTURE\" ]; then if grep -q \"components/ui\\|components/primitives\\|components/blocks\\|Views/\\|src/components\" \"$STRUCTURE\"; then case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; else case \"$FILE\" in */components/ui/*|*/components/primitives/*|*/components/blocks/*|*/Views/*.swift|*/src/components/*) MATCH=1 ;; esac; fi; if [ \"$MATCH\" = \"1\" ]; then printf \"[project-protocol] design-check dispatcher: file written to %s. Run /design-check on this file before continuing.\\n\" \"$FILE\" >&2; fi'"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILE=\"${TOOL_INPUT_FILE_PATH:-${TOOL_INPUT_PATH:-}}\"; if [ -z \"$FILE\" ]; then exit 0; fi; case \"$FILE\" in */brain/DESIGN.md) printf \"[project-protocol] DESIGN.md changed — sync tokens to CSS: npx @google/design.md lint brain/DESIGN.md (validate), then npx @google/design.md export --format css-tailwind brain/DESIGN.md > <your theme/globals css target> and verify the app still renders.\\n\" >&2 ;; esac'"
+          }
+        ]
       }
     ]
   }

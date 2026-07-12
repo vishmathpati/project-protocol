@@ -182,8 +182,11 @@ Output:
 {{end}}
 
 Next step:
-  npx @google/design.md lint brain/DESIGN.md
-    — syncs DESIGN.md → global.css (or DesignTokens.swift for Swift projects)
+  Validate: npx @google/design.md lint brain/DESIGN.md (fix reference/contrast findings).
+  Then sync tokens into the app:
+    npx @google/design.md export --format css-tailwind brain/DESIGN.md > <theme css target>
+    (e.g. app/theme.css, or splice into globals.css — DesignTokens.swift for Swift projects)
+  A PostToolUse hook reminds you whenever DESIGN.md changes.
 
   Then start UI work. The design-check skill will fire on any visual change
   and enforce the new tokens.

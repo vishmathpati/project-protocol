@@ -346,11 +346,11 @@ If `brain/STRUCTURE.md` does not exist yet, queue this data for when it is first
 
 ---
 
-### Step 5 — Custom DESIGN.md lint (optional)
+### Step 5 — DESIGN.md lint + sync (optional)
 
 If you have a custom DESIGN.md linter configured for this project, run it here.
 
-No linter is shipped with project-protocol. The `@google/design.md` package is not a project-protocol dependency and is not installed by default. If you want to lint `brain/DESIGN.md`, install and configure your own linter and document it under "optional dev tools" in `brain/TOOLING.md`.
+No linter is bundled with project-protocol as a dependency, but `@google/design.md` (Google Labs) is the officially wired flow for `brain/DESIGN.md`: `npx @google/design.md lint brain/DESIGN.md` validates the frontmatter (reference/contrast checks), and `npx @google/design.md export --format css-tailwind brain/DESIGN.md > <theme css target>` syncs the tokens into the app's CSS. Both are invoked on demand via `npx` — not installed by default. A PostToolUse hook reminds you to run this flow whenever `brain/DESIGN.md` changes.
 
 ---
 

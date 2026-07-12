@@ -223,5 +223,5 @@ Wrote:
   ✅ brain/DESIGN.md — token frontmatter (if Phase 6.5 returned approved values)
   ✅ brain/preview/<direction-slug>-<date>.html
 
-Next step: run `npx @google/design.md lint brain/DESIGN.md` to sync DESIGN.md → global.css, then start UI work.
+Next step: Validate with `npx @google/design.md lint brain/DESIGN.md` (fix reference/contrast findings). Then sync tokens into the app: `npx @google/design.md export --format css-tailwind brain/DESIGN.md > <theme css target>` (e.g. `app/theme.css`, or splice into `globals.css`). A PostToolUse hook reminds you whenever DESIGN.md changes. Then start UI work.
 ```
