@@ -52,6 +52,9 @@ def main() -> int:
             for field in ("display_name:", "short_description:", "default_prompt:"):
                 if field not in metadata:
                     errors.append(f"missing {field[:-1]} in {sidecar.relative_to(ROOT)}")
+            description = re.search(r'^\s*short_description:\s*["\'](.*)["\']\s*$', metadata, re.M)
+            if description and len(description.group(1)) > 64:
+                errors.append(f"short_description exceeds 64 characters: {sidecar.relative_to(ROOT)}")
     for directory in RETIRED_DIRS:
         if (ROOT / "skills" / directory).exists():
             errors.append(f"retired skill directory remains: {directory}")
@@ -69,15 +72,23 @@ def main() -> int:
     except Exception as exc:
         errors.append(f"invalid hooks/hooks.json: {exc}")
 
-    current_files = [ROOT / "README.md", ROOT / "hooks"] + skill_dirs
-    retired_terms = ("brain/SITUATIONS.md",)
+    current_files = [ROOT / "README.md", ROOT / "templates", ROOT / "hooks"] + [
+        path for path in skill_dirs if path.name not in {"migrate-project", "migrate-to-brain"}
+    ]
+    retired_terms = (
+        "brain/SITUATIONS.md", "session-recap", "audit-before-close",
+        "discussion-mode", "design-direction", "calibrate", "research_depth",
+    )
     for item in current_files:
         paths = [item] if item.is_file() else list(item.rglob("*.md")) + list(item.rglob("*.json"))
         for path in paths:
             text = path.read_text(errors="ignore")
             for term in retired_terms:
-                if term in text and "migrate-to-brain" not in str(path):
+                if re.search(rf"(?<![\w-]){re.escape(term)}(?![\w-])", text):
                     errors.append(f"retired current-source reference {term}: {path.relative_to(ROOT)}")
+    for path in (ROOT / "README.md", ROOT / ".claude-plugin/plugin.json", ROOT / ".codex-plugin/plugin.json", ROOT / ".claude-plugin/marketplace.json"):
+        if re.search(r"\b\d+\s+skills?\b", path.read_text(), re.I):
+            errors.append(f"hardcoded skill count: {path.relative_to(ROOT)}")
     debris_roots = (ROOT / "skills", ROOT / "hooks", ROOT / "scripts", ROOT / "templates", ROOT / "aside-skill", ROOT / "tests")
     if (ROOT / ".DS_Store").exists():
         errors.append("packaging debris: .DS_Store")

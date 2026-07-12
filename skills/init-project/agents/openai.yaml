@@ -1,6 +1,6 @@
 interface:
   display_name: "Init Project"
-  short_description: "Create the universal project foundation without duplicate specialist questions"
+  short_description: "Create the universal project foundation once"
   default_prompt: "Inspect this repository, establish or repair its Universal Foundation, ask only undetectable universal project questions, and recommend the correct next doorway."
 
 policy:

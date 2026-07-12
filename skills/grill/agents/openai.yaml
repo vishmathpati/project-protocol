@@ -1,6 +1,6 @@
 interface:
   display_name: "Grill"
-  short_description: "A relentless one-question-at-a-time interview that sharpens a chapter's Goal + Plan before building — when scope is fuzzy and requirements need pressure-testing first"
+  short_description: "Pressure-test a chapter one question at a time"
   default_prompt: "Pressure-test this proposed chapter one decision at a time, read discoverable answers from the project, and produce a complete executable contract."
 
 policy:

@@ -109,7 +109,7 @@ Then tell the user: "Chapter NN reported and committed on `<branch>`. Tell the C
 ## Rules
 
 - Do ONE worker pass. Don't wander into other work, don't refactor unasked.
-- Write boundary is strict: code files + the chapter file only. Never the shared canon.
+- Write boundary is chapter-scoped: change only files the chapter genuinely requires. Canon changes are proposals in the worker branch until CEO approval and merge; shared-state reconciliation remains the CEO's job.
 - A chapter may carry multiple Completion Reports (one per specialist pass). **Append** yours as a new dated section; never overwrite a prior report.
 - The Completion Report template is fixed — the CEO reads these exact sections.
 - Ambiguity → Flag and stop, never guess.

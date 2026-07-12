@@ -1,6 +1,6 @@
 interface:
   display_name: "Marketing Brief"
-  short_description: "Build or resume brand-facing content, sitemap, copy, proof, and media canon"
+  short_description: "Build brand-facing content and marketing canon"
   default_prompt: "Read the project and brand foundations, resume the appropriate marketing stage, ask only marketing gaps, and write content intent without choosing page composition."
 
 policy:

@@ -1,6 +1,6 @@
 interface:
   display_name: "CEO"
-  short_description: "Orchestrate work as the boss who defines chapters, delegates to workers, and verifies results — for running the CEO/worker delegation loop"
+  short_description: "Define, delegate, verify, and integrate chapters"
   default_prompt: "Act as CEO: orient from live canon, define or verify chapters, review worker evidence and diffs selectively, and reconcile only approved work into the integration branch."
 
 policy:

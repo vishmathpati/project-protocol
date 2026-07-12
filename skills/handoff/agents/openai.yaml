@@ -1,6 +1,6 @@
 interface:
   display_name: "Handoff"
-  short_description: "Mid-task context carry-over note for when a session runs long or context fills up — distinct from Codex's built-in Handoff and the worker→CEO Completion Report"
+  short_description: "Carry unfinished work into the same checkout and role"
   default_prompt: "Create a durable carry-over and paste-ready cross-tool handoff for this exact repo, worktree, branch, role, chapter, checkpoint, and next action."
 
 policy:

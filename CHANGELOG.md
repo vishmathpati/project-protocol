@@ -28,6 +28,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Hooks narrowed to mechanics.** Session Start is minimal; PreCompact no longer writes timestamped backups; PostCompact routes same-role Recap; Stop only warns on likely unpersisted state; post-write scanning is centralized and deterministic.
 - **Migration is fail-closed.** Legacy consolidation preserves README and customized canon, skipped semantic deltas remain incomplete, explicit files are staged, and the version is stamped only after target validation succeeds.
 - **Codex metadata completed.** Every shipped skill sidecar now includes a default prompt alongside its display name and concise description.
+- **Worker ownership contradiction closed.** The final worker rules now match the governing chapter-scoped authority model: required canon edits are branch proposals, while CEO approval and reconciliation establish shared truth.
+- **Discovery metadata normalized.** Codex skill descriptions are concise and Build Page now advertises the substantial brand-facing lane instead of implying every dashboard page enters that workflow.
 
 ### Removed
 - **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.

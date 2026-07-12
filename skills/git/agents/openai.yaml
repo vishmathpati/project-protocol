@@ -1,6 +1,6 @@
 interface:
   display_name: "Git"
-  short_description: "Git under the protocol — for committing, branching, creating or syncing a worktree, merging canon, pushing, or reading a worker's branch"
+  short_description: "Run safe, worktree-aware Git operations"
   default_prompt: "Perform the requested Git operation while preserving unrelated work, respecting worktree ownership, and reporting the exact branch and remote state."
   brand_color: "#f05133"
 

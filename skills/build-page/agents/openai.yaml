@@ -1,6 +1,6 @@
 interface:
   display_name: "Build Page"
-  short_description: "Compose a whole page (marketing or dashboard) in a long iterative conversation — when an entire page needs to be designed and written against the locked brief and canon"
+  short_description: "Compose and verify a substantial brand-facing page"
   default_prompt: "Compose this substantial page from locked content, design canon, optional research, and existing components; record page decisions in the chapter and verify the rendered result."
 
 policy:

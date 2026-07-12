@@ -1,6 +1,6 @@
 interface:
   display_name: "Add Context"
-  short_description: "Add extended context files (data contracts, domain reference, integrations)"
+  short_description: "Add and index extended project context"
   default_prompt: "Add the requested context under brain/docs, then register it in brain/docs/INDEX.md and add only a concise trigger pointer to root CLAUDE.md."
   brand_color: "#475569"
 
