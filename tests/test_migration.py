@@ -81,6 +81,23 @@ class MigrationInspectorTests(unittest.TestCase):
                 self.assertTrue(data["validation"]["ok"])
             self.assertEqual(before, digest(project))
 
+    def test_v5_target_rejects_semantically_stale_claude(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            for relative in REQUIRED:
+                path = project / relative; path.parent.mkdir(parents=True, exist_ok=True); path.write_text("# valid\n")
+            (project / "brain/.plugin-version").write_text("5.0.0\n")
+            (project / "CLAUDE.md").write_text(
+                "# Project\n\nOne tool active at a time.\n\n"
+                "Log every change as it happens.\n\n## Hooks index\nOld hook manual.\n"
+            )
+            result, data = run(project, True)
+            self.assertNotEqual(result.returncode, 0)
+            codes = {item["path"] for item in data["validation"]["problems"]}
+            self.assertIn("CLAUDE.md:one-tool-only", codes)
+            self.assertIn("CLAUDE.md:per-action-worklog", codes)
+            self.assertIn("CLAUDE.md:embedded-hooks-index", codes)
+
 
 if __name__ == "__main__":
     unittest.main()

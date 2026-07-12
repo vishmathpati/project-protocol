@@ -32,6 +32,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Discovery metadata normalized.** Codex skill descriptions are concise and Build Page now advertises the substantial brand-facing lane instead of implying every dashboard page enters that workflow.
 - **Git ownership rule aligned.** The Git gate now preserves chapter-scoped worker authority instead of reintroducing the retired code-plus-chapter-only restriction; the structural audit guards both authority-bearing skills against regression.
 
+### Fixed
+- **Migration semantic validation.** Full CLAUDE modernization now starts from the concise v5 structure, preserves project-specific guardrails, and rejects stale one-tool-only, per-action WORKLOG, unconditional pull/push, embedded hook-index, situation-router, and pre-task-classification rules before stamping success.
+
 ### Removed
 - **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.
 - **Monolithic `design-direction`.** Its brand diagnosis moved to Brand Foundation, token/preview work to Style Lock, research to UI Research, and implementation to Build Page/Component. Forced three-direction generation was removed.

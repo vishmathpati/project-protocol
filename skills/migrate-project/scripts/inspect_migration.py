@@ -17,6 +17,15 @@ REQUIRED = (
 LEGACY_DIRS = ("cowork", "agents", "human")
 RETIRED_FILES = ("brain/SITUATIONS.md", "brain/CLAUDE.md")
 RETIRED_SKILLS = ("session-recap", "audit-before-close", "discussion-mode", "discipline")
+STALE_CLAUDE_RULES = (
+    ("one-tool-only", r"one (?:tool|session) active at a time"),
+    ("per-action-worklog", r"(?:per action|every change as it happens|worklog[^\n]{0,80}per action)"),
+    ("unconditional-pull-main", r"pull main before start"),
+    ("unconditional-chat-push", r"commit\s*\+\s*push before (?:leaving|closing) (?:any|every) chat"),
+    ("embedded-hooks-index", r"^## Hooks index\b"),
+    ("embedded-situation-router", r"^## Situation router\b"),
+    ("embedded-pre-task-classification", r"^## Pre-task classification\b"),
+)
 
 
 def version_key(value: str) -> tuple[int, int, int]:
@@ -50,6 +59,9 @@ def inspect(project: Path, plugin: Path, validate: bool) -> tuple[dict, int]:
         for skill in RETIRED_SKILLS:
             if re.search(rf"(?<![\w-]){re.escape(skill)}(?![\w-])", claude):
                 problems.append({"code": "retired-route", "path": f"CLAUDE.md:{skill}"})
+        for code, pattern in STALE_CLAUDE_RULES:
+            if re.search(pattern, claude, re.I | re.M):
+                problems.append({"code": "stale-claude-rule", "path": f"CLAUDE.md:{code}"})
 
     result = {
         "project_root": str(project), "plugin_root": str(plugin),

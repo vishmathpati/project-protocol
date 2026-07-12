@@ -1,7 +1,7 @@
 interface:
   display_name: "Migrate Project"
   short_description: "Transactionally migrate protocol canon to the installed version"
-  default_prompt: "Inspect the project and pending manifests, produce one dry-run plan, apply only safe deterministic changes, resolve semantic diffs explicitly, validate, and stamp the version only after success."
+  default_prompt: "Plan a safe migration, modernize CLAUDE concisely, validate every mandatory delta, then stamp the version."
 
 policy:
   allow_implicit_invocation: false

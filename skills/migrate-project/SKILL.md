@@ -30,6 +30,18 @@ Apply only transformations whose meaning is unambiguous: missing-file additions,
 
 For BRIEF consolidation, CLAUDE routing preservation, STATUS history reduction, BRAND/DESIGN normalization, SITUATIONS reconciliation, marketing layout retirement, and other meaning-dependent work: produce a proposed diff, explain what moves where, and wait for approval. Archive before removing uncertain content.
 
+When the user approves **full CLAUDE modernization**, use `templates/CLAUDE.md` as the structural base—not the old file as the base. Preserve only project-specific identity, essential coding/tooling/design guardrails, and extended-context pointers. Generic skill procedures live in installed skills. Generic hook behavior lives in the plugin. Fold only genuinely project-specific SITUATIONS routes; do not copy the full router into CLAUDE.
+
+Full modernization must remove obsolete operating rules and equivalent wording:
+
+- one tool/session active at a time;
+- per-action or every-change WORKLOG logging;
+- unconditional pull-main-before-starting;
+- unconditional commit-and-push-before-every-chat-closes;
+- embedded Hooks Index, Situation Router, or pre-task classification procedure.
+
+The v5 replacement is role-aware: humans choose CEO/worker/solo; concurrent workers use isolated worktrees; WORKLOG stores meaningful recovery notes; Save Session owns persistence; installed skill metadata owns routing. Show the proposed concise CLAUDE diff before writing.
+
 `skip` leaves the migration incomplete. It never counts as success and never permits the version stamp.
 
 ## 5. Validate transactionally
@@ -38,6 +50,7 @@ Run the inspector again with `--validate-target`. Confirm:
 
 - Required v5 files and routing exist.
 - Retired current-source names are gone.
+- Root CLAUDE is a concise project constitution/source index and contains no retired operating rules or embedded generic routing/hook manuals.
 - No meaningful source was silently deleted.
 - No application code changed.
 - Optional files remain conditional.
