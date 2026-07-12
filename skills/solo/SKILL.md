@@ -17,7 +17,7 @@ There is ONE canon: `brain/`.
 
 - `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
-- neither set → stamp `· Cowork`
+- neither set → stamp `· Agent` (treat as a full-capability host)
 
 ---
 
@@ -84,15 +84,7 @@ git add <changed files> brain/chapters/NN-name.md   # or brain/WORKLOG.md for tr
 git commit -m "<type>: <short summary> <author stamp>"
 ```
 
-**Pushing:** host tools (Claude Code / Codex) can push — `git push origin <branch>`. Cowork CANNOT push (no credentials); commit locally and emit the command for the user:
-
-````
-✅ Done + committed locally. Cowork can't push — run this to sync:
-
-```bash
-git push origin <branch>
-```
-````
+**Pushing:** push your branch — `git push origin <branch>`.
 
 Then capture the hash into the report's **Commit** line if you committed first.
 
@@ -103,4 +95,3 @@ Then capture the hash into the report's **Commit** line if you committed first.
 - Solo is for small work only. The moment it grows — multiple parts, decisions to lock, or a sensitive area (auth, money, deletion, security) — escalate to `/ceo` + `/worker`.
 - Report shape matches `/worker`'s Completion Report, so records stay consistent across all three skills.
 - Trivial work goes to WORKLOG; small-but-real work goes to a chapter file — **append** a new dated report if the chapter already exists, never overwrite a prior one.
-- Never push from Cowork; commit locally and emit the push command.

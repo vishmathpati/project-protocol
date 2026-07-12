@@ -21,7 +21,7 @@ Detect the author stamp (labels your entries only):
 
 - `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
-- neither set → stamp `· Cowork`
+- neither set → stamp `· Agent` (treat as a full-capability host)
 
 Confirm your location: `git rev-parse --abbrev-ref HEAD` and `git rev-parse --show-toplevel`. You should be on a worktree branch, NOT on `main`. If you're on `main`, STOP and tell the user — a worker works on a branch, not the canon.
 
@@ -97,10 +97,7 @@ git commit -m "chapter(NN): <name> — <short summary> <author stamp>"
 
 Capture the commit hash and branch name — they go in the report's **Commit** line (re-edit the report if you committed first, or amend).
 
-**Pushing:** a host tool (Claude Code / Codex) may push your branch so the CEO can pull it. Cowork CANNOT push (no credentials) — it commits locally only. Since worktrees share the same `.git`, the CEO can read your branch locally either way (`git show <branch>:brain/chapters/NN-name.md`, `git diff main..<branch>`), so a push is for syncing across machines, not required for the local CEO handoff.
-
-- Host tool: `git push -u origin <branch>` (then report the branch is pushed).
-- Cowork: commit locally; tell the user the branch is committed and ready for the CEO to verify locally; if they need it on another machine, they push.
+**Pushing:** you may push your branch so the CEO can pull it: `git push -u origin <branch>` (then report the branch is pushed). Since worktrees share the same `.git`, the CEO can read your branch locally either way (`git show <branch>:brain/chapters/NN-name.md`, `git diff main..<branch>`), so a push is for syncing across machines, not required for the local CEO handoff.
 
 Then tell the user: "Chapter NN reported and committed on `<branch>`. Tell the CEO: chapter NN done, check."
 
@@ -113,4 +110,4 @@ Then tell the user: "Chapter NN reported and committed on `<branch>`. Tell the C
 - A chapter may carry multiple Completion Reports (one per specialist pass). **Append** yours as a new dated section; never overwrite a prior report.
 - The Completion Report template is fixed — the CEO reads these exact sections.
 - Ambiguity → Flag and stop, never guess.
-- Never push from Cowork; commit locally. Worktrees share `.git`, so the CEO verifies your branch locally regardless.
+- Worktrees share `.git`, so the CEO can verify your branch locally regardless of whether you've pushed.

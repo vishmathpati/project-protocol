@@ -13,7 +13,7 @@ stand right now so work can continue without losing the thread.
 
 ## Step 1 — Read context
 
-> Single canon: all project state lives in `brain/`. Recap always reads `brain/STATUS.md` and `brain/WORKLOG.md` regardless of which tool (Claude Code, Codex, or Cowork) saved last — this is what prevents empty recaps.
+> Single canon: all project state lives in `brain/`. Recap always reads `brain/STATUS.md` and `brain/WORKLOG.md` regardless of which tool (Claude Code or Codex) saved last — this is what prevents empty recaps.
 
 Read in order:
 

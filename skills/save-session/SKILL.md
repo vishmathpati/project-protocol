@@ -18,7 +18,7 @@ We detect which tool is running ONLY to label entries — never to pick a folder
 
 - `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
-- neither set → stamp `· Cowork`
+- neither set → stamp `· Agent` (treat as a full-capability host)
 
 Call this value the **author stamp**. Apply it to the CHANGELOG dated section and the BRIEF version block below.
 
@@ -63,7 +63,7 @@ Append a new dated section at the top (below header):
 - [anything deliberately deleted]
 ```
 
-The author stamp is one of `· Cowork`, `· Claude Code`, `· Codex` (from Step 0).
+The author stamp is one of `· Claude Code`, `· Codex`, `· Agent` (from Step 0).
 
 If nothing shipped: `- No changes shipped this session.`
 
@@ -118,7 +118,7 @@ Append a new version block to `brain/BRIEF.md`:
 Rules:
 - Increment version from last block.
 - Include exact time (`date +%Y-%m-%d\ %H:%M`).
-- The author stamp is one of `· Cowork`, `· Claude Code`, `· Codex` (from Step 0).
+- The author stamp is one of `· Claude Code`, `· Codex`, `· Agent` (from Step 0).
 - Append only; never edit existing blocks.
 - If no significant decisions: skip this step.
 - **500-line limit:** if BRIEF.md approaches 500 lines, create `brain/BRIEF-2.md`, add pointer `> Continued in BRIEF-2.md` at the top of BRIEF.md, append the new block to BRIEF-2.md instead.
@@ -169,7 +169,7 @@ Otherwise: skip.
 Do **not** replace the entire file. Instead:
 
 1. Read the current contents of `brain/WORKLOG.md`.
-2. Determine the **author stamp** from Step 0 (one of `· Cowork`, `· Claude Code`, `· Codex`).
+2. Determine the **author stamp** from Step 0 (one of `· Claude Code`, `· Codex`, `· Agent`).
 3. Remove every entry (line or block) that is stamped with the current author stamp. Leave all entries stamped with other authors intact — those authors have not yet folded their work into CHANGELOG.
 4. If, after removing the current author's entries, no substantive entries remain (the file is empty or contains only whitespace/blank lines), write the canonical cleared-state marker as the file's sole content:
 
@@ -193,10 +193,7 @@ This is unconditional. `audit-before-close` is idempotent — if it was already 
 
 ## Step 10 — Git sync — environment-aware
 
-There are two real cases now, keyed on whether the runtime can push:
-
-- **Host tool (Claude Code or Codex)** — `CLAUDE_PLUGIN_ROOT` or `CODEX_PLUGIN_ROOT` is set. The runtime CAN commit and push. See branch (a) / (b).
-- **Cowork** — neither env var is set. Cowork CAN commit locally but CANNOT push (no credentials in its sandbox). See branch (c).
+Every host — `CLAUDE_PLUGIN_ROOT` set (Claude Code), `CODEX_PLUGIN_ROOT` set (Codex), or neither set (unknown host, stamp `· Agent`) — CAN commit and push. See branch (a) / (b).
 
 **Staging — same rule in every branch:**
 - Stage `brain/` (plus root `CLAUDE.md` / `README.md` if changed).
@@ -209,7 +206,7 @@ Determine the environment from the env vars above (this is the same detection us
 
 ### Branch (a) — host tool, working directly on `main`
 
-Detected when: `CLAUDE_PLUGIN_ROOT` or `CODEX_PLUGIN_ROOT` is set, AND `git rev-parse --abbrev-ref HEAD` returns `main`.
+Detected when: `git rev-parse --abbrev-ref HEAD` returns `main`.
 
 Simple add → commit → push:
 
@@ -229,7 +226,7 @@ If push fails (auth, non-fast-forward, network): **STOP** and report the exact e
 
 ### Branch (b) — host tool, on a worktree branch
 
-Detected when: `CLAUDE_PLUGIN_ROOT` or `CODEX_PLUGIN_ROOT` is set, AND current branch is NOT `main`.
+Detected when: current branch is NOT `main`.
 
 This is the existing merge-to-main flow:
 
@@ -278,39 +275,12 @@ If merge fails (conflicts): **STOP** — list conflicted files and tell the user
 
 ---
 
-### Branch (c) — Cowork (can commit, cannot push)
-
-Detected when: neither `CLAUDE_PLUGIN_ROOT` nor `CODEX_PLUGIN_ROOT` is set.
-
-Cowork CAN commit locally but CANNOT push (no credentials in its sandbox). So:
-
-1. Stage and commit locally (same staging rule above):
-
-```bash
-git add brain/ CLAUDE.md README.md
-git commit -m "chore(session): save session YYYY-MM-DD <author stamp>"
-```
-
-2. Then output the exact `git push` command as a copy-paste snippet for the user to run themselves:
-
-````
-✅ Committed locally. Cowork can't push — run this in your terminal to sync:
-
-```bash
-git push origin main
-```
-````
-
-Replace `YYYY-MM-DD` and `<author stamp>` with the actual values. Do NOT claim to have pushed. Note this in Step 11 with a ⚠️ line on the push status.
-
----
-
 ### 10-final — Report git outcome (feeds into Step 11)
 
 Capture for the final confirmation:
-- Which branch was taken (a / b / c)
+- Which branch was taken (a / b)
 - Files staged (count)
-- Branch pushed to origin (or "committed locally; push snippet provided" for Cowork)
+- Branch pushed to origin
 - Merge commit SHA on main (or "fast-forward" or "N/A — working on main")
 - Anything skipped or requiring user follow-up
 
@@ -337,12 +307,6 @@ If git sync was skipped or halted partway, replace the `✅ Git:` line with:
 
 ```
 ⚠️ Git: <what happened> — <exact command the user needs to run>
-```
-
-For Cowork sessions (branch c), replace the `✅ Git:` line with:
-
-```
-⚠️ Git: committed locally — Cowork can't push. Run the snippet above (`git push origin main`) in your terminal to sync.
 ```
 
 ---

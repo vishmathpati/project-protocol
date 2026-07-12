@@ -72,7 +72,7 @@ This can be multiple pages — paste everything at once.
 Type DONE on a new line when finished.
 ```
 
-In Cowork (single-message chat interface), paste all content in a single message and end with DONE on the last line. In Claude Code / Codex (multi-line input), you can send multiple messages and type DONE in the final one.
+In Claude Code / Codex (multi-line input), you can send multiple messages and type DONE in the final one.
 
 Accumulate all lines until "DONE" appears on its own line. Strip the "DONE" line.
 

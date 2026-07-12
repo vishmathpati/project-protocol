@@ -95,7 +95,7 @@ After the summary, list any `[VERIFY]` items and stubs that need filling:
 ```
 ✍  Authorship convention:
   Every WORKLOG, BRIEF, and CHANGELOG entry is stamped with who wrote it —
-  · Cowork, · Codex, or · Claude Code. There is no tier folder; the stamp is how
+  · Claude Code, · Codex, or · Agent (unknown host). There is no tier folder; the stamp is how
   authorship stays visible inside the single brain/ folder.
 ```
 
@@ -121,6 +121,6 @@ One-time setup, applies to all projects.
 ## When this skill ends
 
 Hand back control to the user. They take it from here — typically:
-- Open the relevant tool (Cowork chat for first orchestration session).
-- Tell Cowork: "Start by locking decisions in `brain/BRIEF.md` v1.0."
+- Open a CEO session (Claude Code) for first orchestration session.
+- Start by locking decisions in `brain/BRIEF.md` v1.0.
 - Then proceed via the `discipline` skill for any further edits.

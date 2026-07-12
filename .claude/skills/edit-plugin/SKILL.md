@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git:*,ls:*,cat:*,date:*,wc:*)
 
 # Edit Plugin — Self-Discipline for project-protocol
 
-This skill fires whenever an agent (Cowork, Claude Code, Codex) edits the **project-protocol plugin's own source code** — skills, hooks, commands, manifests, templates, version scripts, README, CHANGELOG.
+This skill fires whenever an agent (Claude Code, Codex) edits the **project-protocol plugin's own source code** — skills, hooks, commands, manifests, templates, version scripts, README, CHANGELOG.
 
 The problem it solves: an agent edits a skill, the user thanks them, the session moves on — but the change was never committed or pushed. The next time the user pulls from GitHub or reinstalls the plugin, the change is gone. This skill makes that impossible by chaining commit + push to every edit.
 

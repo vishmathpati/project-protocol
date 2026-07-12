@@ -62,7 +62,7 @@ Detect the author stamp (used to label every entry you write — never to pick a
 
 - `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
-- neither set → stamp `· Cowork`
+- neither set → stamp `· Agent` (treat as a full-capability host)
 
 Confirm where you are: run `git rev-parse --abbrev-ref HEAD` and `git worktree list --porcelain`. The CEO works on the **main / canon branch**. Workers live on their own worktree branches (Codex and Claude Code each create real worktrees that share this repo's `.git`). Branches sync locally through the shared `.git` — no GitHub needed to move commits between them.
 
@@ -184,18 +184,7 @@ Remove the worker's worktree once merged:
 git worktree remove <worktree-path>   # add --force only if you've confirmed nothing is unmerged
 ```
 
-**The push is the user's one manual step.** Cowork can read git and commit locally but CANNOT push (no credentials). Host tools (Claude Code / Codex) push. So:
-
-- If a host tool is running, push: `git push origin main`.
-- If running in Cowork, do NOT claim to have pushed. Emit the command for the user:
-
-````
-✅ Chapter NN merged + canon updated, committed locally. Cowork can't push — run this to sync:
-
-```bash
-git push origin main
-```
-````
+Push to sync the merge to GitHub: `git push origin main`.
 
 ---
 
@@ -221,6 +210,5 @@ Commit the chapter file on main, then tell the user to hand the chapter back to 
 - Trust the report by default; deep-check only on a trigger (Step 4).
 - The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections. You verify the latest unverified one.
 - Use the canonical `## Verdict — YYYY-MM-DD · CEO (<author stamp>)` heading consistently, appended under the report it judges — never overwrite an earlier Verdict.
-- Never push from Cowork. Commit locally and emit the push command for the user.
 - One chapter = one file. It may take ONE OR MORE worker passes (e.g. backend, UI, wire-up), each appending its own Completion Report + earning its own Verdict. Keep each pass small enough to verify.
 - **Won't-do habit:** whenever you and the user reject an idea, option, or direction during planning or chapter definition, immediately append one line to `brain/WONT-DO.md`: `YYYY-MM-DD · [author stamp] — what was rejected — one-line reason`. This prevents the same idea from surfacing again. Read `brain/WONT-DO.md` before proposing any new idea or direction.

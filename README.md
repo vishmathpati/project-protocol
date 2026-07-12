@@ -25,10 +25,6 @@ The first command registers the catalog (the `owner/repo` shorthand clones the r
 
 How a new version is detected: Claude Code resolves the plugin version from `version` in `plugin.json` first, then the marketplace entry, then the git commit SHA. This plugin sets `version` in `.claude-plugin/plugin.json`, so existing installs see a new version when that field is bumped on a release. (If the `version` field were omitted, every new commit on the default branch would count as a new version instead.)
 
-### Cowork (Claude desktop)
-
-**Team / Enterprise org.** Connect this repo as a GitHub-synced org marketplace in admin settings and turn on "sync automatically." Members then receive updates on their next session after a PR merges to the default branch. Org sync requires the repo to be **private** and the marketplace plugin `source` entries to be **relative paths within the repo** — this plugin's entry uses `"source": "./"`, which satisfies that.
-
 ### Codex
 
 Install via the co-located Codex manifest at `.codex-plugin/plugin.json`. Codex updates are manual — restart or re-sync after pulling a newer version. See [Compatibility](#compatibility) for the one-time `~/.codex/config.toml` setup that lets Codex read `CLAUDE.md` automatically.
@@ -77,7 +73,7 @@ Auto-fire on description match, also invokable via slash command.
 - **`discussion-mode`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
 - **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix.
 - **`design-check`** — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Step 8 auto-fixes mechanical violations (raw hex matching tokens, missing dimensions, ellipsis, nbsp, etc.) with user confirmation. Human-judgment violations are surfaced for user input only.
-- **`migrate-project`** — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Refuses to run in Cowork. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
+- **`migrate-project`** — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
 
 ### Build skills
 
@@ -121,7 +117,7 @@ project-root/
     └── chapters/          ← one .md per chapter (CEO defines, worker executes)
 ```
 
-The root `CLAUDE.md` is the brain — non-negotiable rules, skill index, hooks index, and a map of where everything lives. Every significant write to `BRIEF.md`, `STATUS.md`, `DISCOVERIES.md`, or `CHANGELOG.md` carries an author stamp (`· Cowork` / `· Claude Code` / `· Codex`) so the next agent can see who decided what. The old `.session-type` file is gone; author stamps carry that signal instead.
+The root `CLAUDE.md` is the brain — non-negotiable rules, skill index, hooks index, and a map of where everything lives. Every significant write to `BRIEF.md`, `STATUS.md`, `DISCOVERIES.md`, or `CHANGELOG.md` carries an author stamp (`· Claude Code` / `· Codex`) so the next agent can see who decided what. The old `.session-type` file is gone; author stamps carry that signal instead.
 
 ---
 

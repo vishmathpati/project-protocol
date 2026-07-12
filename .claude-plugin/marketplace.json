@@ -3,7 +3,7 @@
   "owner": {
     "name": "Vish Mathpati"
   },
-  "description": "Project session discipline for Claude Code, Codex, and Cowork.",
+  "description": "Project session discipline for Claude Code and Codex.",
   "plugins": [
     {
       "name": "project-protocol",

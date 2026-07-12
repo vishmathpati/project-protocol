@@ -78,9 +78,9 @@ On re-init / audit: overwrite with the current version after standards are re-ap
 
 When writing any WORKLOG / BRIEF / CHANGELOG entry, stamp it with the current author detected from the runtime:
 
-- `· Cowork` when running inside a Cowork session.
 - `· Codex` when `CODEX_PLUGIN_ROOT` is set.
 - `· Claude Code` when running as Claude Code.
+- `· Agent` when the host can't be determined.
 
 A reasonable detection (used only to choose the stamp string — nothing is persisted):
 
@@ -90,7 +90,7 @@ if [ -n "${CODEX_PLUGIN_ROOT:-}" ]; then
 elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
   AUTHOR="Claude Code"
 else
-  AUTHOR="Cowork"
+  AUTHOR="Agent"
 fi
 ```
 
@@ -128,7 +128,7 @@ fi
 
 ## Git rules
 
-**Commit format:** `type(scope): summary [ch-NN] · Agent` — Agent is `· Cowork`, `· Codex`, or `· Claude Code`.
+**Commit format:** `type(scope): summary [ch-NN] · Agent` — Agent is `· Claude Code` or `· Codex` (unknown host → `· Agent`).
 
 **Branches:** CEO works on `main` / the canon branch. Worker branches are named `ch-NN-name` (e.g. `ch-03-auth`).
 
@@ -138,9 +138,7 @@ fi
 
 **Write boundary:** workers edit code files and their own chapter file only. The CEO owns the shared canon: `brain/STATUS.md`, `brain/BRIEF.md`, `brain/ROADMAP.md`, `brain/WONT-DO.md`.
 
-**Cowork:** can commit locally but cannot push — it emits the push command for the human to run.
-
-Full per-tool procedures + Cowork git setup: see the `git` skill.
+Full per-tool procedures: see the `git` skill.
 
 ## Skill index — what's available and when to use it
 
@@ -159,7 +157,7 @@ Full per-tool procedures + Cowork git setup: see the `git` skill.
 | `calibrate` | Capture an annotated moodboard + follow/deviate/refuse conventions audit — the bridge inside design-direction, before the three directions. | `/calibrate` · "build the moodboard", "annotate references", "conventions audit" |
 | `discipline` | Pre-action gate before any non-trivial change — forces pause, declares cascades, verifies canon. | `/discipline` · "before I do this", "I'm about to edit Y" |
 | `discussion-mode` | No-edit conversation mode — prevents file edits during thinking or planning. | `/discussion-mode` · "discuss", "let's talk", "brainstorm", "explore" |
-| `git` | Commit/branch conventions, local worktree sync, push policy, Cowork git setup. | model-invoked |
+| `git` | Commit/branch conventions, local worktree sync, push policy. | model-invoked |
 | `grill` | Relentless interview to sharpen a chapter's goal or feature intent before building. | model-invoked |
 | `bug-fixing` | Repro-first bug discipline: reliable red/green reproduction, ranked hypotheses, fix, regression test. | model-invoked |
 | `handoff` | Write a Carry-over note into the active chapter when a session fills up, so the next session continues cleanly. | model-invoked |
@@ -274,7 +272,7 @@ If you change anything upstream, check everything downstream.
 | Design feels wrong / palette off / looks too generic | `design-direction` | `brain/BRAND.md` |
 | Raw hex / px / font-family values found in a component | `design-check` | `brain/FUNDAMENTALS.md` (Token Rule section) |
 | Want to commit, update WORKLOG, and close the session | `save-session` | `brain/STATUS.md` |
-| Committing, branching, syncing a worktree, or pushing — need git conventions or Cowork git setup | `git` | `brain/STATUS.md` (for branch context) |
+| Committing, branching, syncing a worktree, or pushing — need git conventions | `git` | `brain/STATUS.md` (for branch context) |
 | Setting up a brand new project or re-initializing | `init-project` | nothing (this is the entry point) |
 | Converting an old three-folder / flat-root project to the brain layout | `migrate-to-brain` | nothing (the migration entry point) |
 | Migrating an existing project to the current plugin version | `migrate-project` | `brain/.plugin-version` |
@@ -301,7 +299,7 @@ If you change anything upstream, check everything downstream.
 
 ```markdown
 # brain/STATUS.md
-> Last updated: YYYY-MM-DD · [Cowork | Codex | Claude Code]
+> Last updated: YYYY-MM-DD · [Claude Code | Codex | Agent]
 
 ## Current sprint
 [One-paragraph context]
@@ -315,7 +313,7 @@ If you change anything upstream, check everything downstream.
 - [questions or decisions that require a human session]
 
 ## Recent sessions (rolling 5)
-- YYYY-MM-DD · [Cowork | Codex | Claude Code]: [one-line summary]
+- YYYY-MM-DD · [Claude Code | Codex | Agent]: [one-line summary]
 
 ## Next actions
 1. [specific next step]
@@ -326,11 +324,11 @@ If you change anything upstream, check everything downstream.
 ```markdown
 # brain/BRIEF.md — Project Decisions
 > What we're building and why. Append-only. New version block per change.
-> Every version block is stamped with its author: · Cowork, · Codex, or · Claude Code.
+> Every version block is stamped with its author: · Claude Code, · Codex, or · Agent.
 
 ---
 
-## v1.0 — YYYY-MM-DD · [Cowork | Codex | Claude Code]
+## v1.0 — YYYY-MM-DD · [Claude Code | Codex | Agent]
 
 ### What we're building
 [One paragraph]
@@ -358,7 +356,7 @@ If you change anything upstream, check everything downstream.
 # brain/WONT-DO.md — Rejected Decisions
 > A running list of things we deliberately decided NOT to do, each with a one-line reason.
 > Append-only. When you reject an option during any session, add it here instead of burying it in chat.
-> Format: YYYY-MM-DD · [Cowork | Codex | Claude Code] — what we rejected — one-line reason.
+> Format: YYYY-MM-DD · [Claude Code | Codex | Agent] — what we rejected — one-line reason.
 
 ## Log
 (none yet — add a line each time an option is killed)
@@ -368,7 +366,7 @@ If you change anything upstream, check everything downstream.
 
 ```markdown
 # brain/ROADMAP.md — Direction & Phases
-> Owner: Vish + Cowork (joint). Agents execute against this; do not edit unless authorized.
+> Owner: the human + the CEO session (joint). Workers execute against this; do not edit unless authorized.
 
 ## Direction
 [One paragraph — what we're going toward]
@@ -386,7 +384,7 @@ If you change anything upstream, check everything downstream.
 ```markdown
 # brain/WORKLOG.md — Real-time work log
 > Real-time log. Cleared by save-session. Every entry is author-stamped.
-> Format per entry: YYYY-MM-DD HH:MM · [Cowork | Codex | Claude Code] — what was done.
+> Format per entry: YYYY-MM-DD HH:MM · [Claude Code | Codex | Agent] — what was done.
 
 > WORKLOG cleared — last session closed cleanly.
 ```
@@ -396,7 +394,7 @@ If you change anything upstream, check everything downstream.
 ```markdown
 # brain/CHANGELOG.md — Project history
 > Project history. Never cleared. Keep a Changelog format. Every entry is author-stamped.
-> Each dated block notes who wrote it: · Cowork, · Codex, or · Claude Code.
+> Each dated block notes who wrote it: · Claude Code, · Codex, or · Agent.
 
 ## [Unreleased]
 ```

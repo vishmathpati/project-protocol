@@ -20,7 +20,7 @@ There is ONE canon: `brain/`. The carry-over lives on the active chapter file (o
 
 - `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
-- neither set → stamp `· Cowork`
+- neither set → stamp `· Agent` (treat as a full-capability host)
 
 ---
 
@@ -71,7 +71,7 @@ Point the next session at the note in one line, e.g.:
 Carry-over written to brain/chapters/NN-name.md (## Carry-over). Next session: read that chapter + carry-over to resume.
 ```
 
-If this session can commit, fold the carry-over into the normal commit; if running in Cowork (no push), commit locally and emit the push command per the git skill. The carry-over is a note, not a Completion Report — it does not close the chapter.
+Fold the carry-over into the normal commit. The carry-over is a note, not a Completion Report — it does not close the chapter.
 
 ---
 

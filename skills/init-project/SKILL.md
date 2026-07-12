@@ -47,11 +47,11 @@ Every canon file stays SEPARATE by purpose. STATUS, BRIEF, WORKLOG, CHANGELOG ar
 
 There is no longer a "tier" or a `.session-type` marker. Instead, every **WORKLOG**, **BRIEF**, and **CHANGELOG** entry is stamped with who wrote it:
 
-- `· Cowork` — written during a Cowork orchestration session.
 - `· Codex` — written during a Codex session.
 - `· Claude Code` — written during a Claude Code session.
+- `· Agent` — written by a host that can't be determined.
 
-The stamp goes on the `> Last updated:` line and on each version/entry header. This makes authorship visible without splitting the project across three folders. Detect the current author at write time from the runtime (Cowork / Codex / Claude Code) — do not persist it to a marker file.
+The stamp goes on the `> Last updated:` line and on each version/entry header. This makes authorship visible without splitting the project across three folders. Detect the current author at write time from the runtime (Codex / Claude Code / Agent) — do not persist it to a marker file.
 
 ---
 

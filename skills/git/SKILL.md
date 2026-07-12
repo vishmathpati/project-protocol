@@ -1,6 +1,6 @@
 ---
 name: git
-description: Git operations under the Project Protocol — committing, branching, creating or syncing a worktree, merging canon locally, pushing, the CEO verify-by-reading loop, and one-time git setup in Cowork. Use whenever you commit, branch, create or sync a worktree, push, read a worker's branch, or touch git in any tool. The /ceo, /worker, and /solo roles call this. Triggers — "commit this", "make a branch", "create a worktree", "sync the canon", "merge main", "push", "set up git in Cowork", "git.lock", "git is stuck".
+description: Git operations under the Project Protocol — committing, branching, creating or syncing a worktree, merging canon locally, pushing, and the CEO verify-by-reading loop. Use whenever you commit, branch, create or sync a worktree, push, read a worker's branch, or touch git in any tool. The /ceo, /worker, and /solo roles call this. Triggers — "commit this", "make a branch", "create a worktree", "sync the canon", "merge main", "push", "git.lock", "git is stuck".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*, rm:*)
 ---
 
@@ -13,10 +13,6 @@ Two facts drive every rule below:
 1. **The canon is one folder — `brain/`.** Chapters live in `brain/chapters/NN-name.md`. The CEO owns the shared canon; workers own only their own chapter file + code.
 2. **Worktrees of a repo share ONE local `.git`.** A commit on any worktree's branch is instantly visible to every other worktree with **no push**. GitHub is a **BACKUP**, not the sync path. Moving work between worktrees is a *local* `git merge`, offline and instant.
 
-And one hard constraint:
-
-- **Cowork can read git and commit LOCALLY but CANNOT push** — it has no credentials in its sandbox. Host tools (Claude Code / Codex) push. In Cowork you commit, then emit the exact `git push` command for the user to run.
-
 ---
 
 ## Step 0 — Detect context
@@ -27,7 +23,7 @@ Two things to detect: which **tool** is running, and whether you're in a **workt
 
 - `CLAUDE_PLUGIN_ROOT` set → **Claude Code** · stamp `· Claude Code` · can push
 - `CODEX_PLUGIN_ROOT` set → **Codex** · stamp `· Codex` · can push
-- neither set → **Cowork** · stamp `· Cowork` · **cannot push** (commit locally, emit the push command)
+- neither set → stamp `· Agent` · treat as a full-capability host · can push
 
 **Worktree?** Run:
 
@@ -60,14 +56,14 @@ type(scope): summary [ch-NN] · Agent
 - **scope** — the area touched (a module, page, or `session`), optional but preferred.
 - **summary** — imperative, one line.
 - **`[ch-NN]`** — the chapter this work belongs to. **Omit it for non-chapter work** (e.g. session saves, plugin chores).
-- **Agent** — the author stamp from Step 0: `· Cowork`, `· Codex`, or `· Claude Code`.
+- **Agent** — the author stamp from Step 0: `· Claude Code`, `· Codex`, or `· Agent` (unknown-host fallback).
 
 Examples:
 
 ```
 feat(auth): add password reset flow [ch-03] · Codex
 fix(dashboard): correct totals rollup [ch-07] · Claude Code
-chore(session): save session 2026-06-24 · Cowork
+chore(session): save session 2026-06-24 · Claude Code
 ```
 
 **When to commit:**
@@ -181,37 +177,11 @@ Because each chapter is exactly one file owned by one worker, two workers in two
 - **Default: push at close.** End of session / chapter close, via `save-session`. That's the normal push point.
 - **A worker MAY push its branch manually** as a backup on a long or risky chapter — optional, never required for the handoff.
 - **The CEO↔worker verify loop never needs a push** — it's all local (Step 8).
-- **Whoever can push, pushes.** A host tool (Claude Code / Codex) runs `git push`. In **Cowork**, commit locally and **emit the exact `git push` command** for the user — never claim to have pushed.
-
-Cowork push snippet (emit verbatim, filling in the real branch):
-
-````
-✅ Committed locally. Cowork can't push — run this in your terminal to sync:
-
-```bash
-git push origin <branch>
-```
-````
+- **Whoever runs the session pushes at close.** The host tool (Claude Code / Codex / unknown-host `· Agent`) runs `git push`.
 
 ---
 
-## Step 7 — Cowork git setup (run on first git use in a Cowork session)
-
-The first time you touch git in a Cowork session, do this once so git behaves:
-
-1. **Recommend "Act without asking" mode.** Tell the user that switching Cowork to *Act without asking* lets git run its sequence of commands without a prompt on each one.
-2. **Ensure delete permission for the project folder.** Cowork blocks file deletes until the user grants delete permission for the folder — and that block **also stops git from managing its lock files**. Ask the user to grant delete permission for the project folder.
-3. **Auto-clear any stale lock.** If a previous run left a lock behind, clear it (safe when no git process is running):
-
-   ```bash
-   rm -f .git/index.lock
-   ```
-
-After these, **git works normally in Cowork** — commit / branch / merge all run locally. The only thing it still cannot do is **push**; commit locally and emit the push command (Step 6).
-
----
-
-## Step 8 — CEO verify-by-reading
+## Step 7 — CEO verify-by-reading
 
 The CEO verifies a worker's finished chapter **locally, with no GitHub** — the worktrees share `.git`, so the worker's branch is already readable:
 
@@ -231,7 +201,7 @@ git worktree remove <worktree-path>     # add --force only after confirming noth
 
 ---
 
-## Step 9 — Lockfile / dependency rule
+## Step 8 — Lockfile / dependency rule
 
 **Don't change lockfiles or dependencies in two worktrees at once** — they conflict at merge (lockfiles regenerate divergently and don't auto-merge).
 
@@ -244,15 +214,14 @@ git worktree remove <worktree-path>     # add --force only after confirming noth
 
 | Situation | Command / action |
 |---|---|
-| Which tool / can I push? | env vars (Step 0). Cowork = no push. |
+| Which tool / can I push? | env vars (Step 0). All hosts can push. |
 | Pull latest canon into a worktree | `git merge main` — local, offline (Step 3) |
 | Name a worker branch | `ch-NN-name` (Step 2) |
 | Commit message | `type(scope): summary [ch-NN] · Agent` (Step 1) |
 | New worktree, Claude Code | `worktree.baseRef: "head"` + `claude --worktree <name>` (Step 4) |
 | New worktree, Codex | "Worktree" thread, select canon branch as base (Step 4) |
-| CEO reads a worker's branch | `git show <branch>:…` + `git diff main..<branch>` (Step 8) |
-| Cowork git stuck on lock | `rm -f .git/index.lock` + grant delete perm (Step 7) |
-| Push | at close (default); Cowork emits the command (Step 6) |
+| CEO reads a worker's branch | `git show <branch>:…` + `git diff main..<branch>` (Step 7) |
+| Push | at close (default) (Step 6) |
 
 ---
 
@@ -260,7 +229,6 @@ git worktree remove <worktree-path>     # add --force only after confirming noth
 
 - The canon is one folder, `brain/`. Workers write code + their own chapter file only; the CEO owns the shared canon.
 - Worktrees share one local `.git` — sync between them with a **local merge**, never push-then-pull. GitHub is a backup.
-- Cowork commits locally and **never claims to have pushed** — it emits the `git push` command for the user.
 - New worktrees must branch from **local HEAD** of the canon branch (`baseRef: head` in Claude Code; select the canon branch in Codex), or you reintroduce "push first."
 - Don't touch lockfiles/dependencies in two worktrees at once — do them on the canon branch.
 - Every commit carries the author stamp; the final commit carries the Completion Report.

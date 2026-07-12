@@ -23,6 +23,7 @@ The research-engine release. `calibrate` grows from a single moodboard capture i
 
 ### Removed
 - **`edit-plugin` no longer ships to users** — it moved from `skills/edit-plugin/` to the repo's workshop-only `.claude/skills/edit-plugin/`. It is a plugin-*developer* tool (the discipline gate for editing this plugin's own source); end users who install project-protocol to build their own product never edit the plugin, so shipping it was noise. It still auto-loads when a developer opens this repo. Shipped skill count is now **26** (was 27). `init-project`'s generated skill index + situation router no longer list `edit-plugin`.
+- **Cowork support removed.** The plugin is now Claude Code + Codex only. Deleted: the Cowork no-push git machinery (git Step 7 setup, save-session branch (c), push-snippet emission), three-way tool detection (unknown hosts now stamp `· Agent` and are treated as full-capability), the Cowork README install section, and bump-version.sh's `--validate` Cowork-upload checks. The zip-era distribution (build.sh / install.sh / dist/) was removed in the same release. Legacy `cowork/` FOLDER references in migrate-to-brain are unaffected — that is the old layout's folder name, not the tool.
 
 ## [4.0.0] — 2026-07-11
 

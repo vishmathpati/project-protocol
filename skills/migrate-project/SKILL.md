@@ -28,7 +28,7 @@ Check environment variables to determine which tool is running this skill:
 
 - `$CLAUDE_PLUGIN_ROOT` is set → **Claude Code**
 - `$CODEX_PLUGIN_ROOT` is set → **Codex**
-- Neither is set → **Cowork**
+- Neither is set → stamp `· Agent`, treat as a full-capability host
 
 There is no `.session-type` file — do not look for one.
 
@@ -146,27 +146,13 @@ This advances the project's recorded version to the current plugin version. Skip
 
 ### 9. Commit the changes
 
-**Claude Code or Codex:** commit and push.
+All hosts (Claude Code, Codex, or unknown-host `· Agent`) commit and push.
 
 ```bash
 git add -A
 git commit -m "chore: migrate protocol files to v${PLUGIN_VERSION}"
 git push
 ```
-
-**Cowork:** commit locally, then emit the push command for the user to run.
-
-```bash
-git add -A
-git commit -m "chore: migrate protocol files to v${PLUGIN_VERSION}"
-```
-
-Then print:
-
-> Protocol files committed locally. Run the following to push:
-> `git push`
-
-Do not refuse to run in Cowork. Apply the migration, commit, and hand the push to the user.
 
 ### 10. End-of-skill summary
 
