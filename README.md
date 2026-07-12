@@ -8,7 +8,7 @@ Install once. Every project gets a shared system that works the same way no matt
 
 ## Install & updates
 
-The repo ships its own plugin marketplace (`.claude-plugin/marketplace.json`), so the marketplace is the primary install path on every tool. The built `.zip` in `dist/` is the manual fallback.
+The repo ships its own plugin marketplace (`.claude-plugin/marketplace.json`) — the marketplace is the install path on every tool.
 
 ### Claude Code (recommended)
 
@@ -29,22 +29,9 @@ How a new version is detected: Claude Code resolves the plugin version from `ver
 
 **Team / Enterprise org.** Connect this repo as a GitHub-synced org marketplace in admin settings and turn on "sync automatically." Members then receive updates on their next session after a PR merges to the default branch. Org sync requires the repo to be **private** and the marketplace plugin `source` entries to be **relative paths within the repo** — this plugin's entry uses `"source": "./"`, which satisfies that.
 
-**Personal (no org features).** Either add the marketplace from the repository (same flow as Claude Code), or drag the built zip `dist/project-protocol-vX.Y.Z.zip` into the Cowork chat window. The zip is the manual fallback — re-drag the newer zip to update.
-
 ### Codex
 
 Install via the co-located Codex manifest at `.codex-plugin/plugin.json`. Codex updates are manual — restart or re-sync after pulling a newer version. See [Compatibility](#compatibility) for the one-time `~/.codex/config.toml` setup that lets Codex read `CLAUDE.md` automatically.
-
-### Manual zip fallback (any tool)
-
-Download the latest `.zip` from [Releases](https://github.com/vishmathpati/project-protocol/releases), or build it yourself (see [Build from source](#build-from-source)), then:
-
-```bash
-# Claude Code
-claude plugin install ~/Downloads/project-protocol-vX.Y.Z.zip
-
-# Cowork (Claude desktop) — drag the .zip into the chat window
-```
 
 ---
 
@@ -170,21 +157,11 @@ project_doc_fallback_filenames = ["CLAUDE.md"]
 
 ---
 
-## Build from source
+## Developing this plugin
 
-```bash
-git clone https://github.com/vishmathpati/project-protocol
-cd project-protocol
-./build.sh
-```
+Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when you open *this* repo in Claude Code, and it never ships to users (the installed plugin loads `skills/` only). It chains commit + push to every source edit and enforces manifest discipline on version bumps. End users never edit this plugin, so they never see it.
 
-Outputs `project-protocol-vX.Y.Z.zip` in the `dist/` folder. This zip is the manual fallback documented under [Install & updates](#install--updates); the repo marketplace is the primary install path.
-
-To release: bump `version` in `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`, then run `./build.sh`. Bumping `version` in `plugin.json` is also what signals a new version to marketplace installs.
-
-### Developing this plugin
-
-Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when you open *this* repo in Claude Code, and it never ships to users (the installed plugin loads `skills/`, and the built zip copies `skills/` only). It chains commit + push to every source edit and enforces manifest discipline on version bumps. End users never edit this plugin, so they never see it.
+To release: run `scripts/bump-version.sh <new-version>` (syncs both plugin.json files + marketplace.json), add `migrations/vX.Y.Z.md` and a CHANGELOG entry, commit, push. Marketplace installs pick up the new version automatically.
 
 ---
 

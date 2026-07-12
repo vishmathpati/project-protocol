@@ -31,7 +31,10 @@ py_get_version() {
 import sys, json
 path, field = sys.argv[1], sys.argv[2]
 data = json.load(open(path))
-print(data[field])
+node = data
+for part in field.split('.'):
+    node = node[int(part)] if isinstance(node, list) else node[part]
+print(node)
 PYEOF
 }
 
@@ -45,7 +48,15 @@ import sys, json
 path, field, new_val = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(path) as f:
     data = json.load(f)
-data[field] = new_val
+parts = field.split('.')
+node = data
+for part in parts[:-1]:
+    node = node[int(part)] if isinstance(node, list) else node[part]
+last = parts[-1]
+if isinstance(node, list):
+    node[int(last)] = new_val
+else:
+    node[last] = new_val
 with open(path, 'w') as f:
     json.dump(data, f, indent=2)
     f.write('\n')   # trailing newline
