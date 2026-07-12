@@ -1,7 +1,7 @@
 interface:
   display_name: "UI Research"
-  short_description: "Research UI concepts and tear down a selected direction"
-  default_prompt: "Use the project's brand, content, target surface, and refusals to prepare a two-round Aside UI research mission, then ingest the evidence into research and moodboard canon."
+  short_description: "Discover UI concepts or inspect pinned references"
+  default_prompt: "Respect the user's target and reference scope, prepare the correct Aside mission, then ingest research and moodboard evidence."
 
 policy:
   allow_implicit_invocation: false

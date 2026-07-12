@@ -1,10 +1,10 @@
-# Research-Engine Interface Spec — v4.1 (single source of truth)
+# UI Research Interface Spec — v5 (single source of truth)
 
-> Committed home of the spec referenced by `skills/calibrate/` and `aside-skill/`. If a format
-> changes, change it HERE first, then `skills/calibrate/references/round-formats.md`, then both
-> consumers (`skills/calibrate/SKILL.md` and `aside-skill/design-research/SKILL.md`).
+> Committed home of the spec referenced by `skills/ui-research/` and `aside-skill/`. If a format
+> changes, change it HERE first, then `skills/ui-research/references/round-formats.md`, then both
+> consumers (`skills/ui-research/SKILL.md` and `aside-skill/ui-research/SKILL.md`).
 
-> This is the CONTRACT. The Aside skill, the mission-prompt template, and the calibrate
+> This is the CONTRACT. The Aside skill, the mission-prompt template, and the UI Research
 > orchestrator must all use these exact formats. Authors: obey this verbatim. Do not invent
 > alternative field names or block shapes.
 
@@ -15,16 +15,16 @@
 ```
                  STATIC (installed once in Aside)          DYNAMIC (regenerated per project/round)
                  ┌───────────────────────────┐            ┌──────────────────────────────┐
-                 │  design-research skill      │            │  mission prompt (from canon) │
+                 │  ui-research skill          │            │  mission prompt (from canon) │
                  │  (rounds, saturation, tiers,│            │  niche/register/refusals/... │
                  │   teardown checklist, output│            │  + this round's task         │
                  │   formats, comms protocol)  │            └──────────────────────────────┘
                  └───────────────────────────┘
                                                 RELAY (human = the wire)
-   calibrate (plugin) ──gen prompt──▶ human ──paste──▶ Aside chat ──research──▶ summary block
+   ui-research (plugin) ──gen prompt──▶ human ──paste──▶ Aside chat ──research──▶ summary block
                                         ▲                                          │
                                         └──────────── paste summary ◀──────────────┘
-   calibrate reads summary ──▶ decide/pick concept (with human) ──▶ gen Round-2 directive ──▶ paste ──▶ same Aside chat
+   ui-research reads summary ──▶ decide/pick concept (with human) ──▶ gen Round-2 directive ──▶ paste ──▶ same Aside chat
 ```
 
 Two lanes:
@@ -46,6 +46,22 @@ Usefulness is the only bar: a site earns its place by adding a concept, a better
 or a convention data point. Duration is never our concern — state this explicitly.
 Depth dial (quick/standard/deep) tunes *appetite/thoroughness*, NOT hard counts.
 
+A user-pinned reference list is not a hardcoded research count. It is an explicit scope boundary:
+inspect every supplied URL and discover no additional sites.
+
+## 1.1 Entry modes and precedence (v5 amendment)
+
+- **Discovery mode** — use when the user wants the field explored or has not selected references.
+  Run Round 1, human checkpoint, then Round 2.
+- **Provided-reference mode** — use when the user supplies/pins websites or explicitly requests a
+  locked set. Skip discovery and render the provided-reference teardown mission. Record the locked
+  focus and pinned URLs in `research/concepts.md`; do not invent alternative concepts or sites.
+
+The user's explicit target page/surface and reference constraints outrank STATUS, ROADMAP, prior
+next-actions, and inferred opportunities. Ask only for a missing target, missing pinned URLs, and
+research depth. Manual Aside prompt relay is the default transport; do not offer another browser
+unless the user requests an alternative or Aside is unavailable.
+
 ## 2. Canon field additions
 
 ### 2a. niche (load-bearing; the sweep keys off it)
@@ -53,21 +69,18 @@ In `brain/BRAND.md` under `## Product`:
 ```
 - Niche: [industry in plain words — e.g. "luxury hospitality — hotel, fine-dine, banquet, rooftop"]
 ```
-Deep path (design-direction Phase 7) and Quick path (init Phase 4) both populate it.
-`[VERIFY]` if auto-detected.
+Brand Foundation or migration may populate it from existing verified project truth. Mark `[VERIFY]`
+when inferred; UI Research does not rewrite BRAND.
 
-### 2b. research_depth (the depth dial)
-Asked once at kickoff (init Phase 4, alongside archetype). Stored in `brain/DESIGN.md` frontmatter:
-```
-research_depth: "[quick | standard | deep]"   # tunes sweep appetite + teardown thoroughness; NOT a count
-```
-quick = fast map, few concepts confirmed; standard = default; deep = exhaustive field map.
+### 2b. research depth (the invocation dial)
+Ask per UI Research invocation; do not store it in DESIGN. Quick is a fast confident pass,
+standard is the default, and deep chases edge variants. It tunes thoroughness, never counts.
 
 ## 3. Round 1 — SWEEP
 
 ### 3a. Mission prompt (Round 1) — sections IN ORDER
 Header line: `PROJECT-PROTOCOL DESIGN RESEARCH — ROUND 1 (SWEEP) — <project name>`
-1. **Role pointer**: "Run the design-research skill you have installed. This prompt is the project brief."
+1. **Role pointer**: "Run the ui-research skill you have installed. This prompt is the project brief."
 2. **Project context** (from canon, verbatim values):
    - Niche
    - Register: trust temperature · information density · tempo · cultural anchor
@@ -81,14 +94,14 @@ Header line: `PROJECT-PROTOCOL DESIGN RESEARCH — ROUND 1 (SWEEP) — <project 
    named concepts (as many as the field truly has). Saturation-driven — no target count.
    Tier discipline applies (ceiling sets craft bar; Pinterest texture-only). Agency-portfolio
    mining is a bonus move when a build credit appears, never the spine — sites first."
-4. **Depth**: research_depth value + its meaning.
+4. **Depth**: invocation depth value + its meaning.
 5. **Write to disk** (absolute paths given): `brain/research/concepts.md`, screenshots to `brain/moodboard/`.
 6. **Return**: "End by printing the ROUND-1 SUMMARY BLOCK below for me to paste back."
 
 ### 3b. `brain/research/concepts.md` (Aside writes to disk)
 ```
 # Field concepts — <niche>
-> Aside design-research · Round 1 sweep · <date> · <N> sites examined · depth: <dial>
+> Aside ui-research · Round 1 sweep · <date> · <N> sites examined · depth: <dial>
 
 ## Concept <A>: <name>
 Feeling: <one line — the emotional read>
@@ -137,11 +150,9 @@ QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
 The plugin receives the paste, validates (does concepts.md parse? screenshots present?), then
 presents the concepts for a decision. The human picks ONE, or BLENDS ("hero of A + type of B"),
 or asks for more. The decision is written to canon so all skills see it:
-- `brain/BRAND.md` → Decisions log line + Locked direction seed.
-- Concept choice recorded; blend expressed as explicit component-level picks.
-This is a conversation, not a menu dump. Phase 5's three directions are then built FROM the
-chosen concept — and Rule 7 still forces ≥1 direction to DEPART from everything found
-(the escape hatch from the old-style trap: concepts describe the field, never cap ambition).
+- Record the Round-2 focus inside `brain/research/concepts.md`; do not mutate BRAND or DESIGN.
+- Express a blend as explicit page/component-level picks.
+This is a conversation, not a menu dump. Research describes evidence and never becomes design authority.
 
 ## 5. Round 2 — DEEP TEARDOWN
 
@@ -211,40 +222,31 @@ FILES: brain/research/teardowns/<k> · brain/moodboard/<k> shots
 ═══ END ROUND-2 ═══
 ```
 
-## 6. Fold into canon (calibrate, plugin-side, after Round 2 paste)
+## 6. Ingest without changing design authority
 
-calibrate maps the returns onto EXISTING consumers (unchanged formats downstream):
-- `brain/moodboard/notes.md` — existing v4.0.0 per-entry format, now populated from the chosen
-  concept's torn-down sites (tier tag stays; "why it works" line now cites teardown evidence).
-- `brain/DESIGN.md` conventions audit (FOLLOW/DEVIATE/REFUSE) — existing block, now EVIDENCE-BACKED
-  (e.g. "9 of 12 hotels use full-bleed video hero" not a guess).
-- `brain/research/` files already on disk from Aside — the deep evidence Phase 6.5 (tokens) and
-  build-page's external-ref cross-check read.
-Then hand back to design-direction Phase 5 exactly as today (explicit `Skill()` call).
+UI Research validates and preserves the returned evidence under `brain/research/` and
+`brain/moodboard/`. It does not mutate BRAND or DESIGN. Page-specific choices belong in the
+relevant chapter; Style Lock or Build Page consumes the evidence later only when explicitly invoked.
 
-## 7. Three transport methods (same file contract for all three)
+## 7. Transport
 
-- **Primary: manual skill + prompt relay** (this spec). Aside runs the installed skill; the human
+- **Default: manual skill + prompt relay** (this spec). Aside runs the installed skill; the human
   relays the paste blocks. Works for any user, any project.
-- **Fallback A: MCP repl** (the tested runbook — never fullPage, one action/call, ./artifacts→cp).
-  Used when the plugin must drive Aside directly (no human relay available).
-- **Fallback C: pure paste** (no Aside FS access) — Aside prints everything; the plugin writes ALL
+- Do not present a transport-choice menu. Use another browser only when the user asks or Aside is unavailable.
+- **Fallback: pure paste** (no Aside FS access) — Aside prints everything; the plugin writes ALL
   canon from the paste blocks. This is why the blocks must be self-sufficient.
 
 ## 8. Where each piece lives
 
-- **`aside-skill/design-research/SKILL.md`** (standalone, installed into Aside once): everything in
+- **`aside-skill/ui-research/SKILL.md`** (standalone, installed into Aside once): everything in
   Aside's head — round structure, saturation law, tier map, traversal moves (awards→agency-portfolio
   bonus→competitors), teardown checklist, technical-detection cheatsheet (window.gsap/Lenis/Framer/
   document.fonts/:root palette/video-network), bot-wall + cookie-wall handling (skip, never fight),
   the two SUMMARY BLOCK formats to print, the disk-write paths convention, the "no hardcoded counts"
   law. NO project specifics — those come in the prompt.
-- **`skills/calibrate/references/mission-prompt-template.md`**: the fill-in-the-blanks template
-  calibrate renders from canon, Round-1 and Round-2 variants, with `<placeholders>` mapped to canon
+- **`skills/ui-research/references/mission-prompt-template.md`**: the fill-in-the-blanks template
+  UI Research renders from canon, discovery Round-1/Round-2 and provided-reference variants
   sources.
-- **`skills/calibrate/references/round-formats.md`**: the four block formats + two file formats above,
-  as the shared reference both calibrate and the Aside skill point to (single source, no divergence).
-- **`skills/calibrate/SKILL.md`**: the plugin-side orchestrator — gen Round-1 prompt from canon →
-  present to the human to paste → ingest Round-1 paste + validate → checkpoint (pick/blend, write
-  decision to canon) → gen Round-2 directive → ingest Round-2 paste + validate → fold into
-  moodboard/notes.md + DESIGN.md conventions audit → hand back to design-direction Phase 5.
+- **`skills/ui-research/references/round-formats.md`**: the relay/file formats shared by both sides.
+- **`skills/ui-research/SKILL.md`**: selects the entry mode, renders the Aside mission, ingests
+  evidence, and stops before Style Lock or Build Page.

@@ -141,3 +141,77 @@ FILES: brain/research/teardowns/<k> · brain/moodboard/<k> shots
 <brain-abs>       ← this project's brain/ absolute path (e.g. /Users/…/<project>/brain)
 <slug> <count> <k>  ← Aside fills at run time — never a preset target (Spec §1)
 ```
+
+---
+
+## Variant C — PROVIDED REFERENCES (CONSTRAINED TEARDOWN)
+
+Use when the user pins the complete reference set. This is a direct entry, not Round 2 of a sweep.
+
+```
+PROJECT-PROTOCOL UI RESEARCH — PROVIDED REFERENCES — <project>
+
+Run the ui-research skill you have installed. This prompt is the complete project mission.
+
+PROJECT CONTEXT
+- Target page/surface: <target>
+- Locked focus/direction: <locked-focus>
+- Audience and page goal: <audience-goal>
+- Existing design system: <design-summary>
+- Refusals: <refusals>
+
+PINNED REFERENCE SET — CLOSED
+<pinned-urls>
+
+SCOPE LAW
+Inspect every pinned URL and no other website. Do not discover replacements, competitors, award
+examples, agency work, or adjacent references. A pinned list is the user's scope boundary, not a
+target count. If a site is blocked, report the blocker and continue with the remaining pinned sites.
+Scope each teardown to <target>; do not inspect unrelated inner pages.
+
+DEPTH
+research depth: <research-depth> — <depth-meaning>
+
+TEARDOWN CHECKLIST (per pinned site)
+- Type: fonts actually loaded (`document.fonts`), weights, pairing, scale
+- Color: `:root` / computed palette and usage split
+- Motion: detected libraries/network/runtime plus actual behaviors
+- Hero: medium, composition, interaction, responsive changes
+- Rhythm: section sequence and transitions for the target page
+- Imagery/video: treatment, crops, masking, delivery
+- Navigation, mobile, accessibility, reduced motion, performance implications
+- FOLLOW / DEVIATE / REFUSE evidence for this project
+
+WRITE TO DISK
+- Locked focus + pinned URLs → <brain-abs>/research/concepts.md (preserve existing research)
+- Teardowns → <brain-abs>/research/teardowns/<slug>.md
+- Conventions → <brain-abs>/research/conventions.md
+- Screenshots + manifest → <brain-abs>/moodboard/
+
+RETURN
+Print the PROVIDED-REFERENCE SUMMARY block even when disk writes succeed.
+
+═══ PROVIDED-REFERENCE SUMMARY · <project> · <target> ═══
+PINNED SITES: <sites actually inspected>
+BLOCKED: <blocked URLs and reason | none>
+CONVERGENCE: Type · Color · Motion · Hero · Rhythm · Imagery · Navigation
+SITE-SPECIFIC MOVES: <site → useful evidence>
+CONVENTIONS: FOLLOW <…> | DEVIATE <…> | REFUSE <…>
+FILES: brain/research/concepts.md · brain/research/conventions.md · brain/research/teardowns/<k> · brain/moodboard/<k> shots
+QUESTIONS: <unresolved evidence gaps | none>
+═══ END PROVIDED-REFERENCE SUMMARY ═══
+```
+
+### Placeholder sources (Variant C)
+
+```
+<project>        ← BRAND/DESIGN project name
+<target>         ← user's explicit page/surface/region; never STATUS next action when they differ
+<locked-focus>   ← user's stated direction or existing approved BRAND/DESIGN decision
+<audience-goal>  ← target page brief/content plus relevant BRAND audience
+<design-summary> ← concise approved DESIGN identity/expression; never raw full-file paste
+<refusals>       ← relevant DESIGN/BRAND refusals
+<pinned-urls>    ← exact user-confirmed URL list; no inferred additions
+<research-depth> <depth-meaning> <brain-abs> ← same sources as Variants A/B
+<slug> <k>       ← Aside reports actual output counts
+```

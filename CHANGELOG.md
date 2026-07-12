@@ -35,6 +35,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ### Fixed
 - **Migration semantic validation.** Full CLAUDE modernization now starts from the concise v5 structure, preserves project-specific guardrails, and rejects stale one-tool-only, per-action WORKLOG, unconditional pull/push, embedded hook-index, situation-router, and pre-task-classification rules before stamping success.
 - **Custom CLAUDE instructions are protected.** Migration now inventories every existing block and asks before moving or removing user-authored, project-specific, personal, or unrecognized content. The default is to keep it verbatim; conciseness and “full modernization” never imply deletion authority.
+- **UI Research respects locked references.** Added discovery and provided-reference entry modes. Explicit user page/URL scope now outranks STATUS, pinned-site runs forbid discovery/substitution, and the Aside paste-prompt is the default instead of a transport-choice menu.
 
 ### Removed
 - **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.
