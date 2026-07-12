@@ -11,6 +11,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Separated brand and visual workflows.** Added Brand Foundation and Style Lock so brand truth, research evidence, and design tokens have distinct owners. Style Lock preserves the rich real-content preview as a deterministic HTML asset.
 - **Component inspection workflow.** Added Project Protocol and standalone Aside `inspect-component` skills for evidence-backed investigation of unclear external UI mechanics.
 - **Adaptive marketing templates.** Added BRAND, SITEMAP, PAGE-BRIEF, and MEDIA templates and replaced the SaaS-shaped CONTENT registry with an adaptive business-neutral contract.
+- **Deterministic Project Dashboard.** Added a stdlib-only generator for Project, Brand, Design, Research/Moodboard, and Build Progress tabs, with local/portable asset modes and embedded input hashes for staleness checks.
+- **Tested hook scripts.** Session drift, compaction recovery, stop warnings, and post-write UI findings now live in small Python scripts instead of opaque inline shell programs.
 
 ### Changed
 - **CEO/worker authority is chapter-scoped.** Workers may propose any chapter-required code or canon change in isolated worktrees; only CEO approval and merge establish shared canon.
@@ -21,11 +23,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Marketing is resumable Stage A/B.** It may run whenever brand-facing work becomes relevant, owns meaning/copy/media requirements, and no longer produces layout sketches.
 - **Frontend execution lanes clarified.** Brand-facing substantial pages use Build Page; conventional product/dashboard UI may follow established shadcn patterns directly; Build Component is only for a genuine missing component.
 - **Design Check split into preflight/postflight.** It verifies the correct surface, existing system, changed hunks, and render evidence without replacing Style Lock or Completion Check.
+- **Hooks narrowed to mechanics.** Session Start is minimal; PreCompact no longer writes timestamped backups; PostCompact routes same-role Recap; Stop only warns on likely unpersisted state; post-write scanning is centralized and deterministic.
 
 ### Removed
 - **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.
 - **Monolithic `design-direction`.** Its brand diagnosis moved to Brand Foundation, token/preview work to Style Lock, research to UI Research, and implementation to Build Page/Component. Forced three-direction generation was removed.
 - **Unsafe/duplicated marketing references.** Removed layout ownership, forced SaaS structures, and fictional proof/testimonial guidance.
+- **Hook noise and mutation.** Removed UserPromptSubmit classification, PreToolUse WORKLOG warnings, SubagentStart/Stop logging, cleared-WORKLOG assumptions, and backup-file accumulation.
 
 ## [4.1.0] — 2026-07-11
 

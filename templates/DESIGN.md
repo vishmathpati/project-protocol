@@ -182,11 +182,11 @@ Example: "Editorial, warm, considered. Slightly formal. References: Stripe Press
 
 ---
 
-## Archetype
+## Per-surface expression
 
-The single classification that selects everything below. Set once, at init.
+Choose the row per declared surface. The project may use several rows over one shared identity.
 
-| Archetype | Component source | Composition | Motion | Era-sensitivity | "Done" feels like |
+| Surface kind | Component source | Composition | Motion | Era-sensitivity | "Done" feels like |
 |---|---|---|---|---|---|
 | **dashboard / app** | shadcn primitives, re-skinned | repeat one grammar (repetition = usability) | functional micro-motion only | low — patterns are stable | invisible, zero friction |
 | **marketing / brand** | bespoke expressive components; libraries are craft *references*, never installed aesthetics | vary grammar per section (repetition = boredom) | register-driven, still → cinematic | **high — dated is fatal** | a feeling the visitor can name |

@@ -1,6 +1,6 @@
 # project-protocol
 
-A plugin for Claude Code and Codex (and any tool that supports the [agentskills.io](https://agentskills.io) standard) that gives every project a consistent session discipline — so your AI agent always knows where things stand, logs its work in real time, audits before closing, and hands off cleanly when a session ends.
+A project operating system for Claude Code and Codex: durable canon, role-aware sessions, isolated worktrees, disciplined engineering, optional brand/frontend expertise, and one generated human dashboard.
 
 Install once. Every project gets a shared system that works the same way no matter which agent you're using.
 
@@ -43,7 +43,7 @@ Work is organized around three roles:
 - **Worker** — executes one chapter in an isolated worktree and writes an evidence-rich Completion Report.
 - **Solo** — single-agent mode for smaller tasks that don't need the CEO/worker split.
 
-Invoke a role with `/ceo`, `/worker`, or `/solo` at the start of a session. The CEO defines chapters in `brain/chapters/`. Each chapter is a scoped unit of work executed by a worker in an isolated git worktree; the CEO verifies the Completion Report and merges. The `handoff` skill (model-invoked) signals the end of a worker session and packages the report for CEO review.
+Invoke `/ceo`, `/worker`, or `/solo` deliberately at session start; the role runs Recap from live Git and canon. Workers report finished work through Completion Reports. Handoff is reserved for unfinished cross-session or cross-tool continuity.
 
 ### Session lifecycle (the core 4)
 
@@ -60,7 +60,7 @@ Invoke a role with `/ceo`, `/worker`, or `/solo` at the start of a session. The 
 - **`handoff`** — Durable carry-over plus a paste-ready packet for continuing unfinished work in the same branch/worktree.
 - **`git`** — Git operations gate. Validates branch state, enforces commit message discipline, guards against unintended force-pushes.
 - **`grill`** — Adversarial review: stress-tests a plan, implementation, or decision before it ships.
-- **`bug-fixing`** — Structured bug investigation: reproduce → isolate → fix → verify, with WORKLOG entries at each step.
+- **`bug-fixing`** — Structured bug investigation: reproduce → isolate → fix → verify, recording only meaningful recovery evidence.
 - **`migrate-to-brain`** *(temporary)* — One-time structural migration from the old three-folder layout (`cowork/`, `agents/`, `human/`) to `brain/`. Merges duplicates, confirms before writing, removes `agents/.session-type`.
 
 ### Discipline skills
@@ -86,6 +86,7 @@ Invoked explicitly — via `Skill()` calls from other skills, slash commands, or
 - **`ui-research`** — Optional two-round Aside workflow: sweep a niche into named concepts, let the human pick/blend, then deeply tear down the selected concept.
 - **`inspect-component`** — Investigates one exact external UI region when its implementation mechanics are unclear.
 - **`style-lock`** — Converts brand, content, research, existing tokens, and surface needs into an approved visual system through a real-content preview.
+- **`project-dashboard`** — Deterministically renders Project, Brand, Design, Research/Moodboard, and Build Progress tabs from Markdown canon; `--check` detects staleness.
 
 The Aside package ships standalone `ui-research` and `inspect-component` skills under `aside-skill/`. Upload them into Aside; Project Protocol supplies each project mission and ingests the evidence.
 
@@ -93,7 +94,7 @@ The Aside package ships standalone `ui-research` and `inspect-component` skills 
 
 ## Project layout
 
-When `init-project` runs on v3.0.0, it creates this structure in your project:
+Universal Foundation creates the core files; specialist groups add their optional canon when used:
 
 ```
 project-root/
@@ -115,13 +116,14 @@ project-root/
     ├── DISCOVERIES.md
     ├── moodboard/         ← local screenshots + manifest.md from UI Research
     ├── research/          ← concepts, conventions, teardowns, component inspections
+    ├── project-dashboard.html  ← generated view; never source of truth
     ├── docs/
     │   ├── INDEX.md
     │   └── detail/
     └── chapters/          ← one .md per chapter (CEO defines, worker executes)
 ```
 
-The root `CLAUDE.md` is the brain — non-negotiable rules, skill index, hooks index, and a map of where everything lives. Every significant write to `BRIEF.md`, `STATUS.md`, `DISCOVERIES.md`, or `CHANGELOG.md` carries an author stamp (`· Claude Code` / `· Codex`) so the next agent can see who decided what. The old `.session-type` file is gone; author stamps carry that signal instead.
+Root `CLAUDE.md` is the concise constitution, skill router, and source index. Detailed truth stays in its owning canon file. The generated dashboard is only a human-readable projection of those sources.
 
 ---
 
@@ -131,9 +133,16 @@ AI agents forget everything between sessions. This plugin fixes that by keeping 
 
 `brain/WORKLOG.md` is a temporary recovery buffer for meaningful progress, decisions, blockers, failed attempts, and next actions. Save Session folds durable information into its proper owner and removes only recovery entries that were safely folded.
 
-The **discipline skills** add a second layer: gates that fire automatically when their description matches the conversation. They force the agent to verify before acting, read before answering, and audit before closing — the patterns that fail in untrained agent sessions.
+Mechanical hooks provide reminders and deterministic findings; skills own judgment. Hooks never choose roles, approve work, save, research, merge, or regenerate the dashboard.
 
-**CEO/worker/solo model.** For non-trivial work the CEO breaks the project into chapters, each chapter is a scoped unit a worker picks up in an isolated git worktree. The worker executes, writes a Completion Report, and calls `handoff`. The CEO reviews and merges. This keeps individual sessions small and the audit trail clean. Solo mode collapses the model to a single agent for simpler work.
+**CEO/worker/solo model.** The CEO defines and verifies durable chapters; workers execute them in isolated worktrees and report evidence; solo collapses the model for genuinely small work. Save persists state, Completion Check proves done, and Handoff transfers unfinished work.
+
+### Mechanical hooks
+
+- Session Start: role/Recap reminder plus version-drift detection.
+- PreCompact/PostCompact: branch/worktree recovery context and same-role Recap routing; no backup-file accumulation.
+- Stop: warning only when Git or WORKLOG suggests unpersisted state.
+- Post-write: deterministic UI findings, Design Check routing, and Style Lock synchronization reminder after DESIGN changes.
 
 **Multiple tools, isolated work.** Claude Code and Codex may work on separate chapter worktrees. Git branches and chapter contracts establish ownership; author stamps record provenance.
 

@@ -30,7 +30,7 @@ Read in order:
    - If there are uncommitted changes, summarize them briefly.
 2. Root `CLAUDE.md` — overall project orientation: active skills, rules.
 3. `brain/STATUS.md` — project health, blockers, last-known state.
-4. Tail of `brain/WORKLOG.md` — real-time log of this session's events. Read the last 50 lines; do not read the entire file.
+4. Tail of `brain/WORKLOG.md` — meaningful recovery notes for unfinished work. Read only the useful tail.
 
 ---
 

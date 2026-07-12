@@ -1,0 +1,7 @@
+interface:
+  display_name: "Project Dashboard"
+  short_description: "Generate the human-readable project dashboard"
+  default_prompt: "Generate or check the deterministic Project Dashboard from Markdown canon and local research assets without creating a second source of truth."
+
+policy:
+  allow_implicit_invocation: false
