@@ -69,11 +69,11 @@ Vercel, Linear, and every premium product follow this ratio intentionally. Their
 
 ---
 
-## Motion Spec (archetype, easing, frequency)
+## Motion Spec (surface register, easing, frequency)
 
-The Motion Principles above are the floor. This is the rest of the system. Motion has two archetypes — pick one per surface before you animate anything.
+The Motion Principles above are the floor. Pick a motion register per surface before animating.
 
-### The two archetypes
+### Two useful registers
 
 | | **Productive** | **Expressive** |
 |---|---|---|
@@ -82,7 +82,7 @@ The Motion Principles above are the floor. This is the rest of the system. Motio
 | Duration | **70–240 ms** | up to **700 ms** |
 | Feel | Efficient, nearly subliminal | Deliberate, choreographed |
 
-A dashboard that animates like a landing page feels slow. A landing page that animates like a dashboard feels cheap. Match the archetype to the surface (it's the `archetype:` field in `DESIGN.md`).
+A dashboard that animates like a cinematic landing page feels slow. A brand-facing page with no expressive rhythm can feel generic. Match the register declared for the surface in DESIGN.
 
 ### Representative easing curves
 
@@ -104,7 +104,7 @@ A dashboard that animates like a landing page feels slow. A landing page that an
 
 ### The frequency law
 
-- An action performed **100+ times a day** gets **no animation.** Frequency turns delight into friction.
+- As a heuristic, very frequent actions usually need no decorative animation. Frequency turns delight into friction; preserve only truthful state feedback.
 - A **keyboard-initiated** action is **never** animated. Keyboard = they want speed, not choreography.
 
 ### Rules, not taste
@@ -113,7 +113,7 @@ A dashboard that animates like a landing page feels slow. A landing page that an
 - **Press feedback:** `scale(0.97)` on `:active`. Registers touch without bouncing.
 - **Stagger** grouped reveals **30–80 ms** apart. More reads as a slideshow.
 - **Replay on re-scroll.** Scroll reveals must re-fire when the element re-enters, not one-shot — a reveal that fires once then shows nothing on scroll-back looks broken.
-- **`prefers-reduced-motion` = gentler, not zero.** Cut travel and duration; keep a short opacity fade.
+- **`prefers-reduced-motion`** removes or substantially reduces nonessential movement. Keep only communication that remains necessary, without requiring a fade.
 - **Animate `transform` and `opacity` only.** Never `transition: all`.
 
 ---
@@ -304,7 +304,7 @@ The Images craft rules above (`width`/`height`, `fetchpriority`, `alt`, `lazy`) 
 
 Build a site in this sequence. The order is not preference — each step exists so the next one has something to stand on. Out of order means rework.
 
-1. **Tokens.** Locked in `design-direction` before any component exists. Nothing gets built against unlocked tokens.
+1. **Tokens.** Locked through Style Lock when a new visual system is required. Existing successful product systems may continue from their established tokens.
 2. **Global shell.** Nav, footer, page skeleton, base primitives — built once, used by every page. **The nav gets the strictest review of anything on the site, because it appears on — and breaks on — every page.**
 3. **Home page — hardest first.** It births the reusable kit and sets the quality bar every other page inherits.
 4. **Internal pages — mostly reuse.** Each is composed largely from the kit the home page produced. **An internal page may introduce at most 1–2 new component shapes** — more means the kit is too small (fix the kit) or the page is showing off (rein it in).

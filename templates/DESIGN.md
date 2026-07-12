@@ -1,15 +1,11 @@
 ---
 version: alpha
 name: "[Project Name]"
-archetype: "[dashboard | marketing | content | commerce | app]"
-# The ONE classification that selects the rulebook. Set once at init; drives component source, composition, motion class, era-sensitivity.
-#   dashboard / app → consistency wins · shadcn primitives · repeat one composition grammar · functional motion only · low era-sensitivity
-#   marketing       → expression wins · bespoke expressive components · vary grammar per section · register-driven motion · high era-sensitivity (dated is fatal)
-#   content         → reading comfort wins · one strong column · minimal motion
-#   commerce        → conversion + trust · product-grid patterns · restrained motion
-# A project may host two archetypes (app + its marketing site); identity (fonts, palette) stays shared, expression tier differs — see per-surface overrides at the bottom.
-research_depth: "[quick | standard | deep]"   # tunes Aside sweep appetite + teardown thoroughness; NOT a count
-# Asked once at init (Phase 4, alongside archetype). quick = fast map, few concepts confirmed; standard = default; deep = exhaustive field map.
+surfaces:
+  "[part-id]":
+    kind: "[marketing | product | dashboard | content | commerce | mobile | desktop]"
+    expression: "[productive | restrained | editorial | expressive | cinematic]"
+# Identity tokens are shared. Each real surface declares its own expression; research depth belongs to UI Research, not DESIGN.
 
 # UNIVERSAL TOKENS — applied to all surfaces (marketing, dashboard, desktop, etc.)
 
@@ -18,7 +14,7 @@ font:
     family: "[font]"             # e.g. "Migra", "Editorial New", "Tobias", "Cooper"
     fallback: "[font], serif"
     role: "headlines, hero, brand moments"
-    banned: ["Inter", "Geist", "Söhne", "IBM Plex", "SF Pro", "Roboto", "Space Grotesk", "Open Sans", "Public Sans", "system-ui"]  # not allowed as display
+    avoid_by_default: ["Inter", "Geist", "Söhne", "IBM Plex", "SF Pro", "Roboto", "Space Grotesk", "Open Sans", "Public Sans", "system-ui"]  # heuristic; intentional surface-specific exceptions allowed
   body:                          # WAYFINDING job — must be invisible
     family: "[font]"             # Inter/Geist/Söhne acceptable here
     fallback: "[font], sans-serif"
@@ -27,7 +23,7 @@ font:
     family: "[font]"             # e.g. "JetBrains Mono", "Geist Mono", "Berkeley Mono"
     role: "code, numeric data, tabular"
 
-icon:                            # ONE family, chosen at design-direction lock, matched to the letterforms
+icon:                            # ONE family, chosen at Style Lock, matched to the letterforms
   family: "[library]"            # default "Lucide"; alternatives "Phosphor", "Radix Icons", or a custom set
   style: "[stroke/weight]"       # e.g. "line, 1.5px stroke, rounded" — must echo the display/body character
   # never mix families · never emoji-as-icon (see DO NOT) · currentColor, sized on the 16/20/24 grid
@@ -197,7 +193,7 @@ The single classification that selects everything below. Set once, at init.
 | **content / editorial** | typography system + a few patterns | one strong column, rhythmic breaks | minimal; never between reader and text | medium | reader forgets the interface |
 | **commerce** | product-grid + trust patterns | scannable, consistent | restrained | medium | frictionless path to buy |
 
-The identity layer (fonts, palette, tokens) is shared across a project's surfaces. What the archetype switches is *expression* — how loud, how varied, how much motion. A product and its marketing site can be two archetypes over one identity (the Adobe Consonant model): same atoms underneath, different expression tier above.
+The identity layer (fonts, palette, tokens) is shared. Each declared surface selects its own expression—how loud, varied, dense, or motion-led it should be—without pretending the whole project has one archetype.
 
 ---
 
@@ -367,17 +363,17 @@ Motion is a **register dial set per brand**, not a fixed rule — a law firm is 
 - **Entrances ease-out; exits accelerate; never ease-in on UI.** One easing family so everything feels related.
 - **Frequency law:** the more often an action fires, the less it animates. Keyboard-initiated / 100×-a-day actions get no animation.
 - **Never `scale(0)`** — enter from `scale(0.95)` + opacity. Press feedback `scale(0.97)`.
-- **Scroll reveals replay** on re-entry — they are not one-shot. A page that goes static after first scroll reads dead.
-- **`prefers-reduced-motion` = gentler, not zero.** Keep opacity/color, drop transform movement and parallax.
+- Scroll replay is chosen per surface and motion register. Never leave content invisible or interactions broken after re-entry.
+- Under `prefers-reduced-motion`, remove or substantially reduce nonessential movement; preserve necessary state communication without forced animation.
 - **Animate `transform` / `opacity` only.** Never `transition: all`.
 
-The productive-vs-expressive split maps to the archetype: dashboard = productive curves + fast tokens; marketing = expressive curves + moderate/slow tokens.
+Map productive or expressive motion per surface, not per project.
 
 ---
 
 ## Icons
 
-One family for the whole project, chosen at design-direction lock and matched to the letterforms — geometric type takes geometric icons, humanist type takes softer ones. Default **Lucide**; alternatives Phosphor / Radix / a custom set.
+One family for the whole project, chosen at Style Lock and matched to the letterforms — geometric type takes geometric icons, humanist type takes softer ones. Default **Lucide**; alternatives Phosphor / Radix / a custom set.
 
 - One library only — mixed sets betray themselves via stroke weight and corner radius.
 - Stroke weight matches the type; size on the 16 / 20 / 24 grid; `currentColor`.

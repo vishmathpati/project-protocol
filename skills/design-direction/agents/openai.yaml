@@ -1,7 +1,0 @@
-interface:
-  display_name: "Design Direction"
-  short_description: "Deep brand-direction diagnostic — when a project's brand and design system need to be established or re-anchored from a raw brand dump"
-  brand_color: "#475569"
-
-policy:
-  allow_implicit_invocation: true

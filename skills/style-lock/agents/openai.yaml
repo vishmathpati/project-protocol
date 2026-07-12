@@ -1,0 +1,7 @@
+interface:
+  display_name: "Style Lock"
+  short_description: "Turn approved brand and research into verified design tokens"
+  default_prompt: "Read the brand, content, research, existing design system, and surfaces; propose one coherent token direction, render the preview, and write DESIGN.md only after approval."
+
+policy:
+  allow_implicit_invocation: false

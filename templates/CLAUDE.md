@@ -28,4 +28,4 @@ Read optional canon when relevant: `ROADMAP.md`, `BRAND.md`, `DESIGN.md`, `FUNDA
 
 ## Skill router
 
-Use the installed Project Protocol skill whose description matches the situation. Core doorways: `init-project`, `ceo`, `worker`, `solo`, `recap`, `handoff`, `save-session`, `completion-check`, `project-audit`, `change-check`, `discuss`, `git`, `grill`, `bug-fixing`, and `test-driven-development`.
+Use the installed Project Protocol skill whose description matches the situation. Core doorways: `init-project`, `ceo`, `worker`, `solo`, `recap`, `handoff`, `save-session`, `completion-check`, `project-audit`, `change-check`, `discuss`, `git`, `grill`, `bug-fixing`, and `test-driven-development`. Brand/frontend group: `brand-foundation`, `marketing-brief`, `ui-research`, `style-lock`, `build-page`, `build-component`, `inspect-component`, and `design-check`.

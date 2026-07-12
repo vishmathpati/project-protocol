@@ -1,0 +1,7 @@
+interface:
+  display_name: "Inspect Component"
+  short_description: "Investigate how a specific external UI region works"
+  default_prompt: "Prepare an Aside mission for this exact URL and component region, capture implementation evidence, and write a reusable component inspection report without copying proprietary code or assets."
+
+policy:
+  allow_implicit_invocation: false

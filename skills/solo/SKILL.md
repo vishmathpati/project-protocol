@@ -46,7 +46,7 @@ Make the change directly. Read the slice of canon you need; edit the code files.
 
 When building a feature or fixing a bug, invoke `test-driven-development` for the implementation (RED-GREEN-REFACTOR); for a bug, `bug-fixing` provides the structured repro that becomes the RED test.
 
-When the work creates or modifies any page or UI component — files under a `components/`, `app/`, `pages/`, or `marketing/` path, or the job is visual — do NOT hand-roll the UI. Route it explicitly: call `Skill("build-page")` for a whole page and/or `Skill("build-component")` for a component. The `design-check` gate fires per the existing PostToolUse hook. UI touched by hand, bypassing the design skills, is out of bounds even in solo mode.
+For UI work, run Design Check preflight and use the established component system. Brand-facing substantial pages use Build Page. Conventional dashboard/product UI may proceed directly with existing patterns and shadcn. Build Component is for a genuine gap; UI Research and Inspect Component are explicit optional tools.
 
 ---
 

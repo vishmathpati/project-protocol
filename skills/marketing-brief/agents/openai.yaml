@@ -1,7 +1,7 @@
 interface:
   display_name: "Marketing Brief"
-  short_description: "End-of-project marketing-site planning pass — when the project is ready to plan its marketing site and needs canonical content, sitemap, copy, and layout briefs before any marketing pages are built"
-  brand_color: "#475569"
+  short_description: "Build or resume brand-facing content, sitemap, copy, proof, and media canon"
+  default_prompt: "Read the project and brand foundations, resume the appropriate marketing stage, ask only marketing gaps, and write content intent without choosing page composition."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

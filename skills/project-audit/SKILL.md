@@ -65,7 +65,7 @@ Findings here are category (A) — real violations.
 
 **4. Garbage-collect `brain/preview/`.**
 
-`design-direction` writes versioned HTML preview files to `brain/preview/<direction-slug>-<date>.html`. These accumulate over multiple runs and are never automatically cleaned.
+Style Lock may write versioned HTML previews to `brain/preview/<direction-slug>-<date>.html`. Treat them as generated artifacts; report stale previews but do not delete without confirmation.
 
 1. List all files in `brain/preview/` (if the folder exists).
 2. Group by direction-slug (the filename prefix before the date).

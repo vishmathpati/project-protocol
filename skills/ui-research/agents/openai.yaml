@@ -1,0 +1,16 @@
+interface:
+  display_name: "UI Research"
+  short_description: "Research real UI concepts, then deeply tear down the selected direction"
+  default_prompt: "Use the project's brand, content, target surface, and refusals to prepare a two-round Aside UI research mission, then ingest the evidence into research and moodboard canon."
+
+policy:
+  allow_implicit_invocation: false
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "aside"
+  references:
+    - "aside-skill/ui-research/SKILL.md"
+    - "references/mission-prompt-template.md"
+    - "references/round-formats.md"

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Brand Foundation"
+  short_description: "Establish brand truth without repeating project questions"
+  default_prompt: "Read the Universal Foundation and existing brand canon, ask only brand-specific gaps, diagnose the brand in plain language, and update BRAND.md after confirmation."
+
+policy:
+  allow_implicit_invocation: false

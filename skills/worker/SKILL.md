@@ -44,7 +44,7 @@ Read `brain/chapters/NN-name.md` — its **Goal**, **Plan**, and **Constraints /
 
 When the chapter is building a feature or fixing a bug, invoke `test-driven-development` for the implementation (RED-GREEN-REFACTOR); for bug chapters, the repro step is the RED test — use `bug-fixing` alongside it for structured investigation.
 
-When the chapter creates or modifies any page or UI component — files under a `components/`, `app/`, `pages/`, or `marketing/` path, or a Goal that is visual — do NOT hand-author the UI. Route it explicitly, the same way a feature routes through `test-driven-development`: call `Skill("build-page")` for a whole page and/or `Skill("build-component")` for a component. The `design-check` gate then fires per the existing PostToolUse hook. Hand-rolling UI and skipping the design skills is a Flag (Step 5), not a shortcut.
+For UI work, run Design Check preflight and follow the project's component system. Brand-facing substantial pages use Build Page; ordinary dashboard/product pages may be implemented directly from established patterns and shadcn. Use Build Component only for a genuinely missing piece. UI Research and Inspect Component are explicit, optional tools—not automatic gates.
 
 ---
 
@@ -70,7 +70,7 @@ When the work is done, **append** the report to `brain/chapters/NN-name.md` as a
 **Changed:** <one line per file/area>
 **Verified:** <command run> → <result/exit + counts, e.g. "tests 34/34 pass" / "tsc clean">
 **Diff:** <paste of `git diff --stat <integration-branch>..<branch>`>
-**UI evidence:** <only for UI chapters: "via build-page/build-component · design-check PASS" + screenshot path if taken; omit line for non-UI work>
+**UI evidence:** <only for UI work: lane used, Design Check verdict, render/screenshot path, and any Build Page/Component/Research skills actually used>
 **Flags:** <deviations / risks / unsure — these are the CEO's drill-down targets>
 **Commit:** <branch · hash>
 ```

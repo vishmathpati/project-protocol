@@ -164,7 +164,7 @@ Triggers:
 2. The report **doesn't match the Goal** (wrong files, missing pieces, scope creep).
 3. The **Verified** section is thin, vague, or missing.
 4. The change touches a **sensitive area** — auth, money/payments, data deletion, security.
-5. The report covers **UI work** — a page or component was created or modified. **If** the report's Verified/UI evidence lines attest the work went through `Skill("build-page")` and/or `Skill("build-component")` AND that `design-check` passed, with specific detail (not a bare assertion) — treat this trigger as satisfied by a light check: confirm those attestation lines exist and are specific, no diff read needed. Deep-read (per the diff-scoped rule above) only when that evidence is absent, vague, or contradicted by the diff stat. UI hand-authored in bypass of the design skills, or attested vaguely, is a fail: send it back (Step 6, changes requested), the same way you'd reject a missing test.
+5. The report covers **UI work**. If its evidence names the correct lane (brand-facing Build Page or conventional product/dashboard), confirms Design Check passed, and includes specific render evidence, a light check is enough. Deep-read only when evidence is missing, vague, contradicted, or shows component-system bypass. Do not require Build Page or UI Research for ordinary dashboard patterns.
 
 Otherwise, **trust the report.** Do NOT line-by-line re-read clean work that matches the Goal — that defeats the point of delegation. The report is the contract; only break the seal when a trigger tells you to. The goal of verification is confidence per token, not coverage: read the smallest thing that answers the question.
 

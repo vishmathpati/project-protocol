@@ -1,0 +1,22 @@
+---
+name: inspect-component
+description: Prepare and ingest an Aside-browser investigation of a specific external website component or region when its implementation is unclear. Use for exact URLs and behaviors such as parallax, scroll effects, video heroes, unusual image treatment, animation, responsive mechanics, or unknown assets. Produces evidence for Build Component without copying proprietary code or assets.
+---
+
+# Inspect Component
+
+Investigate one exact external UI region, not a design field.
+
+## Inputs
+
+Require exact URL, component/region, liked behavior, target stack, and relevant captures. Do not run for ordinary components whose implementation is clear.
+
+## Aside mission
+
+Generate a mission for `aside-skill/inspect-component`. Inspect DOM structure, computed styles, assets, network requests, libraries, motion timing/triggers, responsive behavior, states, performance, and accessibility. Separate evidence from inference. Never request proprietary source code, copyrighted assets, credentials, or protected content.
+
+## Output
+
+Write `brain/research/components/<slug>.md`: source URL/date/page/viewport/region/method; observed behavior; DOM/style/network/asset/library evidence; responsive/motion/state/accessibility/performance notes; labeled inference; adaptation plan for project stack/tokens/content/assets; required user assets; unresolved questions.
+
+Build Component consumes the report. Inspect Component never writes DESIGN or implementation code.

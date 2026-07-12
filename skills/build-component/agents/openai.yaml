@@ -1,7 +1,7 @@
 interface:
   display_name: "Build Component"
   short_description: "Build a new component, or adopt an external one, into the project's design system — when a net-new UI primitive is needed or an outside component must be normalized to the project's tokens"
-  brand_color: "#475569"
+  default_prompt: "Search for reuse first, choose the project's configured primitive system, build only the genuinely missing component, and verify it against design and accessibility canon."
 
 policy:
   allow_implicit_invocation: true

@@ -8,15 +8,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ### Added
 - **Universal Foundation.** `init-project` now inspects first, captures universal project truth once, creates only the core canon, and routes to specialist groups without asking brand, marketing, design, research, or implementation questions.
 - **Universal canon templates.** Added concise templates for CLAUDE, BRIEF, STATUS, STRUCTURE ownership, WORKLOG, CHANGELOG, agenda, WONT-DO, and chapters.
+- **Separated brand and visual workflows.** Added Brand Foundation and Style Lock so brand truth, research evidence, and design tokens have distinct owners. Style Lock preserves the rich real-content preview as a deterministic HTML asset.
+- **Component inspection workflow.** Added Project Protocol and standalone Aside `inspect-component` skills for evidence-backed investigation of unclear external UI mechanics.
+- **Adaptive marketing templates.** Added BRAND, SITEMAP, PAGE-BRIEF, and MEDIA templates and replaced the SaaS-shaped CONTENT registry with an adaptive business-neutral contract.
 
 ### Changed
 - **CEO/worker authority is chapter-scoped.** Workers may propose any chapter-required code or canon change in isolated worktrees; only CEO approval and merge establish shared canon.
 - **Session continuity redesigned.** Recap is role-aware orientation; Handoff carries exact repo/worktree/branch/checkpoint identity; Save Session persists role-owned state without conflating save, completion, approval, or merge.
 - **Chapter contracts expanded.** Goal, Why, Method, Done When, Plan, dependencies, constraints, carry-over, reports, and verdicts now form one durable review unit.
 - **Core skill names clarified.** `session-recap` → `recap`, `audit-before-close` → `completion-check`, `audit` → `project-audit`, `discipline` → `change-check`, and `discussion-mode` → `discuss`.
+- **UI research renamed and decoupled.** `calibrate` → `ui-research`; it now writes research/moodboard evidence without mutating BRAND or DESIGN and never auto-triggers for ordinary dashboards.
+- **Marketing is resumable Stage A/B.** It may run whenever brand-facing work becomes relevant, owns meaning/copy/media requirements, and no longer produces layout sketches.
+- **Frontend execution lanes clarified.** Brand-facing substantial pages use Build Page; conventional product/dashboard UI may follow established shadcn patterns directly; Build Component is only for a genuine missing component.
+- **Design Check split into preflight/postflight.** It verifies the correct surface, existing system, changed hunks, and render evidence without replacing Style Lock or Completion Check.
 
 ### Removed
 - **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.
+- **Monolithic `design-direction`.** Its brand diagnosis moved to Brand Foundation, token/preview work to Style Lock, research to UI Research, and implementation to Build Page/Component. Forced three-direction generation was removed.
+- **Unsafe/duplicated marketing references.** Removed layout ownership, forced SaaS structures, and fictional proof/testimonial guidance.
 
 ## [4.1.0] — 2026-07-11
 
