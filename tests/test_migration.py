@@ -34,6 +34,16 @@ def run(project: Path, validate: bool = False):
 
 
 class MigrationInspectorTests(unittest.TestCase):
+    def test_migration_skill_requires_custom_claude_preservation(self):
+        skill = (ROOT / "skills/migrate-project/SKILL.md").read_text()
+        reference = ROOT / "skills/migrate-project/references/claude-preservation.md"
+        self.assertTrue(reference.is_file())
+        self.assertIn("No answer means keep", skill)
+        self.assertIn("Never infer removal from “full modernization.”", skill)
+        contract = reference.read_text()
+        self.assertIn("Treat as custom and recommend `keep`", contract)
+        self.assertIn("Any unaccounted block", contract)
+
     def test_legacy_plan_is_read_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp)

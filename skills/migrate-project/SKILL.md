@@ -30,7 +30,7 @@ Apply only transformations whose meaning is unambiguous: missing-file additions,
 
 For BRIEF consolidation, CLAUDE routing preservation, STATUS history reduction, BRAND/DESIGN normalization, SITUATIONS reconciliation, marketing layout retirement, and other meaning-dependent work: produce a proposed diff, explain what moves where, and wait for approval. Archive before removing uncertain content.
 
-When the user approves **full CLAUDE modernization**, use `templates/CLAUDE.md` as the structural base—not the old file as the base. Preserve only project-specific identity, essential coding/tooling/design guardrails, and extended-context pointers. Generic skill procedures live in installed skills. Generic hook behavior lives in the plugin. Fold only genuinely project-specific SITUATIONS routes; do not copy the full router into CLAUDE.
+When the user approves **full CLAUDE modernization**, read `references/claude-preservation.md` and follow its inventory/approval contract. Use `templates/CLAUDE.md` as the structural base—not the old file as the base—but treat every user-authored, project-specific, personal, or unrecognized instruction as protected. Conciseness never authorizes deletion. Generic skill procedures live in installed skills. Generic hook behavior lives in the plugin. Fold only genuinely project-specific SITUATIONS routes; do not copy the full router into CLAUDE.
 
 Full modernization must remove obsolete operating rules and equivalent wording:
 
@@ -42,6 +42,8 @@ Full modernization must remove obsolete operating rules and equivalent wording:
 
 The v5 replacement is role-aware: humans choose CEO/worker/solo; concurrent workers use isolated worktrees; WORKLOG stores meaningful recovery notes; Save Session owns persistence; installed skill metadata owns routing. Show the proposed concise CLAUDE diff before writing.
 
+Before writing, present one consolidated **CLAUDE preservation inventory**. For every protected or uncertain block, recommend **Keep** and ask the user to choose: `keep in CLAUDE | move to brain/docs with a concise pointer | remove`. No answer means keep. Never infer removal from “full modernization.”
+
 `skip` leaves the migration incomplete. It never counts as success and never permits the version stamp.
 
 ## 5. Validate transactionally
@@ -51,6 +53,7 @@ Run the inspector again with `--validate-target`. Confirm:
 - Required v5 files and routing exist.
 - Retired current-source names are gone.
 - Root CLAUDE is a concise project constitution/source index and contains no retired operating rules or embedded generic routing/hook manuals.
+- Every pre-migration CLAUDE block is accounted for as preserved verbatim, moved with approval, replaced as identified plugin boilerplate, or removed with explicit approval.
 - No meaningful source was silently deleted.
 - No application code changed.
 - Optional files remain conditional.
@@ -73,5 +76,6 @@ Return versions, mode, checkpoint, applied/already-present/manual/archived count
 - Idempotent detection.
 - No success stamp after skip or failure.
 - No silent overwrite or deletion of customized canon.
+- Unknown or user-authored CLAUDE content is preserved by default.
 - No application-code edits.
 - No `git add -A`.
