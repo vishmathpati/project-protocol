@@ -1,6 +1,7 @@
 interface:
   display_name: "Bug-fixing"
   short_description: "Repro-first bug discipline for diagnosing and fixing defects without guess-and-check — broken behavior, stack traces, intermittent or flaky failures, regressions"
+  default_prompt: "Reproduce the defect, identify the root cause, add focused regression proof, implement the smallest correct fix, and verify it."
   brand_color: "#dc2626"
 
 policy:

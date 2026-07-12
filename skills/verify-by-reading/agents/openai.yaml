@@ -1,6 +1,7 @@
 interface:
   display_name: "Verify by Reading"
   short_description: "Force opening the file before answering questions about it"
+  default_prompt: "Open the named source-of-truth files and answer only from their current contents, clearly separating verified facts from inference."
   brand_color: "#475569"
 
 policy:

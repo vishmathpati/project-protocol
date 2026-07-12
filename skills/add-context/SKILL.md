@@ -18,11 +18,11 @@ Before adding anything, silently read:
 
 If either file is missing, stop and tell the user:
 
-> "This project doesn't appear to have the three-folder protocol set up yet — run init-project first."
+> "This project doesn't appear to have the brain protocol initialized yet — run init-project first."
 
 If the project has the legacy flat layout (no `brain/` folder), also stop and tell the user:
 
-> "This project is on the legacy flat layout. Run init-project to migrate to the three-folder layout first, or place context files manually if you want to stay on legacy."
+> "This project uses a legacy layout. Run migrate-to-brain, then migrate-project, before adding context."
 
 ---
 
@@ -134,13 +134,7 @@ Without asking, update two places:
 ```
 If no Key Files table exists, create a `## Key Files` section.
 
-**Root `CLAUDE.md`** — before appending, count the current line count of root `CLAUDE.md`. If adding the new entry would push the file past **280 lines**, stop and warn the user:
-
-> "Root `CLAUDE.md` is at [N] lines. Adding this entry would exceed the 280-line ceiling (§9.2). Options: (A) summarize or compact older `## Extended Context` entries to make room, (B) split the situation router to `brain/SITUATIONS.md` and leave a one-line pointer in `CLAUDE.md`, (C) add the entry anyway and accept the overage. Which do you prefer?"
-
-Wait for the user's choice before writing. If the user picks A or B, apply the compaction or split first, then add the new entry.
-
-If the file is under the ceiling (or once compaction is done), find `## Extended Context` section and append:
+**Root `CLAUDE.md`** — keep this as a concise index, not a second copy of the context. Find `## Extended Context` and append:
 ```
 - `brain/docs/[filename]` — [type]: [one-line description]. Read before [trigger condition].
 ```

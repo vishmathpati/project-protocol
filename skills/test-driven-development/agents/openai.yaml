@@ -1,6 +1,7 @@
 interface:
   display_name: "Test-driven development"
   short_description: "RED-GREEN-REFACTOR discipline for building a feature test-first — reach for it before writing implementation code, or when the user says TDD, test-first, or red-green-refactor"
+  default_prompt: "Use red-green-refactor: first prove the missing behavior with a focused failing test, implement minimally, then refactor with the suite green."
   brand_color: "#16a34a"
 
 policy:

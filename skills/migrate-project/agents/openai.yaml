@@ -1,7 +1,7 @@
 interface:
   display_name: "Migrate Project"
-  short_description: "Apply version-by-version plugin migration deltas to bring a project's protocol files up to the current plugin version"
-  brand_color: "#475569"
+  short_description: "Transactionally migrate protocol canon to the installed version"
+  default_prompt: "Inspect the project and pending manifests, produce one dry-run plan, apply only safe deterministic changes, resolve semantic diffs explicitly, validate, and stamp the version only after success."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

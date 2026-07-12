@@ -61,7 +61,7 @@ Invoke `/ceo`, `/worker`, or `/solo` deliberately at session start; the role run
 - **`git`** — Git operations gate. Validates branch state, enforces commit message discipline, guards against unintended force-pushes.
 - **`grill`** — Adversarial review: stress-tests a plan, implementation, or decision before it ships.
 - **`bug-fixing`** — Structured bug investigation: reproduce → isolate → fix → verify, recording only meaningful recovery evidence.
-- **`migrate-to-brain`** *(temporary)* — One-time structural migration from the old three-folder layout (`cowork/`, `agents/`, `human/`) to `brain/`. Merges duplicates, confirms before writing, removes `agents/.session-type`.
+- **`migrate-to-brain`** — Legacy compatibility migration from old flat/three-folder layouts to `brain/`. It inventories first, preserves README and customized canon, reconciles duplicates, and hands back without stamping success early.
 
 ### Discipline skills
 
@@ -73,7 +73,7 @@ Invoked explicitly — via `Skill()` calls from other skills, slash commands, or
 - **`discuss`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
 - **`project-audit`** — Cross-file consistency check across canon and repository truth. Reports drift, does not auto-fix.
 - **`design-check`** — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Step 8 auto-fixes mechanical violations (raw hex matching tokens, missing dimensions, ellipsis, nbsp, etc.) with user confirmation. Human-judgment violations are surfaced for user input only.
-- **`migrate-project`** — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
+- **`migrate-project`** — Build one consolidated migration plan, apply deterministic deltas, review semantic diffs, validate the target, and stamp the installed version only after every mandatory change succeeds.
 - **`advisor`** — Research-first expert mode: searches before opining, gives an independent view with trade-offs; model-invoked on "what do you think / recommend" questions.
 - **`test-driven-development`** — RED-GREEN-REFACTOR discipline for features and bugfixes; worker/solo route implementation chapters through it.
 
@@ -170,7 +170,7 @@ project_doc_fallback_filenames = ["CLAUDE.md"]
 
 Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when you open *this* repo in Claude Code, and it never ships to users (the installed plugin loads `skills/` only). It chains commit + push to every source edit and enforces manifest discipline on version bumps. End users never edit this plugin, so they never see it.
 
-To release: run `scripts/bump-version.sh <new-version>` (syncs both plugin.json files + marketplace.json), add `migrations/vX.Y.Z.md` and a CHANGELOG entry, commit, push. Marketplace installs pick up the new version automatically.
+To release: run `scripts/bump-version.sh <new-version>` (syncs both plugin.json files + marketplace.json), add `migrations/vX.Y.Z.md` and a CHANGELOG entry, then run `scripts/bump-version.sh --audit`. The audit structurally validates manifests, skills, sidecars, hooks, migration presence, and package cleanliness before commit/push.
 
 ---
 

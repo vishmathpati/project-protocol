@@ -1,7 +1,7 @@
 interface:
   display_name: "Migrate to Brain"
-  short_description: "One-time migration from the old three-folder layout (cowork/, agents/, human/) to the unified brain/ folder — DELETE before public launch"
-  brand_color: "#b45309"
+  short_description: "Safely consolidate a legacy layout into one brain folder"
+  default_prompt: "Inventory the legacy protocol layout, propose a lossless consolidation into brain, preserve README and project rules, and hand back to migrate-project without stamping success early."
 
 policy:
   allow_implicit_invocation: false

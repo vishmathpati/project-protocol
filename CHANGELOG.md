@@ -13,6 +13,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Adaptive marketing templates.** Added BRAND, SITEMAP, PAGE-BRIEF, and MEDIA templates and replaced the SaaS-shaped CONTENT registry with an adaptive business-neutral contract.
 - **Deterministic Project Dashboard.** Added a stdlib-only generator for Project, Brand, Design, Research/Moodboard, and Build Progress tabs, with local/portable asset modes and embedded input hashes for staleness checks.
 - **Tested hook scripts.** Session drift, compaction recovery, stop warnings, and post-write UI findings now live in small Python scripts instead of opaque inline shell programs.
+- **Transactional migration inspector.** Added a read-only planner/target validator with fixtures for legacy, partial, and complete protocol states.
+- **Structural release audit.** Release validation now checks manifests, migration presence, skill metadata, hook targets/events, retired source, and packaging debris instead of grepping historical prose or hardcoding a skill count.
 
 ### Changed
 - **CEO/worker authority is chapter-scoped.** Workers may propose any chapter-required code or canon change in isolated worktrees; only CEO approval and merge establish shared canon.
@@ -24,6 +26,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Frontend execution lanes clarified.** Brand-facing substantial pages use Build Page; conventional product/dashboard UI may follow established shadcn patterns directly; Build Component is only for a genuine missing component.
 - **Design Check split into preflight/postflight.** It verifies the correct surface, existing system, changed hunks, and render evidence without replacing Style Lock or Completion Check.
 - **Hooks narrowed to mechanics.** Session Start is minimal; PreCompact no longer writes timestamped backups; PostCompact routes same-role Recap; Stop only warns on likely unpersisted state; post-write scanning is centralized and deterministic.
+- **Migration is fail-closed.** Legacy consolidation preserves README and customized canon, skipped semantic deltas remain incomplete, explicit files are staged, and the version is stamped only after target validation succeeds.
+- **Codex metadata completed.** Every shipped skill sidecar now includes a default prompt alongside its display name and concise description.
 
 ### Removed
 - **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.

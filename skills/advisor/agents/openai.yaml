@@ -1,6 +1,7 @@
 interface:
   display_name: "Advisor"
   short_description: "Expert research-and-advice mode for when an independent, well-grounded view matters more than agreement — opinions, recommendations, decisions, naming/direction/strategy/tool-choice questions"
+  default_prompt: "Give an independent, evidence-grounded recommendation, challenge weak assumptions, compare real tradeoffs, and state a clear verdict."
   brand_color: "#2563eb"
 
 policy:
