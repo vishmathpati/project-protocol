@@ -1,7 +1,7 @@
 interface:
   display_name: "Solo"
   short_description: "Wear both CEO and worker hats for small work done in one pass — for quick changes that don't warrant the full delegation loop"
-  brand_color: "#6d28d9"
+  default_prompt: "Act in solo mode for a genuinely small task: orient, implement within scope, verify, persist the result, and escalate if it grows."
 
 policy:
   allow_implicit_invocation: false

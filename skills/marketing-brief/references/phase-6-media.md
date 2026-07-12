@@ -167,6 +167,6 @@ Compositional types are also allowed:
 - **`(none)` is a real declaration**, not a missing field. It tells Phase 7 not to leave space for media.
 - **Screenshots use real product UI.** No mockups, no Figma screenshots passing as the real app. The marketing surface that lies about the product loses trust fast.
 - **No emoji-as-icon.** Use the BRAND.md icon system (lucide or whichever the project picked).
-- **Numbers without sources are `[VERIFY]`.** `audit` will surface every unflagged number for spot-check.
+- **Numbers without sources are `[VERIFY]`.** `project-audit` will surface every unflagged number for spot-check.
 - **Real customer trumps fictional.** If a real customer signed a testimonial, that testimonial uses the real company. Fictional fills only the unfilled slots.
 - **This file does not generate images.** It briefs them.

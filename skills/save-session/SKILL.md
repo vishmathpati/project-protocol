@@ -1,319 +1,67 @@
 ---
 name: save-session
-description: Save and close a project session, persisting the session's work into the project's canon. Reach for it at the end of a working session. Triggers — "save", "save session", "close session", "end session", "done for today".
-allowed-tools: Read, Write, Edit, Glob, Bash(ls:*,date:*,wc:*,git:*)
+description: Save and close a project session by persisting the active role's meaningful work into the correct canon, committing only owned changes, and reporting branch and push state. Use when the user says save, save session, close, or finish for today.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*)
 ---
 
-# Save Session — Project Protocol
+# Save Session
 
-Closes the current session cleanly. Works for any project that follows the protocol layout — a single canon in `brain/`.
+Persistence dispatcher for CEO, worker, and solo sessions. Saving is not completion, approval, or merge.
 
-There is ONE canon. Every step operates on `brain/WORKLOG.md`, `brain/STATUS.md`, `brain/BRIEF.md`, `brain/CHANGELOG.md`, `brain/DISCOVERIES.md`, and `brain/agenda.md`.
+## 1. Verify identity
 
----
+Determine the human-invoked role. Run `git status --short --branch`, `git rev-parse --show-toplevel`, and `git worktree list --porcelain`. Record repository, worktree, branch, and active chapter. Never infer the role from Git alone.
 
-## Step 0 — Determine the author stamp
+## 2. Read recovery state
 
-We detect which tool is running ONLY to label entries — never to pick a folder. Detect via environment variables:
+Read `brain/WORKLOG.md`, `brain/STATUS.md`, the active chapter, and changed-file status. WORKLOG is a temporary recovery buffer, not a complete transcript. If useful context exists only in the conversation, capture it before clearing.
 
-- `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
-- `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
-- neither set → stamp `· Agent` (treat as a full-capability host)
+## 3. Fold durable information into its owner
 
-Call this value the **author stamp**. Apply it to the CHANGELOG dated section and the BRIEF version block below.
+- Current state, active chapters, blockers, pending human decisions, and one Last saved session → `STATUS.md`.
+- Changed durable project contract or locked project decision → update the relevant section of `BRIEF.md`.
+- Accepted or shipped outcome → `CHANGELOG.md`.
+- Proven reusable implementation lesson → `DISCOVERIES.md`.
+- Evidence-backed preference signal → `TASTE.md`.
+- Immediate human checkout, role, chapter, or decision → `agenda.md`.
+- Unfinished chapter recovery → append Carry-over or run `handoff`.
 
----
+Do not write empty history, discussion summaries, rejected variants, routine edits, or worker work awaiting CEO approval into CHANGELOG.
 
-## Step 1 — Read WORKLOG
+## 4. Apply the role contract
 
-Read `brain/WORKLOG.md`. This is your real-time log of what happened.
+### CEO
 
-If WORKLOG is empty or in cleared state (its only content is the line `> WORKLOG cleared — last session closed cleanly.`), reconstruct from session memory.
+Reconcile only approved work into shared canon. Update agenda from live chapter and Git state. Commit explicit owned files on the integration branch and push. Saving does not approve an unverified worker branch.
 
----
+### Worker
 
-## Step 2 — Update `brain/CHANGELOG.md`
+Do not merge. If unfinished, write Carry-over or Handoff. If finished, append the Completion Report with verification, diff, canon-change, untouched-region, flag, branch, and commit evidence. Commit explicit chapter-owned files and push the worker branch. Report that it is ready for CEO review.
 
-Read WORKLOG entries, categorize into Keep a Changelog format. If CHANGELOG doesn't exist, create with header first.
+### Solo
 
-**Mapping WORKLOG → CHANGELOG categories:**
-- `fixed:` entries → `### Fixed`
-- `decided:` entries about new capabilities → `### Added`
-- `decided:` entries about changes to existing features → `### Changed`
-- `tried_failed:` entries → **excluded** (internal working notes)
-- `found_bug:` entries → **excluded** unless fixed this session
+Persist the small result and its evidence. Run `completion-check` before calling substantial work done. Update shared canon only where the completed result requires it. Commit explicit files and push the current branch.
 
-**Only include things that actually shipped.**
+## 5. Clear only folded recovery entries
 
-Append a new dated section at the top (below header):
+Remove WORKLOG entries whose durable content has been folded or is no longer needed. Preserve unresolved entries. An empty WORKLOG is valid; no cleared-state marker is required.
 
-```markdown
-## [YYYY-MM-DD] [author stamp]
+## 6. Git safely
 
-### Added
-- [new feature or capability shipped]
+- Never use `git add -A` or stage a whole directory blindly.
+- Stage explicit files owned by this session.
+- Preserve unrelated dirty or untracked files.
+- Do not switch branches, merge, or delete a worktree unless the role contract explicitly requires and authorizes it.
+- Push the current owned branch and report any failure exactly.
 
-### Changed
-- [modification to existing feature]
+## 7. Report
 
-### Fixed
-- [bug resolved]
+Return: role, saved state, canon files changed, carry-over/report path, commit hash, branch, push result, remaining dirty files, and the exact next human action.
 
-### Removed
-- [anything deliberately deleted]
-```
+## Distinctions
 
-The author stamp is one of `· Claude Code`, `· Codex`, `· Agent` (from Step 0).
-
-If nothing shipped: `- No changes shipped this session.`
-
-CHANGELOG header (created once, never overwritten):
-
-```markdown
-# brain/CHANGELOG.md — Project history
-```
-
-**CHANGELOG.md is never cleared.**
-
----
-
-## Step 3 — Check `brain/docs/INDEX.md` was updated
-
-If any feature was added, page changed, or shared function modified this session:
-- Verify `brain/docs/INDEX.md` was updated inline during the session.
-- If not, add a reminder to `brain/STATUS.md` Next Actions: `[ ] Update brain/docs/INDEX.md — [what changed]`.
-
-Do not update INDEX.md yourself during save-session — that should have happened inline.
-
----
-
-## Step 4 — Update `brain/STATUS.md`
-
-Read `brain/STATUS.md`. Apply:
-1. Update "Last updated" line: `> Last updated: YYYY-MM-DD [author stamp]`.
-2. Add this session's one-line summary to Recent Sessions (rolling — keep last 5, drop oldest).
-3. Update Health: add new bugs as 🔴, remove resolved ones.
-4. Update "Pending human input" / "Needs CEO input": add open decisions, clear resolved ones.
-5. Update "Next actions" to reflect what's actually next.
-
-STATUS.md must never exceed 60 lines.
-
----
-
-## Step 5 — Sign `brain/BRIEF.md` if decisions were made
-
-If any architecture, tech stack, or significant scope decisions were made this session:
-
-Append a new version block to `brain/BRIEF.md`:
-
-```markdown
----
-
-## v1.X — YYYY-MM-DD HH:MM [author stamp]
-
-[describe only the delta — what changed or was decided this session]
-[rejected options if any]
-```
-
-Rules:
-- Increment version from last block.
-- Include exact time (`date +%Y-%m-%d\ %H:%M`).
-- The author stamp is one of `· Claude Code`, `· Codex`, `· Agent` (from Step 0).
-- Append only; never edit existing blocks.
-- If no significant decisions: skip this step.
-- **500-line limit:** if BRIEF.md approaches 500 lines, create `brain/BRIEF-2.md`, add pointer `> Continued in BRIEF-2.md` at the top of BRIEF.md, append the new block to BRIEF-2.md instead.
-
----
-
-## Step 6 — Update `brain/DISCOVERIES.md` if needed
-
-If any UI patterns, component integrations, or design decisions proved out this session, append:
-
-```
-[YYYY-MM-DD] [author stamp] · [component/pattern] — what worked and why
-```
-
-Belongs here: shadcn component that integrated cleanly, layout pattern that solved a specific spacing problem, animation timing that felt right, CSS variable combination producing a specific effect.
-
-Does NOT belong here: bug fixes (go to CHANGELOG), architecture decisions (go to BRIEF), session events (were in WORKLOG before clearing).
-
-Never clear or reorganize. Append only.
-
----
-
-## Step 6.5 — Update `brain/TASTE.md` from taste signals
-
-If `brain/TASTE.md` exists and this session produced design **taste signals** — a rating on a render, a rejected option ("no, not that"), or an edit the owner made to your output — fold them into the ledger. `save-session` is the **only** writer of confidence values.
-
-For each signal:
-- **New preference** → append an entry: category, one-line statement, a confidence set from the signal strength (a decisive rating or a hands-on edit is stronger than a hesitant pick), and an evidence line `YYYY-MM-DD · <the rating / reject / edit>`.
-- **Recurs a standing entry** → add an evidence line and raise its confidence (+0.1 to +0.2, capped 1.0). Do not create a duplicate — find the existing entry and reinforce it.
-- **Contradicts a standing entry** → lower its confidence and re-date it with the contradicting evidence.
-
-Scope discipline: a preference that would hold on *any* client goes to the **global** ledger (`~/.claude/TASTE.md`); a preference tied to *this* client's identity stays in `brain/TASTE.md`. Never fabricate — every entry and every confidence bump must trace to a real signal in its evidence trail. If TASTE.md is absent (older project not yet migrated), skip this step.
-
----
-
-## Step 7 — Update `brain/agenda.md` if relevant
-
-If a chapter completed: move it to ✓ Done in `brain/agenda.md`, promote next chapter to Up Next.
-
-If `brain/ROADMAP.md` or `brain/BRIEF.md` shape changed: re-derive `brain/agenda.md` from current canon.
-
-Otherwise: skip.
-
----
-
-## Step 8 — Clear `brain/WORKLOG.md`
-
-Do **not** replace the entire file. Instead:
-
-1. Read the current contents of `brain/WORKLOG.md`.
-2. Determine the **author stamp** from Step 0 (one of `· Claude Code`, `· Codex`, `· Agent`).
-3. Remove every entry (line or block) that is stamped with the current author stamp. Leave all entries stamped with other authors intact — those authors have not yet folded their work into CHANGELOG.
-4. If, after removing the current author's entries, no substantive entries remain (the file is empty or contains only whitespace/blank lines), write the canonical cleared-state marker as the file's sole content:
-
-```
-> WORKLOG cleared — last session closed cleanly.
-```
-
----
-
-## Step 9 — Invoke `audit-before-close`
-
-Before committing, run the close-gate audit:
-
-```
-Skill("audit-before-close")
-```
-
-This is unconditional. `audit-before-close` is idempotent — if it was already invoked earlier in this session, the double-call is accepted (locked Risk 7). Surface any findings to the user before proceeding to Step 10.
-
----
-
-## Step 10 — Git sync — environment-aware
-
-Every host — `CLAUDE_PLUGIN_ROOT` set (Claude Code), `CODEX_PLUGIN_ROOT` set (Codex), or neither set (unknown host, stamp `· Agent`) — CAN commit and push. See branch (a) / (b).
-
-**Staging — same rule in every branch:**
-- Stage `brain/` (plus root `CLAUDE.md` / `README.md` if changed).
-- **Protocol .md files** under `brain/`, plus changed root `CLAUDE.md` / `README.md` → stage automatically.
-- **Anything else** → list to the user and ASK before staging. Never sweep code files into a save-session commit.
-
-Determine the environment from the env vars above (this is the same detection used for the author stamp in Step 0).
-
----
-
-### Branch (a) — host tool, working directly on `main`
-
-Detected when: `git rev-parse --abbrev-ref HEAD` returns `main`.
-
-Simple add → commit → push:
-
-```bash
-git add brain/ CLAUDE.md README.md
-git commit -m "chore(session): save session YYYY-MM-DD <author stamp>"
-git push origin main
-```
-
-(Only add `CLAUDE.md` / `README.md` to the stage command if they changed.)
-
-If `git status --porcelain` is clean: skip the commit; still run `git push origin main` to ensure main is up to date.
-
-If push fails (auth, non-fast-forward, network): **STOP** and report the exact error.
-
----
-
-### Branch (b) — host tool, on a worktree branch
-
-Detected when: current branch is NOT `main`.
-
-This is the existing merge-to-main flow:
-
-**10b-1 — Capture git state**
-
-```bash
-git rev-parse --show-toplevel       # current worktree path
-git rev-parse --abbrev-ref HEAD     # current branch
-git status --porcelain              # uncommitted changes
-git worktree list --porcelain       # all worktrees + which holds main
-git remote -v                       # confirm a remote exists
-```
-
-If `HEAD` is detached: **STOP** — "Not on a branch — cannot auto-merge. Checkout a branch first."
-
-If no remote: skip pushes; still do the local merge.
-
-**10b-2 — Stage and commit**
-
-Separate files (same staging rule above). Stage protocol files only:
-
-```bash
-git add brain/ CLAUDE.md README.md
-git commit -m "chore(session): save session YYYY-MM-DD <author stamp>"
-```
-
-**10b-3 — Push worktree branch**
-
-```bash
-git push -u origin <current-branch>
-```
-
-If push fails: **STOP** and report. Do not attempt merge.
-
-**10b-4 — Merge into main**
-
-From `git worktree list --porcelain`, find `<MAIN_PATH>` (worktree on `main`):
-
-```bash
-git -C "<MAIN_PATH>" fetch origin
-git -C "<MAIN_PATH>" merge --no-ff <current-branch> -m "merge: session YYYY-MM-DD <author stamp>"
-git -C "<MAIN_PATH>" push origin main
-```
-
-If merge fails (conflicts): **STOP** — list conflicted files and tell the user: "Resolve conflicts in `<MAIN_PATH>`, then run `git merge --continue && git push origin main`."
-
----
-
-### 10-final — Report git outcome (feeds into Step 11)
-
-Capture for the final confirmation:
-- Which branch was taken (a / b)
-- Files staged (count)
-- Branch pushed to origin
-- Merge commit SHA on main (or "fast-forward" or "N/A — working on main")
-- Anything skipped or requiring user follow-up
-
----
-
-## Step 11 — Confirm
-
-```
-✅ brain/CHANGELOG.md updated — [N Added, N Changed, N Fixed]
-✅ brain/STATUS.md updated [author stamp]
-✅ brain/BRIEF.md signed (v1.X) — [Y/N, or "no decisions this session"]
-✅ brain/WORKLOG.md cleared
-✅ audit-before-close: ran (Step 9) — [findings or "clean"]
-✅ brain/DISCOVERIES.md appended — [Y/N]
-✅ brain/TASTE.md updated — [N entries added/reinforced, or "no taste signals"]
-✅ brain/agenda.md updated — [Y/N]
-✅ Git: committed N file(s) · pushed <branch> → GitHub · merged into main · main pushed
-   Your local folder is now up to date.
-
-Session closed.
-```
-
-If git sync was skipped or halted partway, replace the `✅ Git:` line with:
-
-```
-⚠️ Git: <what happened> — <exact command the user needs to run>
-```
-
----
-
-## Rules
-
-- Never make up content that wasn't in the session. Only log what actually happened.
-- If nothing changed this session, still run through the steps — update STATUS.md at minimum.
-- CHANGELOG.md, DISCOVERIES.md, BRIEF.md are never overwritten — only appended to.
-- Goal: a new session reading `brain/STATUS.md` + `brain/BRIEF.md` has 100% context to continue without asking the user anything.
+- WORKLOG remembers unfinished session detail.
+- Handoff transfers unfinished work to another session/tool.
+- Completion Check proves a finished result against its contract.
+- Project Audit checks system-wide drift.
+- Save Session persists role-owned state; it does none of the above implicitly.

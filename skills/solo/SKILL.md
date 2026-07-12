@@ -1,7 +1,6 @@
 ---
 name: solo
 description: Wear both CEO and worker hats for small work done in one pass, with no worktree and no handoff. Reach for it on quick changes that don't warrant the full delegation loop. Triggers — "/solo", "small fix", "just do this", "quick change".
-disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, mkdir:*, git:*)
 ---
 
@@ -18,6 +17,8 @@ There is ONE canon: `brain/`.
 - `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
 - neither set → stamp `· Agent` (treat as a full-capability host)
+
+Run `recap` before sizing the work so the session starts from live Git, canon, and any active chapter.
 
 ---
 
@@ -59,7 +60,7 @@ Pick the lighter of two homes by size:
 [YYYY-MM-DD] [author stamp] · fixed: <what> — <where>
 ```
 
-**Small-but-real work** → a chapter file `brain/chapters/NN-name.md`. If the chapter doesn't exist yet, start it with the title + a `> Solo:` stamp; if it already exists (a chapter may already hold earlier reports and Verdicts), **append** your report as a new dated section at the bottom — never overwrite an existing one. Use this EXACT Completion Report template (same as `/worker`, so the record speaks the CEO's language):
+**Small-but-real work** → use an existing chapter when one governs the work. Create a chapter only when a durable reviewable contract is useful; do not manufacture one for ceremony. Append the same Completion Report used by `/worker`.
 
 ```
 ## Completion Report — YYYY-MM-DD · <author stamp>
@@ -67,11 +68,12 @@ Pick the lighter of two homes by size:
 **Status:** done | partial | blocked
 **Changed:** <one line per file/area>
 **Verified:** <what ran + result>
+**Diff:** <git diff --stat against the starting point>
 **Flags:** <deviations / risks / unsure — these are the CEO's drill-down targets>
 **Commit:** <branch · hash>
 ```
 
-Same sections as the `/worker` Completion Report — so if a solo job later grows into a delegated one, the record already speaks the CEO's language.
+Run `completion-check` before claiming substantial work done. Solo may close genuinely small work after the check passes.
 
 ---
 

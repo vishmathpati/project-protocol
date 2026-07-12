@@ -179,7 +179,7 @@ When the user pastes the ROUND-2 SUMMARY BLOCK back:
    - <pattern> — <which register axis it violates>
    ```
 
-   FOLLOW claims are now grounded in counts from the teardowns ("9 of 12 hotels use a full-bleed video hero"), not guesses. REFUSE merges with the brand-specific refusal list; enforced downstream by `design-check` and `audit` exactly like the universal anti-patterns.
+   FOLLOW claims are now grounded in counts from the teardowns ("9 of 12 hotels use a full-bleed video hero"), not guesses. REFUSE merges with the brand-specific refusal list; enforced downstream by `design-check` and `project-audit` exactly like the universal anti-patterns.
 
 **Show the audit (and the notes.md entries) to the user before writing. One confirmation pass, then write.**
 
@@ -239,7 +239,7 @@ Never use the most expensive model. Reasoning tier (Sonnet) is the ceiling.
 - **`design-direction`** — the parent. Owns Phases 1–7, picks the direction, writes tokens. `calibrate` is its Phase 4→5 bridge; it runs the research engine, hands back, and never picks a direction.
 - **`build-component` / adopt-external** — normalizes a *specific* pasted component against existing tokens. `calibrate` works one layer up, on taste inputs, before any component or token exists.
 - **`design-check`** — the write-time gate that later enforces the REFUSE bucket and the evidence-not-tokens law this skill establishes.
-- **`discussion-mode`** — pure talk, no writes. Use it to argue about references first, then `calibrate` to research and lock them.
+- **`discuss`** — pure talk, no writes. Use it to argue about references first, then `calibrate` to research and lock them.
 
 ---
 

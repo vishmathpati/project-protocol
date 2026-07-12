@@ -5,7 +5,7 @@
 > and which surfaces apply. Edit by hand only if your project structure
 > changes (folder rename, new app added, surface dropped).
 > Never duplicate this content into other canon — `build-component`,
-> `design-check`, and `audit` all read from here.
+> `design-check`, and `project-audit` all read from here.
 
 ---
 
@@ -74,7 +74,7 @@ matches whatever's already here.
 
 ---
 
-## Cross-tier import rules (enforced by `audit`)
+## Cross-tier import rules (enforced by `project-audit`)
 
 - Marketing components **cannot** import from `components/app/` (or wherever App tier lives)
 - App components **cannot** import from `components/marketing/`

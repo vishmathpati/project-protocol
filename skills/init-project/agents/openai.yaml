@@ -1,7 +1,7 @@
 interface:
   display_name: "Init Project"
-  short_description: "Bootstrap, audit, or upgrade a project onto the single-folder brain protocol — when a project has no root CLAUDE.md or needs its brain/ layout established"
-  brand_color: "#475569"
+  short_description: "Create the universal project foundation without duplicate specialist questions"
+  default_prompt: "Inspect this repository, establish or repair its Universal Foundation, ask only undetectable universal project questions, and recommend the correct next doorway."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

@@ -1,10 +1,10 @@
 ---
-name: discussion-mode
-description: No-edit conversation mode. Activate on "discuss", "let's talk", "what do you think", "your opinion", "brainstorm", "explore". Prevents file edits and premature production during thinking.
+name: discuss
+description: No-edit conversation mode for evaluating options, trade-offs, architecture, or direction before implementation. Use when the user says discuss, brainstorm, explore, or asks what you think.
 allowed-tools: Read, Glob, Grep
 ---
 
-# Discussion Mode
+# Discuss
 
 Pure conversation. No file edits. No premature production.
 
@@ -29,9 +29,9 @@ User signals via phrases like:
 
 **3. Provide analysis, not artifacts.** If the user asks for thinking — give thinking. Don't draft files, don't generate code, don't write documentation. Just talk.
 
-**4. Surface trade-offs, not decisions.** Lay out options and their consequences. Let the user pick. Don't pick for them.
+**4. Bring expertise.** Compare options with live project sources, identify gaps, and recommend the strongest option. The user makes the final decision.
 
-**5. Exit mode** only when the user explicitly signals execution: "do it", "go ahead", "implement", "let's build it", "make the change". Then the `discipline` skill takes over for the actual action.
+**5. Exit mode** only when the user explicitly signals execution: "do it", "go ahead", "implement", "let's build it", "make the change". Then the `change-check` skill takes over for the actual action.
 
 ---
 

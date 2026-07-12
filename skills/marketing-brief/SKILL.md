@@ -209,7 +209,7 @@ Next step:
 - **Fictional customer is asked once, reused everywhere.** Locked in MEDIA.md; every screenshot, every testimonial, every example URL uses it.
 - **Language is English.** All of this user's projects are English-default. No translation phase here.
 - **CONTENT.md is the source of truth.** No marketing file hardcodes a feature name, customer name, or FAQ entry — they reference CONTENT rows.
-- **Every headline is a claim.** Enforced in Phase 5; flagged again in `audit` and `qa` skills downstream.
+- **Every headline is a claim.** Enforced in Phase 5; flagged again in `project-audit` and `qa` skills downstream.
 - **FUNDAMENTALS banned-words list applies** to every copy file. Scan before writing, scan after.
 - **One CTA per page.** Two-CTA pages fail intent.
 
@@ -241,7 +241,7 @@ Never the most expensive model. Reasoning tier (Sonnet) is the ceiling.
 - **`build-component`** — atomic. One component at a time. Called inline by build-page when a page section needs a net-new primitive. For one-off component requests (no page context), invoke directly.
 - **`design-check`** — UI-write-time gate. Fires inside every build-component call and after build-page's wire-up.
 - **`init-project`** — bootstraps the three-folder layout. Marketing-brief assumes init-project has already run (`brain/BRAND.md`, `brain/ROADMAP.md`, `brain/STATUS.md` all exist).
-- **`audit`** — periodic consistency scan. Will catch drift between CONTENT.md and the actual nav / footer / feature pages after marketing-brief runs.
+- **`project-audit`** — periodic consistency scan. Will catch drift between CONTENT.md and the actual nav / footer / feature pages after marketing-brief runs.
 
 ---
 

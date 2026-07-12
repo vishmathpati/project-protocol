@@ -1,0 +1,7 @@
+interface:
+  display_name: "Project Audit"
+  short_description: "Find drift across project canon and repository structure"
+  default_prompt: "Audit this project's canon and declared structure against the live repository, without changing files."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,7 +1,0 @@
-interface:
-  display_name: "Session Recap"
-  short_description: "Mid-session snapshot of where the project currently stands — for getting oriented on current state. Not a save"
-  brand_color: "#475569"
-
-policy:
-  allow_implicit_invocation: true

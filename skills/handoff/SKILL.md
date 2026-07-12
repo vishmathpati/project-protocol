@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, gi
 
 When a session is running long and context is filling, write a small note so the next session can resume without re-deriving where things stood. Any role (`/ceo`, `/worker`, `/solo`) can invoke it.
 
-There is ONE canon: `brain/`. The carry-over lives on the active chapter file (or a scratch note if there's no chapter).
+There is ONE canon: `brain/`. The durable carry-over lives on the active chapter when possible. The skill also produces a paste-ready packet for another Claude Code or Codex session.
 
 ---
 
@@ -32,6 +32,8 @@ Short and operational — enough for the next session to resume cold, no more. C
 - **What's done** — what's actually finished and verified this session.
 - **What's next** — the immediate next action(s), in order.
 - **Open threads / decisions pending** — anything unresolved, any decision still owed, any half-explored idea worth not losing.
+- **Execution identity** — repository, exact worktree path, branch, checkpoint commit, invoked role, and active chapter.
+- **Verification and dirty state** — checks already run, current failures, and an explicit list of uncommitted files.
 
 **Redact secrets.** No API keys, passwords, tokens, or PII in the note — replace with a placeholder (`<API_KEY redacted>`) and say where the real value lives if needed.
 
@@ -63,7 +65,11 @@ If there have been earlier carry-overs on this chapter, add a new dated section 
 
 ---
 
-## Step 3 — Tell the user how to resume
+## Step 3 — Produce the paste-ready handoff
+
+Return a compact block containing the exact repository, worktree, branch, checkpoint commit, role, chapter, completed work, next action, open decisions, verification, and uncommitted warning. The receiving session must verify that same worktree and branch before editing. It must not continue on main or create a new branch for the same work.
+
+## Step 4 — Tell the user how to resume
 
 Point the next session at the note in one line, e.g.:
 
@@ -78,7 +84,7 @@ Fold the carry-over into the normal commit. The carry-over is a note, not a Comp
 ## Rules
 
 - This is a context carry-over note — distinct from Codex's built-in Local↔Worktree "Handoff" and from the worker→CEO Completion Report.
-- Keep it short and operational: where / done / next / open threads.
+- Keep it short and operational: identity / where / done / next / open / verification / dirty state.
 - Redact secrets — never write keys, passwords, or PII into the note.
 - Reference canon by path instead of duplicating it; the note is only the delta.
 - Append as `## Carry-over` to the active chapter (or a scratch note + tell the user the path when there's no chapter).

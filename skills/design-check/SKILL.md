@@ -212,15 +212,15 @@ The user can override with explicit phrases like "skip design-check, just do it"
 
 `DESIGN.md` and `FUNDAMENTALS.md` already encode what the project commits to visually. Agents drift when they aren't forced to consult those files. This skill makes the consultation mechanical — the agent walks the same 8 steps every time, can't skip, can't improvise tokens, can't ship raw values silently.
 
-The Extension protocol in `DESIGN.md` is enforced here at step 4. The pre-ship checklist in `FUNDAMENTALS.md` is enforced here at steps 6–7 and again by `audit-before-close`.
+The Extension protocol in `DESIGN.md` is enforced here at step 4. The pre-ship checklist in `FUNDAMENTALS.md` is enforced here at steps 6–7 and again by `completion-check`.
 
 ---
 
-## Difference from `discipline` and `audit-before-close`
+## Difference from `change-check` and `completion-check`
 
-- `discipline` — universal pre-action gate for any non-trivial change.
-- `audit-before-close` — universal end-of-work gate.
+- `change-check` — universal pre-action gate for any non-trivial change.
+- `completion-check` — universal end-of-work gate.
 - `design-check` — UI-specific gate. Runs at both moments (pre-write at steps 1–4, post-write at steps 6–7). More concrete because the rules are pixel-level.
-- `design-check` now also offers auto-fixes (via Step 8). `audit-before-close` and `audit` remain detection-only and do not modify files.
+- `design-check` now also offers auto-fixes (via Step 8). `completion-check` and `project-audit` remain detection-only and do not modify files.
 
 All three can fire on the same task. `design-check` is the UI-specific layer.

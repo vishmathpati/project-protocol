@@ -10,7 +10,7 @@ Everything git in this protocol, in one place. The role skills (`/ceo`, `/worker
 
 Two facts drive every rule below:
 
-1. **The canon is one folder — `brain/`.** Chapters live in `brain/chapters/NN-name.md`. The CEO owns the shared canon; workers own only their own chapter file + code.
+1. **The canon is one folder — `brain/`.** Worker authority is chapter-scoped inside an isolated worktree. The CEO owns approval, reconciliation, and the integration branch.
 2. **Worktrees of a repo share ONE local `.git`.** A commit on any worktree's branch is instantly visible to every other worktree with **no push**. GitHub is a **BACKUP**, not the sync path. Moving work between worktrees is a *local* `git merge`, offline and instant.
 
 ---
@@ -38,9 +38,9 @@ Recognize the worktree flavor:
 - **Codex worktree** — lives under `~/.codex/worktrees`, usually in **detached HEAD** (branch shows `HEAD`).
 - **Claude Code worktree** — lives under `.claude/worktrees/`, branch named `worktree-*`.
 - **Manual worktree** — created by a plain `git worktree add`, any path/branch.
-- **Not a worktree** — you're in the main checkout, on `main` (the canon branch).
+- **Not a worktree** — usually the integration checkout. Confirm its actual branch; do not assume it is named `main`.
 
-The CEO works on the **main / canon branch**. Workers work on a **worktree branch**. If a worker finds itself on `main`, STOP and say so — a worker works on a branch, not the canon.
+The CEO works on the declared integration branch. Workers work on chapter branches in dedicated worktrees. If a worker is on the integration branch, stop before editing.
 
 ---
 
@@ -75,7 +75,7 @@ chore(session): save session 2026-06-24 · Claude Code
 
 ## Step 2 — Branch naming
 
-- The **CEO works on the main / canon branch** (`main`). Never branch the CEO.
+- The **CEO works on the declared integration branch**. Do not hardcode `main` when the project uses another integration branch.
 - **Worker branches are named `ch-NN-name`** — matching the chapter (`brain/chapters/NN-name.md`). One chapter → one branch → one worktree.
 
 ```
@@ -89,15 +89,15 @@ This keeps the branch, the worktree, the chapter file, and the `[ch-NN]` commit 
 
 ## Step 3 — Local sync rule (the important one)
 
-**To pull the latest canon into a worktree, merge LOCALLY — never push-then-pull through GitHub.**
+**To bring the latest integration state into a worktree, merge or rebase LOCALLY. Never manually copy canon between chats or worktrees.**
 
 Inside the worktree branch:
 
 ```bash
-git merge main          # or: git rebase main
+git merge <integration-branch>          # or: git rebase <integration-branch>
 ```
 
-Because all worktrees share one object store, this is **instant and offline** — `main` is already present locally; there is nothing to fetch from GitHub. The old habit of "push from the canon, then pull in the worktree" is wrong here and is the root cause of "I had to push first."
+Because all worktrees share one object store, the integration branch is already present locally; there is nothing to fetch merely to see local commits.
 
 If the merge conflicts, **STOP and report it** (a worker records it under Flags) — do not guess through a canon conflict.
 
@@ -166,7 +166,7 @@ This is what keeps parallel-worktree merges conflict-free:
 - **Workers** edit **code + their own chapter file** (`brain/chapters/NN-name.md`) only.
 - **The CEO** owns the **shared canon** — `brain/STATUS.md`, `brain/BRIEF.md`, `brain/ROADMAP.md`, `brain/WONT-DO.md` (and `brain/CHANGELOG.md`, `brain/agenda.md`).
 
-Because each chapter is exactly one file owned by one worker, two workers in two worktrees never touch the same canon file — so their branches merge into `main` without conflicts. If a worker thinks the canon must change, that's a **Flag** to the CEO, not an edit.
+Workers may touch overlapping files when their chapter contracts require it, so conflicts are possible and must be reconciled by the CEO. Worktree isolation prevents uncontrolled shared working-copy edits; it does not eliminate Git conflicts.
 
 ---
 
@@ -187,7 +187,7 @@ The CEO verifies a worker's finished chapter **locally, with no GitHub** — the
 
 ```bash
 git show <branch>:brain/chapters/NN-name.md     # read the Completion Report (the contract)
-git diff main..<branch>                          # read the actual code change
+git diff <integration-branch>..<branch>          # read the actual code change
 ```
 
 Read the **report** first (Goal / Status / Changed / Verified / Flags), then the **diff** to confirm it matches. No checkout, no fetch, no push. Find `<branch>` from `git worktree list --porcelain` or ask the user.
@@ -215,12 +215,12 @@ git worktree remove <worktree-path>     # add --force only after confirming noth
 | Situation | Command / action |
 |---|---|
 | Which tool / can I push? | env vars (Step 0). All hosts can push. |
-| Pull latest canon into a worktree | `git merge main` — local, offline (Step 3) |
+| Pull latest canon into a worktree | `git merge <integration-branch>` — local (Step 3) |
 | Name a worker branch | `ch-NN-name` (Step 2) |
 | Commit message | `type(scope): summary [ch-NN] · Agent` (Step 1) |
 | New worktree, Claude Code | `worktree.baseRef: "head"` + `claude --worktree <name>` (Step 4) |
 | New worktree, Codex | "Worktree" thread, select canon branch as base (Step 4) |
-| CEO reads a worker's branch | `git show <branch>:…` + `git diff main..<branch>` (Step 7) |
+| CEO reads a worker's branch | `git show <branch>:…` + `git diff <integration-branch>..<branch>` (Step 7) |
 | Push | at close (default) (Step 6) |
 
 ---

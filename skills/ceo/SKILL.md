@@ -1,7 +1,6 @@
 ---
 name: ceo
 description: Orchestrate work as the boss who defines chapters, delegates them to workers, and verifies the results before approving. Reach for this to run the CEO/worker delegation loop. Triggers — "/ceo", "new chapter", "delegate this", "chapter N done, check".
-disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, mkdir:*, git:*)
 ---
 
@@ -9,7 +8,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, mk
 
 The orchestrator. You set direction, hand units of work to workers, and verify what comes back. You do NOT do the chapter's implementation yourself — that's the worker's job (`/worker`). For work too small to delegate, use `/solo` instead.
 
-There is ONE canon: `brain/`. You own the **shared canon** — `brain/STATUS.md`, `brain/BRIEF.md`, `brain/ROADMAP.md`, `brain/WONT-DO.md` — plus `brain/CHANGELOG.md` and `brain/agenda.md`. Workers never touch these; only you do.
+There is ONE canon: `brain/`. You own approval, reconciliation, and the integration branch. Workers may propose any chapter-required file change in isolated worktrees; only your approval and merge establish shared canon.
 
 A **chapter** is one meaningful unit of work: one file at `brain/chapters/NN-name.md`. It carries the CEO's Goal + Plan, then **one or more** Completion Reports (one per worker pass — e.g. backend, then UI, then wire-up — possibly by different specialists), each with its own Verdict from you. A small chapter is one report + one verdict; a big one accumulates several in sequence.
 
@@ -31,14 +30,14 @@ The menu below is ONLY the default when the user hasn't told you what they want.
 **Otherwise, orient the user:**
 
 1. Read `brain/STATUS.md` (and `brain/ROADMAP.md` if it exists). If `brain/` doesn't exist yet, say so and point the user at `/init-project`.
-2. Tell the user where things stand in 2–4 lines: the **active chapter** (if any), what's **in flight** (roadmap or discussion), and **what's next** per STATUS.
+2. Run `recap` for role-aware orientation, then tell the user the active chapter, what is in flight, and the next human action.
 3. Offer modes — **and which modes you offer DEPENDS ON STATE:**
 
    **If nothing is in progress** — no active chapter, no in-flight roadmap, no open discussion per STATUS — offer exactly THESE THREE modes:
 
    - **Roadmap planning** (project scope) — set or adjust direction; define/reorder chapters in `brain/ROADMAP.md`.
    - **Chapter planning** (chapter scope) — sharpen and run ONE chapter.
-   - **Discussion** — think out loud, no edits (`/discussion-mode`).
+   - **Discussion** — think out loud, no edits (`/discuss`).
 
    **If something IS in progress** — STATUS shows an active chapter, an in-flight roadmap, or an open discussion — offer those three PLUS:
 
@@ -51,7 +50,7 @@ After the user picks (or if they gave a direct command up front), proceed to the
 
 ### The two planning scopes
 
-- **Roadmap planning — project scope.** Set or adjust overall direction; define and reorder the chapters in `brain/ROADMAP.md`. The roadmap is **OPTIONAL** — small projects may have only chapters and no roadmap at all. `/init-project` seeds the initial setup chapters; the roadmap is built **here**, in roadmap planning, when the project is large enough to warrant one. Don't force a roadmap onto a small project.
+- **Roadmap planning — project scope.** Set or adjust direction and sequence outcomes in optional `brain/ROADMAP.md`. Foundation never creates real chapters; the CEO creates them only when work is ready to contract.
 - **Chapter planning — chapter scope.** Sharpen and run exactly ONE chapter. This **delegates to the `grill` skill**, which interrogates the chapter into shape AND picks the execution method (**solo / CEO+worker / CEO+specialists**), writing that chosen method into the chapter file. You don't pick the method by hand here — `grill` does, and records it.
 
 ---
@@ -64,13 +63,13 @@ Detect the author stamp (used to label every entry you write — never to pick a
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
 - neither set → stamp `· Agent` (treat as a full-capability host)
 
-Confirm where you are: run `git rev-parse --abbrev-ref HEAD` and `git worktree list --porcelain`. The CEO works on the **main / canon branch**. Workers live on their own worktree branches (Codex and Claude Code each create real worktrees that share this repo's `.git`). Branches sync locally through the shared `.git` — no GitHub needed to move commits between them.
+Confirm where you are with `git rev-parse --abbrev-ref HEAD` and `git worktree list --porcelain`. The CEO works on the declared integration branch; do not assume it is named `main`. Workers live on isolated worktree branches that share the repository's object database.
 
 ---
 
 ## Step 1 — Define a chapter
 
-Pick the next number `NN` (two digits, zero-padded) by listing `brain/chapters/`. Create `brain/chapters/NN-name.md` on the main/canon branch:
+Pick the next number `NN` by listing `brain/chapters/`. Create `brain/chapters/NN-name.md` on the integration branch:
 
 ```markdown
 # Chapter NN — <name>
@@ -80,9 +79,21 @@ Pick the next number `NN` (two digits, zero-padded) by listing `brain/chapters/`
 ## Goal
 [One paragraph — what "done" means for this chapter. Concrete and verifiable.]
 
+## Why
+[Why this chapter matters now.]
+
+## Method
+[solo | CEO+worker | CEO+specialists]
+
+## Done When
+- [observable acceptance criterion]
+
 ## Plan
 - [step]
 - [step]
+
+## Relevant canon / dependencies
+- [path or dependency]
 
 ## Constraints / out of scope
 - [anything the worker must NOT touch or decide]
@@ -93,7 +104,7 @@ Pick the next number `NN` (two digits, zero-padded) by listing `brain/chapters/`
 
 Keep the Goal tight enough that you can verify each worker pass by reading a report + a diff. A chapter may take several passes (backend, UI, wire-up) — each appends its own report, and you verify each in turn.
 
-Commit on the main/canon branch:
+Commit on the integration branch:
 
 ```bash
 git add brain/chapters/NN-name.md
@@ -107,7 +118,7 @@ git commit -m "chapter(NN): define <name> <author stamp>"
 Tell the user exactly which chapter to hand off:
 
 ```
-Chapter NN — <name> is defined and committed on main.
+Chapter NN — <name> is defined and committed on <integration-branch>.
 Hand it to a worker: open a new worker session (Codex or Claude Code), it will create a worktree branch, run /worker, and report back into brain/chapters/NN-name.md.
 ```
 
@@ -121,7 +132,7 @@ Find the worker's branch from `git worktree list --porcelain` (or ask the user f
 
 ```bash
 git show <worker-branch>:brain/chapters/NN-name.md   # the chapter + its Completion Reports
-git diff --stat main..<worker-branch>                # what changed, at a glance
+git diff --stat <integration-branch>..<worker-branch> # what changed, at a glance
 ```
 
 Read the **latest (unverified) Completion Report** — the newest dated section, the one with no Verdict under it yet. If the chapter took multiple passes (backend, UI, wire-up), each new report gets verified in turn; don't re-litigate reports you already gave a Verdict. Read its sections against the chapter **Goal**:
@@ -140,7 +151,7 @@ Compare the diff STAT against the Goal: roughly the right files, roughly the rig
 When a trigger below fires, open evidence **scoped to the diff, per flagged file** — never a whole file:
 
 ```bash
-git diff main..<worker-branch> -- <path>   # changed hunks only, for the specific file in question
+git diff <integration-branch>..<worker-branch> -- <path>
 ```
 
 NEVER pull a whole file via `git show <worker-branch>:<path>` when only part of it changed — the untouched lines are not evidence and reading them burns tokens for nothing.
@@ -161,16 +172,16 @@ Otherwise, **trust the report.** Do NOT line-by-line re-read clean work that mat
 
 ## Step 5 — Approve (merge + fold into canon)
 
-When the chapter passes, merge the worker's branch into main locally (shared `.git`, so this is a local operation):
+When the chapter passes, merge the worker branch into the integration branch locally:
 
 ```bash
 git merge --no-ff <worker-branch> -m "merge: chapter NN <name> <author stamp>"
 ```
 
-Then update the shared canon (author-stamped, since you own these):
+Then reconcile accepted worker proposals into shared canon:
 
 1. `brain/STATUS.md` — reflect the new state, move the chapter to done, update Next Actions; stamp `> Last updated: YYYY-MM-DD [author stamp]`.
-2. `brain/BRIEF.md` — append any decisions locked by this chapter as a new version block (never edit old blocks).
+2. `brain/BRIEF.md` — update the current project contract only when accepted work changed a durable project decision.
 3. `brain/CHANGELOG.md` — fold the chapter's outcome into a dated section (`## [YYYY-MM-DD] [author stamp]`), Keep-a-Changelog format. Only what actually shipped.
 4. **Append** the Verdict into the chapter file directly under the report you just verified (never overwrite an earlier Verdict — a multi-pass chapter has one per report), using this EXACT format:
 
@@ -179,12 +190,12 @@ Then update the shared canon (author-stamped, since you own these):
    **Decision:** approved
    **Notes:** <what was checked + what merged>
    ```
-5. `brain/agenda.md` — move the chapter to ✓ Done, promote the next one.
+5. `brain/agenda.md` — show the next human action and exact checkout; do not maintain duplicate Done history.
 
 Commit the canon update:
 
 ```bash
-git add brain/
+git add <explicit canon files changed during reconciliation>
 git commit -m "chapter(NN): approve + fold into canon <author stamp>"
 ```
 
@@ -194,7 +205,7 @@ Remove the worker's worktree once merged:
 git worktree remove <worktree-path>   # add --force only if you've confirmed nothing is unmerged
 ```
 
-Push to sync the merge to GitHub: `git push origin main`.
+Push the integration branch to its configured remote.
 
 ---
 
@@ -208,14 +219,14 @@ If the report fails verification, do NOT fix it yourself. **Append** a Verdict u
 **Notes:** <what's wrong + what "right" looks like — the specific asks>
 ```
 
-Commit the chapter file on main, then tell the user to hand the chapter back to a worker session. Be precise: vague rejections waste a round trip.
+Commit the chapter verdict on the integration branch, then return the chapter to a worker. Be precise: vague rejections waste a round trip.
 
 ---
 
 ## Rules
 
 - Orient first (Step 0): on a bare `/ceo`, read STATUS, report where things stand, then offer state-aware modes. Offer **Execute** and **Verify** ONLY when something is actually in progress. A direct instruction skips the menu — act on it immediately.
-- You own the shared canon (BRIEF / STATUS / ROADMAP / WONT-DO + CHANGELOG / agenda). Workers never edit these.
+- You own approval and reconciliation. Workers may propose chapter-required canon changes in their branches.
 - Stay worktree-aware: read worker output via `git show`/`git diff` against the worker branch; never assume their uncommitted local files are visible.
 - Trust the report by default; deep-check only on a trigger (Step 4).
 - The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections, including the structured `Verified:` / `Diff:` / (UI chapters only) `UI evidence:` lines. You verify the latest unverified one.

@@ -1,17 +1,22 @@
 ---
-name: session-recap
-description: Mid-session snapshot of where the project currently stands. Not a save. Reach for it to get oriented on current state. Triggers — "recap", "where are we", "what have we done", "catch me up".
+name: recap
+description: Role-aware orientation at the start of a CEO, worker, or solo session, after compaction, on returning later, or whenever the user asks where things stand. Reads live Git and canon; never saves or chooses authority.
 allowed-tools: Read, Glob, Bash(ls:*, pwd:*, date:*, git status:*, git worktree:*, git log:*)
 ---
 
-# Session Recap
+# Recap
 
-A mid-session orientation check. Not a save — just a clear view of where things
-stand right now so work can continue without losing the thread.
+Read-only orientation from live Git and canon. It does not save, select a role,
+or close work.
 
 ---
 
-## Step 1 — Read context
+## Step 1 — Verify role and checkout
+
+Use the role the human invoked; never infer authority from the branch alone. Run
+`pwd`, `git status --short --branch`, and `git worktree list --porcelain` first.
+
+## Step 2 — Read context
 
 > Single canon: all project state lives in `brain/`. Recap always reads `brain/STATUS.md` and `brain/WORKLOG.md` regardless of which tool (Claude Code or Codex) saved last — this is what prevents empty recaps.
 
@@ -29,10 +34,10 @@ Read in order:
 
 ---
 
-## Step 2 — Output the snapshot
+## Step 3 — Output the snapshot
 
 ```
-📋 SESSION RECAP — YYYY-MM-DD
+📋 RECAP — YYYY-MM-DD · <role>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Done this session:
@@ -63,4 +68,4 @@ Where we are:
 - If STATUS.md and git state disagree, trust live git state and mention the mismatch.
 - Worktree check is mandatory — both `.codex/worktrees/` and `.claude/worktrees/` patterns must be detected and surfaced before reading any project files.
 - Do not trigger save-session automatically. If the user wants to save, they'll say so.
-- End with: "Want to continue, or save and close?"
+- End with the role's immediate next action. Do not ask a generic question when canon already answers it.

@@ -194,7 +194,7 @@ Never use the most expensive model. Reasoning tier (Sonnet) is the ceiling.
 - **Never overwrite existing user-written content.** Read first, ask, merge.
 - **Token frontmatter is written by Phase 6.5 + 7 only after explicit user approval via the HTML preview.** Never write tokens silently; never skip the preview when changes are proposed.
 - **No hex codes in direction proposals.** Direction names + palette intent in words at Phase 5 — the user picks intent, not artifacts. Hex codes appear in Phase 6.5 once a direction is locked.
-- **Refusal list lives in DESIGN.md's brand-specific block,** not in a new file. Same enforcement chain as the universal anti-patterns — `design-check` and `audit` will scan against the merged list automatically.
+- **Refusal list lives in DESIGN.md's brand-specific block,** not in a new file. Same enforcement chain as the universal anti-patterns — `design-check` and `project-audit` will scan against the merged list automatically.
 
 ---
 
@@ -202,8 +202,8 @@ Never use the most expensive model. Reasoning tier (Sonnet) is the ceiling.
 
 - **`init-project`** — bootstraps the whole project layout (3 folders + all canon files). Phase 4 inside it creates BRAND.md / DESIGN.md / FUNDAMENTALS.md with the lightweight flow. `design-direction` is a *deeper* alternative for Phase 4, or a re-anchor for projects already initiated.
 - **`design-check`** — UI write-time gate. Reads the DESIGN.md that this skill helped populate. They don't overlap; they chain.
-- **`discussion-mode`** — pure conversation, no writes. `design-direction` writes files. If you want to talk through direction without committing, use `discussion-mode` first, then `design-direction` to lock.
-- **`audit`** — periodic consistency scan. Will catch any drift between BRAND.md / DESIGN.md after this skill runs.
+- **`discuss`** — pure conversation, no writes. `design-direction` writes files. If you want to talk through direction without committing, use `discuss` first, then `design-direction` to lock.
+- **`project-audit`** — periodic consistency scan. Will catch any drift between BRAND.md / DESIGN.md after this skill runs.
 
 ---
 

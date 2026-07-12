@@ -1,7 +1,7 @@
 interface:
   display_name: "Worker"
   short_description: "Execute one delegated chapter in a worktree, doing exactly that chapter's scoped job — for picking up a chapter handed down by the CEO"
-  brand_color: "#0f766e"
+  default_prompt: "Execute the assigned chapter in this isolated worktree, change only what its contract requires, verify the result, and append an evidence-rich Completion Report."
 
 policy:
   allow_implicit_invocation: false

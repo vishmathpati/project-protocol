@@ -165,7 +165,7 @@ Once the copy is in place, patch the placeholders with detected values:
 - **Cross-tier import rules** — leave the template's rule set as-is (they're universal). Only edit if the project explicitly violates one of them (rare).
 - **WORKED EXAMPLE block** — delete the entire HTML-comment block at the bottom of the template before writing. The example is illustrative only and must not ship into the project's canon.
 
-Mark every patched-in value that came from inference (not direct read) with `[VERIFY]` so `audit` surfaces it later.
+Mark every patched-in value that came from inference (not direct read) with `[VERIFY]` so `project-audit` surfaces it later.
 
 Do not invent new sections. Do not strip sections from the template — if a section doesn't apply (e.g. no desktop surface), keep the section header and fill all rows with `no` / `—` / `n/a`. Future migrations into desktop will fill it in without touching the schema.
 

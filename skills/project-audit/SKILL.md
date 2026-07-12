@@ -1,10 +1,10 @@
 ---
-name: audit
-description: Periodic consistency check across canon files (brain/CLAUDE.md, brain/STATUS.md, brain/BRIEF.md, brain/ROADMAP.md, etc.). Read-only — does not auto-fix. Run when canon may have drifted out of sync or before relying on it for a decision.
+name: project-audit
+description: Read-only consistency audit across project canon, chapters, declared structure, and actual repository state. Use for periodic drift checks, stale references, contradictions, and protocol health.
 allowed-tools: Read, Glob, Grep
 ---
 
-# Audit
+# Project Audit
 
 Cross-file consistency check. Surfaces drift, does not fix.
 
@@ -12,7 +12,7 @@ Cross-file consistency check. Surfaces drift, does not fix.
 
 ## When this fires
 
-- User explicitly invokes `/audit`.
+- User explicitly invokes `/project-audit`.
 - User asks "are the files consistent?", "is anything stale?", "check for drift".
 - After multiple sessions of work on canon files without a sweep.
 - Before any major release or chapter close that spans multiple files.
@@ -105,7 +105,7 @@ Findings here are category (B) — stale files. No fix required if the user choo
 [C] brain/agenda.md uses "you" wording; brain/STATUS.md uses neutral wording. Two-audience rule — no fix.
 ```
 
-**7. Do not auto-fix.** Show findings. Let the user decide which to fix and in what order. The fix typically requires the `discipline` skill for canon edits or the `design-check` skill for UI fixes.
+**7. Do not auto-fix.** Show findings. Let the owning role decide which to fix. Consequential canon repairs may require `change-check`; UI repairs may require `design-check`.
 
 ---
 

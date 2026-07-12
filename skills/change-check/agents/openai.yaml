@@ -1,0 +1,7 @@
+interface:
+  display_name: "Change Check"
+  short_description: "Check scope and cascades before high-risk changes"
+  default_prompt: "Check this proposed change for scope, authority, dependencies, and downstream effects before proceeding."
+
+policy:
+  allow_implicit_invocation: true

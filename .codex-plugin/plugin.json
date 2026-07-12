@@ -1,7 +1,7 @@
 {
   "name": "project-protocol",
-  "version": "4.1.0",
-  "description": "Project session discipline for Claude Code and Codex. One brain/ canon (STATUS, BRIEF, ROADMAP, WORKLOG, CHANGELOG, chapters) replaces the old three-folder layout, with a CEO/worker/solo role model, git-worktree handoffs, and 26 skills for planning, building, verifying, and shipping consistently.",
+  "version": "5.0.0",
+  "description": "A project operating system for Claude Code and Codex: universal canon, role-aware sessions, chapter-scoped worktrees, disciplined engineering, and optional brand, marketing, design, and frontend workflows.",
   "skills": "./skills/",
   "hooks": "./hooks/hooks.json",
   "author": {

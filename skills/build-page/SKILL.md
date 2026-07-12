@@ -171,7 +171,7 @@ When the user drops a URL, pasted component code, or a screenshot during section
 Before proceeding when the planned page build is **structural** — defined as: touches `brain/BRIEF.md` (beyond the plan-lock append), touches `brain/ROADMAP.md`, or involves writing files across multiple tiers simultaneously — invoke the discipline skill first:
 
 ```
-Skill("discipline")
+Skill("change-check")
 ```
 
 Normal single-page builds with a plan-lock BRIEF append do NOT trigger this gate. It fires when the scope has expanded to affect the project's roadmap, cross-tier refactors, or multi-file canon changes beyond the expected BRIEF.md append + INDEX.md update.
@@ -252,8 +252,8 @@ Next:
 - **`build-component`** — atomic. One component at a time. `build-page` calls it inline whenever a section needs a net-new primitive. Atomic component requests from the user still go directly to `build-component`. They chain: `build-page` is the conductor, `build-component` is the player.
 - **`design-direction`** — locks brand identity ONCE at the start. Upstream of every page build.
 - **`design-check`** — UI write-time gate. Explicitly invoked via `Skill("design-check")` after this skill's wire-up and after each inline `build-component` call. Backed by PostToolUse hook (double-fire accepted).
-- **`discussion-mode`** — pure conversation, no writes. If the user wants to think about a page WITHOUT committing to architecture, use that first, then `build-page` to actually compose.
+- **`discuss`** — pure conversation, no writes. If the user wants to think about a page WITHOUT committing to architecture, use that first, then `build-page` to actually compose.
 - **`init-project`** — bootstraps the three-folder layout. `build-page` assumes init-project + design-direction + (for marketing pages) marketing-brief have already run.
 - **`save-session`** — closes the session cleanly. Consumes the WORKLOG entries this skill wrote. If a build-page session ends mid-flow, save-session writes a `Resume /build-page <slug>` line to STATUS Next Actions automatically (because WORKLOG will show an open `decided: build-page started` line with no matching `decided: build-page complete` line).
 
-Chain: `init-project` → `design-direction` → `build-component` (per atomic piece) → `marketing-brief` (once, end of project) → **`build-page`** (per page) → `design-check` (auto) → `audit` (periodic).
+Chain: `init-project` → `design-direction` → `build-component` (per atomic piece) → `marketing-brief` (once, end of project) → **`build-page`** (per page) → `design-check` (auto) → `project-audit` (periodic).

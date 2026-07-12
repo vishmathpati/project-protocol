@@ -75,7 +75,7 @@ What to patch per table:
 - **COMPARISONS** — drop the entire table if Phase 1 confirmed no comparison pages. Otherwise one row per competitor with `vs_competitor`, `our_strength`, `their_strength`, `page_slug`.
 - **TESTIMONIALS** — if Phase 1 said "real quotes available", fill with real attributions. Otherwise use the locked fictional-customer brand for `company` and plausible-but-fake names for `customer`. `quote` is verbatim.
 - **FAQS** — one row per question. Each row binds to a `page_slug`; same question across pages = duplicate the row with a different `page_slug`.
-- **LEGAL_PAGES** — keep the universal rows (`/terms`, `/privacy`, …) if the project will need them. Set `last_updated` to `[VERIFY]` so `audit` surfaces them later. Drop rows the project explicitly doesn't have.
+- **LEGAL_PAGES** — keep the universal rows (`/terms`, `/privacy`, …) if the project will need them. Set `last_updated` to `[VERIFY]` so `project-audit` surfaces them later. Drop rows the project explicitly doesn't have.
 
 Hard rules for the patch:
 
@@ -174,7 +174,7 @@ If Phase 1 said "real customer quotes available", populate with real names and r
 | dpa      | DPA               | /legal/dpa      | Vish        | 2026-04-01    |
 ```
 
-If the project doesn't have legal pages yet, write the rows with `last reviewed: [VERIFY]` so they show up in `audit` later.
+If the project doesn't have legal pages yet, write the rows with `last reviewed: [VERIFY]` so they show up in `project-audit` later.
 
 ---
 
@@ -217,7 +217,7 @@ If `brain/marketing/CONTENT.md` already exists:
 - **One row per fact.** Two rows for the same feature is a bug.
 - **`key` is stable.** Code and other marketing files reference `key`. Renaming `key` breaks references.
 - **Blurbs cap at 12 words.** Headlines cap at 8. Enforce on write.
-- **No emoji icons.** Icon column names a lucide-style symbol or "none". `audit` and `design-check` will flag emoji icons downstream.
+- **No emoji icons.** Icon column names a lucide-style symbol or "none". `project-audit` and `design-check` will flag emoji icons downstream.
 - **No invented features.** Every FEATURES row must trace to code or ROADMAP.
 - **No invented testimonials with real-looking author + real-looking company together.** Either both are clearly fictional (using the locked fictional-customer brand from Phase 6) or both are real with the customer's permission.
 - **Banned-words list applies** to blurbs and FAQ answers. Scan against `brain/FUNDAMENTALS.md` § banned words before writing.

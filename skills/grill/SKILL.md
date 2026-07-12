@@ -64,9 +64,9 @@ State your recommended method and give a one-line reason. Confirm with the user 
 
 ---
 
-## Step 6 — Write the sharpened goal + plan into the chapter
+## Step 6 — Write the complete chapter contract
 
-Write the result into the chapter file `brain/chapters/NN-name.md` — fill the **Goal**, **Method**, and **Plan** sections (creating them if the chapter is fresh):
+Write the result into `brain/chapters/NN-name.md`: Goal, Why, Method, Done When, Plan, Relevant canon/dependencies, and Constraints/out of scope. The CEO assigns the final number and commits the completed contract on the integration branch.
 
 - **Goal** — one tight paragraph of what "done" means: concrete, verifiable, reflecting every decision just made.
 - **Method** — one of `solo` | `CEO+worker` | `CEO+specialists`, as chosen in Step 5.

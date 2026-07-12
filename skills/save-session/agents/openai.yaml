@@ -1,7 +1,7 @@
 interface:
   display_name: "Save Session"
-  short_description: "Save and close a project session, persisting the session's work into canon — for the end of a working session"
-  brand_color: "#475569"
+  short_description: "Persist role-owned session state safely and report Git outcome"
+  default_prompt: "Save this session according to the invoked role, fold durable state into its proper canon, commit explicit owned files, and report the exact next action."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

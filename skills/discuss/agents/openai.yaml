@@ -1,0 +1,7 @@
+interface:
+  display_name: "Discuss"
+  short_description: "Evaluate options and trade-offs without editing files"
+  default_prompt: "Discuss this against the live project sources, identify gaps, and recommend the strongest option without editing files."
+
+policy:
+  allow_implicit_invocation: true

@@ -120,7 +120,7 @@ User options:
 - **edit** → "what to change?" — accept free-text instructions, regenerate, re-preview.
 - **restart** → drop the current generation, return to Phase 2.
 
-Allow at most 2 edit rounds. After that, recommend taking it to discussion-mode for deeper rework. **This cap applies to standalone invocations only.** If invoked inside a `build-page` session, this cap does not apply — iterate freely.
+Allow at most 2 edit rounds. After that, recommend taking it to discuss for deeper rework. **This cap applies to standalone invocations only.** If invoked inside a `build-page` session, this cap does not apply — iterate freely.
 
 ---
 

@@ -1,22 +1,22 @@
 ---
-name: discipline
-description: Pre-action gate before any non-trivial change — editing files, locking decisions, structural changes. Use to pause and check before acting when a change could cascade. Triggers — "before I do this", "let me change X", "I'm about to edit Y", or any explicit non-trivial action.
+name: change-check
+description: Pre-action scope and cascade check for structural, cross-cutting, destructive, or otherwise high-risk changes. Use before a change that may invalidate canon, affect several systems, or be difficult to reverse.
 allowed-tools: Read, Glob, Grep
 ---
 
-# Discipline
+# Change Check
 
-A 7-step gate before any non-trivial action. The skill itself does not edit anything — it forces a pause and declaration before whoever invoked it proceeds.
+A lightweight gate for consequential changes. Routine bounded implementation does not need it.
 
 ---
 
 ## When this fires
 
-- About to edit a file in the project.
+- About to restructure files, ownership, or architecture.
 - About to lock a decision into BRIEF.md.
 - About to commit to a recommendation that affects multiple files.
 - About to agree to a structural change.
-- Slash command: `/discipline`
+- Slash command: `/change-check`
 
 ---
 
@@ -36,15 +36,15 @@ A 7-step gate before any non-trivial action. The skill itself does not edit anyt
 - If yes: name the supporting decision/section.
 - If no: name the gap. The gap must be closed before the action proceeds — typically by locking a new `BRIEF.md` version block first.
 
-**6. Read back.** Restate to the user what you understand the task to be. Wait for explicit confirmation ("go", "do it", "confirmed", "yes").
+**6. Authority.** Confirm the requested action is authorized. Ask only when it expands scope or needs a material user choice.
 
-**7. Act.** Only after confirmation. Immediately after, append a `WORKLOG.md` entry for the change.
+**7. Act.** Proceed within the confirmed boundary. Log only meaningful decisions, blockers, failures, or recovery state.
 
 ---
 
 ## Skip conditions
 
-The user can override the gate with explicit phrases like "skip discipline, just do it" or "no gate, proceed". The skill respects this. Default behavior is the full 7 steps.
+Skip for routine, reversible, chapter-scoped edits whose dependencies and authority are already clear.
 
 ---
 
@@ -54,6 +54,6 @@ AI agents drift when they act before verifying. This skill makes the verificatio
 
 ---
 
-## Difference from `audit-before-close`
+## Difference from `completion-check`
 
-`discipline` is the gate BEFORE acting. `audit-before-close` is the gate AT THE END of work. Different moments. Both apply to non-trivial work.
+`change-check` protects scope before consequential work. `completion-check` verifies the finished contract.

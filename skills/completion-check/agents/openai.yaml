@@ -1,0 +1,7 @@
+interface:
+  display_name: "Completion Check"
+  short_description: "Verify finished work against its original contract"
+  default_prompt: "Compare the finished work and evidence against the chapter contract and return a completion verdict."
+
+policy:
+  allow_implicit_invocation: true

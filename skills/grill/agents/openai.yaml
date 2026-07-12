@@ -1,7 +1,7 @@
 interface:
   display_name: "Grill"
   short_description: "A relentless one-question-at-a-time interview that sharpens a chapter's Goal + Plan before building — when scope is fuzzy and requirements need pressure-testing first"
-  brand_color: "#b91c1c"
+  default_prompt: "Pressure-test this proposed chapter one decision at a time, read discoverable answers from the project, and produce a complete executable contract."
 
 policy:
   allow_implicit_invocation: true

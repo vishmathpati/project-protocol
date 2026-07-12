@@ -5,6 +5,19 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+### Added
+- **Universal Foundation.** `init-project` now inspects first, captures universal project truth once, creates only the core canon, and routes to specialist groups without asking brand, marketing, design, research, or implementation questions.
+- **Universal canon templates.** Added concise templates for CLAUDE, BRIEF, STATUS, STRUCTURE ownership, WORKLOG, CHANGELOG, agenda, WONT-DO, and chapters.
+
+### Changed
+- **CEO/worker authority is chapter-scoped.** Workers may propose any chapter-required code or canon change in isolated worktrees; only CEO approval and merge establish shared canon.
+- **Session continuity redesigned.** Recap is role-aware orientation; Handoff carries exact repo/worktree/branch/checkpoint identity; Save Session persists role-owned state without conflating save, completion, approval, or merge.
+- **Chapter contracts expanded.** Goal, Why, Method, Done When, Plan, dependencies, constraints, carry-over, reports, and verdicts now form one durable review unit.
+- **Core skill names clarified.** `session-recap` → `recap`, `audit-before-close` → `completion-check`, `audit` → `project-audit`, `discipline` → `change-check`, and `discussion-mode` → `discuss`.
+
+### Removed
+- **Obsolete init-project mega-flow.** Removed the old discovery/modernize/design/docs phases and `SITUATIONS.md` generation; specialized skills own those concerns.
+
 ## [4.1.0] — 2026-07-11
 
 The research-engine release. `calibrate` grows from a single moodboard capture into a **two-round, human-relayed design-research engine** driven by an Aside browser agent — a SWEEP that maps the field into named concepts, a human checkpoint that picks or blends one, then a DEEP TEARDOWN that forensically autopsies the chosen concept's best real examples (real fonts via `document.fonts`, real palette from `:root`, real motion stack from `window` globals + network). Fixes the deepest remaining gap: directions were proposed from training-data averages; now they are grounded in a swept, forensically-verified field map. Governing law throughout — **no hardcoded counts**; every quantity is saturation-driven.

@@ -439,7 +439,7 @@ When a UI task needs a value that isn't in this file:
 4. **Add the token here AND in `global.css`** (or `DesignTokens.swift` for Swift projects).
 5. **Then use it.**
 
-The `design-check` skill enforces this on every UI task. Skipping the protocol = the agent shipped raw values, which the audit-before-close gate will flag.
+The `design-check` skill enforces this on every UI task. Skipping the protocol = the agent shipped raw values, which the completion-check gate will flag.
 
 ---
 

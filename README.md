@@ -33,23 +33,23 @@ Install via the co-located Codex manifest at `.codex-plugin/plugin.json`. Codex 
 
 ## What you get
 
-26 skills + hook events that turn every AI coding session into a disciplined operation. As of v3.0.0, all project context lives in a single `brain/` folder. The root `CLAUDE.md` is the always-loaded brain — skill index, hooks index, situation router, non-negotiable rules. Hooks fire deterministically on tool events. Skills are invokable via explicit `Skill()` calls — no description-match guessing.
+Skills and mechanical hooks turn AI coding sessions into a disciplined operation. Project context lives in a single `brain/` folder. Root `CLAUDE.md` is the concise always-loaded constitution, skill router, and source index.
 
 ### Role model (new in v3.0.0)
 
 Work is organized around three roles:
 
 - **CEO** — plans the work, breaks it into chapters, reviews and merges completed work.
-- **Worker** — picks up one chapter, executes it in a git worktree, writes a Completion Report, then calls `handoff`.
+- **Worker** — executes one chapter in an isolated worktree and writes an evidence-rich Completion Report.
 - **Solo** — single-agent mode for smaller tasks that don't need the CEO/worker split.
 
 Invoke a role with `/ceo`, `/worker`, or `/solo` at the start of a session. The CEO defines chapters in `brain/chapters/`. Each chapter is a scoped unit of work executed by a worker in an isolated git worktree; the CEO verifies the Completion Report and merges. The `handoff` skill (model-invoked) signals the end of a worker session and packages the report for CEO review.
 
 ### Session lifecycle (the core 4)
 
-- **`init-project`** — Bootstrap or audit a project. Creates the `brain/` layout and root `CLAUDE.md`.
-- **`save-session`** — Close cleanly: WORKLOG → CHANGELOG, update STATUS, clear WORKLOG.
-- **`session-recap`** — Mid-session snapshot: what's been done, what's still open.
+- **`init-project`** — Establish the Universal Foundation without running specialist workflows.
+- **`save-session`** — Persist role-owned state safely; saving is not completion, approval, or merge.
+- **`recap`** — Role-aware orientation at session start, after compaction, or on return.
 - **`add-context`** — Add extended context files (data contracts, domain reference, integrations).
 
 ### Role skills (new in v3.0.0)
@@ -57,7 +57,7 @@ Invoke a role with `/ceo`, `/worker`, or `/solo` at the start of a session. The 
 - **`ceo`** — CEO mode: plan chapters, review Completion Reports, merge worker branches.
 - **`worker`** — Worker mode: claim a chapter, execute in a git worktree, write a Completion Report.
 - **`solo`** — Solo mode: single-agent execution without the CEO/worker split.
-- **`handoff`** *(model-invoked)* — Worker session teardown: write Completion Report, clean worktree state, signal to CEO.
+- **`handoff`** — Durable carry-over plus a paste-ready packet for continuing unfinished work in the same branch/worktree.
 - **`git`** — Git operations gate. Validates branch state, enforces commit message discipline, guards against unintended force-pushes.
 - **`grill`** — Adversarial review: stress-tests a plan, implementation, or decision before it ships.
 - **`bug-fixing`** — Structured bug investigation: reproduce → isolate → fix → verify, with WORKLOG entries at each step.
@@ -67,11 +67,11 @@ Invoke a role with `/ceo`, `/worker`, or `/solo` at the start of a session. The 
 
 Invoked explicitly — via `Skill()` calls from other skills, slash commands, or the hooks that dispatch them.
 
-- **`discipline`** — Pre-action gate: pause, declare files-to-change, cascade-effects, verify canon, confirm, then act.
+- **`change-check`** — Pre-action gate: pause, declare files-to-change, cascade-effects, verify canon, confirm, then act.
 - **`verify-by-reading`** — Open the file before answering questions about it. Catches memory drift.
-- **`audit-before-close`** — Spec-vs-implementation check before any chapter or task is marked done.
-- **`discussion-mode`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
-- **`audit`** — Cross-file consistency check across canon. Reports drift, does not auto-fix.
+- **`completion-check`** — Spec-vs-implementation check before any chapter or task is marked done.
+- **`discuss`** — Read-only mode when the user signals thinking ("discuss", "let's talk", "what do you think").
+- **`project-audit`** — Cross-file consistency check across canon and repository truth. Reports drift, does not auto-fix.
 - **`design-check`** — UI-work gate. Reads `DESIGN.md` + `FUNDAMENTALS.md`, searches `components/` for reuse, halts on missing tokens, scans the diff for raw hex / px / font values. Step 8 auto-fixes mechanical violations (raw hex matching tokens, missing dimensions, ellipsis, nbsp, etc.) with user confirmation. Human-judgment violations are surfaced for user input only.
 - **`migrate-project`** — Apply version-by-version plugin migration deltas to bring an existing project up to the current plugin version. Driven by per-release manifests under `migrations/`. Triggered automatically by the SessionStart drift-detector hook when project's recorded plugin version is behind the installed plugin.
 - **`advisor`** — Research-first expert mode: searches before opining, gives an independent view with trade-offs; model-invoked on "what do you think / recommend" questions.
@@ -127,13 +127,13 @@ The root `CLAUDE.md` is the brain — non-negotiable rules, skill index, hooks i
 
 AI agents forget everything between sessions. This plugin fixes that by keeping all context in plain markdown files the agent reads at session start.
 
-`brain/WORKLOG.md` is the discipline engine: every response that changes something appends one line. By session end, you have a full real-time audit trail. `save-session` distills it into `brain/CHANGELOG.md` and `brain/STATUS.md` so the next session starts from solid ground.
+`brain/WORKLOG.md` is a temporary recovery buffer for meaningful progress, decisions, blockers, failed attempts, and next actions. Save Session folds durable information into its proper owner and removes only recovery entries that were safely folded.
 
 The **discipline skills** add a second layer: gates that fire automatically when their description matches the conversation. They force the agent to verify before acting, read before answering, and audit before closing — the patterns that fail in untrained agent sessions.
 
 **CEO/worker/solo model.** For non-trivial work the CEO breaks the project into chapters, each chapter is a scoped unit a worker picks up in an isolated git worktree. The worker executes, writes a Completion Report, and calls `handoff`. The CEO reviews and merges. This keeps individual sessions small and the audit trail clean. Solo mode collapses the model to a single agent for simpler work.
 
-**One agent at a time.** Either Claude Code or Codex is active on a project, never both simultaneously. Author stamps on every significant write record which agent made each decision.
+**Multiple tools, isolated work.** Claude Code and Codex may work on separate chapter worktrees. Git branches and chapter contracts establish ownership; author stamps record provenance.
 
 ---
 
@@ -144,7 +144,7 @@ Works with Claude Code, Codex CLI, and any tool that supports the [agentskills.i
 - No hardcoded model names.
 - Every skill ships with both a Claude Code `SKILL.md` and a Codex `agents/openai.yaml` sidecar.
 - Dual manifest: `.claude-plugin/plugin.json` + `.codex-plugin/plugin.json`.
-- Worktree detection in `session-recap` for both Codex (`.codex/worktrees/`) and Claude Code (`.claude/worktrees/`).
+- Worktree detection in `recap` for both Codex (`.codex/worktrees/`) and Claude Code (`.claude/worktrees/`).
 - SessionStart hook degrades gracefully if the host doesn't expose `${CLAUDE_PLUGIN_ROOT}` or `${CODEX_PLUGIN_ROOT}`.
 
 **Codex one-time setup:** add this to `~/.codex/config.toml` so Codex reads `CLAUDE.md` automatically:

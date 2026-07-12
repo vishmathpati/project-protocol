@@ -316,7 +316,7 @@ Why: shell before pages (else you rebuild the page when the shell lands); home b
 
 ## Definition of Done (three scopes)
 
-"Done" is not a feeling. Each scope has an explicit checklist — nothing is called done until every box is checked (this is what `audit-before-close` enforces).
+"Done" is not a feeling. Each scope has an explicit checklist — nothing is called done until every box is checked (this is what `completion-check` enforces).
 
 **Component-done:** preview approved · scans clean (no design-scan violations) · all 5 states exist (loading, empty, error, populated, edge) · tokens only · correct tier folder.
 
@@ -448,7 +448,7 @@ If any answer is "no" or "yes I did" — fix the foundation before adding more.
 
 ---
 
-## Pre-Ship Checklist (the audit-before-close skill runs this)
+## Pre-Ship Checklist (the completion-check skill runs this)
 
 - [ ] No raw hex / px / font-family in component files — everything via tokens.
 - [ ] No cardinal-sin patterns (indigo accent, two-stop gradients, emoji icons, hardcoded display font, AI-dashboard tile shape, invented metrics, filler copy).

@@ -101,7 +101,7 @@ This satisfies `save-session` Step 4. Without this inline update, save-session p
 - **No iteration history files** (e.g. `plan-v1.md`, `plan-v2.md`). Iterate in place in chat.
 - **No tool palette restriction.** Standard `allowed-tools` per the SKILL.md frontmatter. The discipline is prose, not enforcement.
 - **No multi-page tracking.** One slug per session. Second invocation of `/build-page` halts politely if the prior session didn't close: *"There's an open build-page session for /<previous-slug> (last WORKLOG entry: <line>). Close that first with `save-session`, or type 'switch' to suspend it and start a new one."*
-- **No defer-list elaborate compatibility machinery.** Other skills' triggers work normally. If the user invokes `/audit` mid-build, audit runs and returns; build-page picks back up in the next message. The agent is responsible for staying oriented across that — same as it would for any other skill.
+- **No defer-list elaborate compatibility machinery.** Other skills' triggers work normally. If the user invokes `/project-audit` mid-build, audit runs and returns; build-page picks back up in the next message. The agent is responsible for staying oriented across that — same as it would for any other skill.
 
 ## Save-session interaction
 
@@ -119,7 +119,7 @@ This is the same pattern every other long-running skill uses. There is no specia
 
 ## When other skills get invoked mid-conversation
 
-If the user types something that fires another skill (`/discuss`, `/audit`, `/save`, `/recap`):
+If the user types something that fires another skill (`/discuss`, `/project-audit`, `/save`, `/recap`):
 
 - That skill runs.
 - It returns control.

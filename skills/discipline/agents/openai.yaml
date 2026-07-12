@@ -1,7 +1,0 @@
-interface:
-  display_name: "Discipline"
-  short_description: "Pre-action gate before any non-trivial change — when a file edit, locked decision, or structural change could cascade"
-  brand_color: "#475569"
-
-policy:
-  allow_implicit_invocation: true

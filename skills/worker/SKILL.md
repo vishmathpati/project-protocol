@@ -1,7 +1,6 @@
 ---
 name: worker
 description: Execute one delegated chapter in a worktree, doing exactly that chapter's scoped job. Reach for it to pick up a chapter handed down by the CEO. Triggers — "/worker", "work this chapter", "pick up chapter N".
-disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*)
 ---
 
@@ -11,7 +10,7 @@ The executor. You take ONE worker pass on a chapter the CEO defined and do exact
 
 A chapter is not always one worker. A big chapter accumulates **one or more** Completion Reports — e.g. a backend pass, then a UI pass, then a wire-up pass — each by a different specialist, each verified in turn. So the chapter file you open may already hold earlier reports (and their Verdicts) from other workers. You ADD yours; you never overwrite theirs.
 
-There is ONE canon: `brain/`. You may READ it. You may WRITE only code files and your own chapter file. You NEVER edit the shared canon — that's the CEO's.
+There is ONE canon: `brain/`. Your authority is **chapter-scoped, not file-type-scoped**. Inside your isolated worktree you may change any file genuinely required by the chapter, including canon. Every worker change is a proposal until the CEO approves and merges it.
 
 ---
 
@@ -23,7 +22,7 @@ Detect the author stamp (labels your entries only):
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
 - neither set → stamp `· Agent` (treat as a full-capability host)
 
-Confirm your location: `git rev-parse --abbrev-ref HEAD` and `git rev-parse --show-toplevel`. You should be on a worktree branch, NOT on `main`. If you're on `main`, STOP and tell the user — a worker works on a branch, not the canon.
+Confirm your location and the declared integration branch. You must be on a dedicated worktree branch, not the integration branch.
 
 ---
 
@@ -32,7 +31,7 @@ Confirm your location: `git rev-parse --abbrev-ref HEAD` and `git rev-parse --sh
 Pull the newest `brain/` (canon + the chapter brief the CEO just wrote) into your worktree. Worktrees sync locally through the shared `.git` — no GitHub needed:
 
 ```bash
-git merge main
+git merge <integration-branch>
 ```
 
 If this conflicts, STOP and report it under Flags — do not guess your way through a canon conflict.
@@ -49,16 +48,14 @@ When the chapter creates or modifies any page or UI component — files under a 
 
 ---
 
-## Step 3 — Write boundary (strict)
+## Step 3 — Chapter boundary (strict)
 
-You may edit ONLY:
+You may edit any code or canon file that the chapter explicitly requires. Do not edit unrelated files merely because they are available in the worktree.
 
-- **code files** the chapter requires, and
-- **this chapter's own file** `brain/chapters/NN-name.md` (this is how you report).
-
-You may NEVER edit the shared canon — `brain/STATUS.md`, `brain/BRIEF.md`, `brain/ROADMAP.md`, `brain/WONT-DO.md` (also `brain/CHANGELOG.md`, `brain/agenda.md`). Those are the CEO's. Editing the chapter file never collides with other workers: even when several specialists work the same chapter in sequence, each only ever **appends** its own dated report at the bottom and leaves every section above it untouched, so there's nothing to conflict over.
-
-If the work seems to need a canon change, that's a Flag (Step 5), not an edit.
+- `STATUS.md`, `agenda.md`, `CHANGELOG.md`, and CEO Verdicts remain CEO reconciliation responsibilities unless the chapter explicitly names them.
+- BRIEF, ROADMAP, DESIGN, BRAND, STRUCTURE, TOOLING, TASTE, DISCOVERIES, and extended context may change when the chapter requires it.
+- Never copy worker canon manually into the CEO chat or main checkout. The CEO reviews and merges the branch diff.
+- Conflicting canon is a Flag; do not guess through it.
 
 ---
 
@@ -72,7 +69,7 @@ When the work is done, **append** the report to `brain/chapters/NN-name.md` as a
 **Status:** done | partial | blocked
 **Changed:** <one line per file/area>
 **Verified:** <command run> → <result/exit + counts, e.g. "tests 34/34 pass" / "tsc clean">
-**Diff:** <paste of `git diff --stat main..<branch>`>
+**Diff:** <paste of `git diff --stat <integration-branch>..<branch>`>
 **UI evidence:** <only for UI chapters: "via build-page/build-component · design-check PASS" + screenshot path if taken; omit line for non-UI work>
 **Flags:** <deviations / risks / unsure — these are the CEO's drill-down targets>
 **Commit:** <branch · hash>
@@ -81,6 +78,8 @@ When the work is done, **append** the report to `brain/chapters/NN-name.md` as a
 Fill **Verified** with real checks, not "looks fine" — the command and its actual result/counts, not a vibe. A specific, evidence-rich report (real **Verified** lines, a real **Diff** stat, real **UI evidence** where it applies) is what lets the CEO approve without re-reading your code; a thin **Verified** line forces an expensive deep-check that costs everyone tokens and time. Fill **Flags** honestly — those are the CEO's drill-down targets, and an empty Flags line on messy work will cost a round trip.
 
 When a large shared file was involved, also state in **Changed** what you did NOT touch — e.g. "only the hero section of `page.tsx` changed; the remaining sections untouched." This is the attestation that spares the CEO reading thousands of unchanged lines.
+
+Also state every canon file changed and why. This lets the CEO reconcile shared state without reopening entire files.
 
 ---
 
@@ -101,7 +100,7 @@ git commit -m "chapter(NN): <name> — <short summary> <author stamp>"
 
 Capture the commit hash and branch name — they go in the report's **Commit** line (re-edit the report if you committed first, or amend).
 
-**Pushing:** you may push your branch so the CEO can pull it: `git push -u origin <branch>` (then report the branch is pushed). Since worktrees share the same `.git`, the CEO can read your branch locally either way (`git show <branch>:brain/chapters/NN-name.md`, `git diff main..<branch>`), so a push is for syncing across machines, not required for the local CEO handoff.
+**Pushing:** push the worker branch as backup and cross-machine transport: `git push -u origin <branch>`. The CEO can also read it locally through the shared repository.
 
 Then tell the user: "Chapter NN reported and committed on `<branch>`. Tell the CEO: chapter NN done, check."
 

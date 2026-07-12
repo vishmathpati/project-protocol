@@ -1,0 +1,7 @@
+interface:
+  display_name: "Recap"
+  short_description: "Orient a role from live Git and project canon"
+  default_prompt: "Orient this session from the invoked role, current worktree and branch, active chapter, status, and next action without changing files."
+
+policy:
+  allow_implicit_invocation: true
