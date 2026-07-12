@@ -32,7 +32,7 @@ Short and operational — enough for the next session to resume cold, no more. C
 - **What's done** — what's actually finished and verified this session.
 - **What's next** — the immediate next action(s), in order.
 - **Open threads / decisions pending** — anything unresolved, any decision still owed, any half-explored idea worth not losing.
-- **Execution identity** — repository, exact worktree path, branch, checkpoint commit, invoked role, and active chapter.
+- **Execution identity** — repository, current checkout/worktree path, working branch, integration branch, checkpoint commit, invoked role, and active chapter.
 - **Verification and dirty state** — checks already run, current failures, and an explicit list of uncommitted files.
 
 **Redact secrets.** No API keys, passwords, tokens, or PII in the note — replace with a placeholder (`<API_KEY redacted>`) and say where the real value lives if needed.
@@ -67,7 +67,15 @@ If there have been earlier carry-overs on this chapter, add a new dated section 
 
 ## Step 3 — Produce the paste-ready handoff
 
-Return a compact block containing the exact repository, worktree, branch, checkpoint commit, role, chapter, completed work, next action, open decisions, verification, and uncommitted warning. The receiving session must verify that same worktree and branch before editing. It must not continue on main or create a new branch for the same work.
+Return a compact block containing the repository, current checkout path, working branch, integration branch, checkpoint commit, role, chapter, completed work, next action, open decisions, verification, and uncommitted warning.
+
+The receiving session may open in a fresh app-created worktree. Before editing, it must verify one of these continuity paths:
+
+1. Resume the existing worktree and branch; or
+2. When all work is committed, create/use a fresh worktree from the recorded working branch or checkpoint commit; or
+3. When uncommitted work remains, return to the original worktree. A new worktree cannot recover another checkout's dirty files.
+
+Never silently continue from the integration branch when the recorded continuation lives on another branch/commit. Do not create a second divergent branch for the same work unless the user explicitly chooses a fork.
 
 ## Step 4 — Tell the user how to resume
 

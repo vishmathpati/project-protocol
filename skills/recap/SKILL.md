@@ -23,10 +23,11 @@ Use the role the human invoked; never infer authority from the branch alone. Run
 Read in order:
 
 1. Run `pwd` and `git status --short --branch` if this is a git repository.
-   - If the branch is detached, say so clearly.
-   - If the cwd contains `.codex/worktrees/`, warn: this is a **Codex worktree** — local uncommitted changes from the main checkout are not present here.
-   - If the cwd contains `.claude/worktrees/`, warn: this is a **Claude Code worktree** — local uncommitted changes from the main checkout are not present here.
-   - In either worktree case, state the main checkout path (strip the worktree suffix) so the user knows where the real files live.
+   - If the branch is detached, say so clearly and record the checkpoint commit.
+   - If the cwd contains `.codex/worktrees/`, state: this is a **Codex worktree** — an isolated real checkout; uncommitted changes in other worktrees are not present here.
+   - If the cwd contains `.claude/worktrees/`, state: this is a **Claude Code worktree** — an isolated real checkout; uncommitted changes in other worktrees are not present here.
+   - For any worktree, identify the repository's other checkout paths from `git worktree list`; never call one checkout the location of the "real files."
+   - If this is not a worktree, give the one-time notice: "This session is using the shared local checkout. A worktree is recommended for isolation and easier review. Continue locally only if that was intentional." Do not repeat it later in the same session.
    - If there are uncommitted changes, summarize them briefly.
 2. Root `CLAUDE.md` — overall project orientation: active skills, rules.
 3. `brain/STATUS.md` — project health, blockers, last-known state.

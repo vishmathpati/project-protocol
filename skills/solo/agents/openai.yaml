@@ -1,7 +1,7 @@
 interface:
   display_name: "Solo"
   short_description: "Complete small work in one accountable pass"
-  default_prompt: "Act in solo mode for a genuinely small task: orient, implement within scope, verify, persist the result, and escalate if it grows."
+  default_prompt: "Act in solo mode for a genuinely small task in the current local checkout or app-created worktree: orient, implement within scope, verify, persist the result, and escalate if it grows."
 
 policy:
   allow_implicit_invocation: false

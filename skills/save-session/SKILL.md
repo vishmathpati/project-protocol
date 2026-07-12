@@ -32,7 +32,7 @@ Do not write empty history, discussion summaries, rejected variants, routine edi
 
 ### CEO
 
-Reconcile only approved work into shared canon. Update agenda from live chapter and Git state. Commit explicit owned files on the integration branch and push. Saving does not approve an unverified worker branch.
+Reconcile only approved work into shared canon. Update agenda from live chapter and Git state. In the local integration checkout, commit explicit owned files there. In a CEO worktree, commit the CEO proposal branch and use the CEO/Git reconciliation path before reporting anything as shared canon; unfinished CEO work may remain on the proposal branch. Saving does not approve an unverified worker branch.
 
 ### Worker
 
@@ -40,7 +40,7 @@ Do not merge. If unfinished, write Carry-over or Handoff. If finished, append th
 
 ### Solo
 
-Persist the small result and its evidence. Run `completion-check` before calling substantial work done. Update shared canon only where the completed result requires it. Commit explicit files and push the current branch.
+Persist the small result and its evidence in the current local checkout or worktree. Run `completion-check` before calling substantial work done. Update shared canon only where the completed result requires it. Commit explicit files and push the current named branch.
 
 ## 5. Clear only folded recovery entries
 

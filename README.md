@@ -57,7 +57,7 @@ Invoke `/ceo`, `/worker`, or `/solo` deliberately at session start; the role run
 - **`ceo`** — CEO mode: plan chapters, review Completion Reports, merge worker branches.
 - **`worker`** — Worker mode: claim a chapter, execute in a git worktree, write a Completion Report.
 - **`solo`** — Solo mode: single-agent execution without the CEO/worker split.
-- **`handoff`** — Durable carry-over plus a paste-ready packet for continuing unfinished work in the same branch/worktree.
+- **`handoff`** — Durable carry-over plus a paste-ready packet for continuing unfinished work from the same branch/checkpoint, including in a fresh app-created worktree.
 - **`git`** — Git operations gate. Validates branch state, enforces commit message discipline, guards against unintended force-pushes.
 - **`grill`** — Adversarial review: stress-tests a plan, implementation, or decision before it ships.
 - **`bug-fixing`** — Structured bug investigation: reproduce → isolate → fix → verify, recording only meaningful recovery evidence.
@@ -135,7 +135,7 @@ AI agents forget everything between sessions. This plugin fixes that by keeping 
 
 Mechanical hooks provide reminders and deterministic findings; skills own judgment. Hooks never choose roles, approve work, save, research, merge, or regenerate the dashboard.
 
-**CEO/worker/solo model.** The CEO defines and verifies durable chapters; workers execute them in isolated worktrees and report evidence; solo collapses the model for genuinely small work. Save persists state, Completion Check proves done, and Handoff transfers unfinished work.
+**CEO/worker/solo model.** Role controls authority; Local vs Worktree controls checkout topology. All roles accept an app-created worktree. Local mode remains supported with a one-time isolation recommendation; workers use a dedicated branch. The CEO defines and verifies durable chapters, workers report evidence, and solo collapses the model for genuinely small work.
 
 ### Mechanical hooks
 

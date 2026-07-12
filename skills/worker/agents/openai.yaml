@@ -1,7 +1,7 @@
 interface:
   display_name: "Worker"
-  short_description: "Execute one delegated chapter in an isolated worktree"
-  default_prompt: "Execute the assigned chapter in this isolated worktree, change only what its contract requires, verify the result, and append an evidence-rich Completion Report."
+  short_description: "Execute one delegated chapter on an isolated branch"
+  default_prompt: "Execute the assigned chapter on an isolated branch, using the current worktree when present, change only what its contract requires, verify, and append an evidence-rich Completion Report."
 
 policy:
   allow_implicit_invocation: false

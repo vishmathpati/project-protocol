@@ -1,24 +1,26 @@
 ---
 name: solo
-description: Wear both CEO and worker hats for small work done in one pass, with no worktree and no handoff. Reach for it on quick changes that don't warrant the full delegation loop. Triggers — "/solo", "small fix", "just do this", "quick change".
+description: Wear both CEO and worker hats for small work done in one pass, in either an app-created worktree or the local checkout. Reach for quick changes that do not warrant the delegation loop. Triggers — "/solo", "small fix", "just do this", "quick change".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, mkdir:*, git:*)
 ---
 
 # Solo — Project Protocol
 
-Both hats, small work. For jobs too small to be worth the `/ceo` + `/worker` ceremony — a quick fix, a tiny addition, a one-file change. You plan lightly, do the work yourself, write a short report, and commit. No worktree, no branch handoff, no delegation. Work directly on the current branch.
+Both hats, small work. For jobs too small to be worth the `/ceo` + `/worker` ceremony — a quick fix, a tiny addition, a one-file change. You plan lightly, do the work yourself, write a short report, and commit. The app may have placed this session in a worktree or the local checkout; either is valid. Checkout topology does not select the role.
 
 There is ONE canon: `brain/`.
 
 ---
 
-## Step 0 — Author stamp
+## Step 0 — Author stamp + checkout
 
 - `CLAUDE_PLUGIN_ROOT` set → stamp `· Claude Code`
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
 - neither set → stamp `· Agent` (treat as a full-capability host)
 
 Run `recap` before sizing the work so the session starts from live Git, canon, and any active chapter.
+
+Use the checkout the user selected when creating the session. If it is a worktree, stay in it and identify its branch/base commit; if HEAD is detached, create a named solo branch before editing. If it is the local checkout, show the protocol's one-time worktree recommendation before the first edit and honor the user's choice to continue locally. Never reject solo mode merely because the app created a worktree.
 
 ---
 

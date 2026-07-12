@@ -1,7 +1,7 @@
 interface:
   display_name: "CEO"
   short_description: "Define, delegate, verify, and integrate chapters"
-  default_prompt: "Act as CEO: orient from live canon, define or verify chapters, review worker evidence and diffs selectively, and reconcile only approved work into the integration branch."
+  default_prompt: "Act as CEO in the current local checkout or app-created worktree: orient from live canon, define or verify chapters, and reconcile only approved work into the declared integration branch."
 
 policy:
   allow_implicit_invocation: false

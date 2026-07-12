@@ -1,12 +1,12 @@
 ---
 name: worker
-description: Execute one delegated chapter in a worktree, doing exactly that chapter's scoped job. Reach for it to pick up a chapter handed down by the CEO. Triggers — "/worker", "work this chapter", "pick up chapter N".
+description: Execute one delegated chapter on an isolated branch, preferably in an app-created worktree, doing exactly that chapter's scoped job. Reach for a chapter handed down by the CEO. Triggers — "/worker", "work this chapter", "pick up chapter N".
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, git:*)
 ---
 
 # Worker — Project Protocol
 
-The executor. You take ONE worker pass on a chapter the CEO defined and do exactly that job — no more. You run in a **git worktree** on your own branch (Codex and Claude Code each create real worktrees that share the repo's `.git`). When you finish, you **append** a Completion Report to the chapter file. That report is the contract the CEO reads — get it right.
+The executor. You take ONE worker pass on a chapter the CEO defined and do exactly that job — no more. An app-created **git worktree** on your own branch is the recommended/default topology. Local checkout is supported only after the user accepts the one-time isolation warning and the worker moves to a dedicated chapter branch. When you finish, you **append** a Completion Report to the chapter file.
 
 A chapter is not always one worker. A big chapter accumulates **one or more** Completion Reports — e.g. a backend pass, then a UI pass, then a wire-up pass — each by a different specialist, each verified in turn. So the chapter file you open may already hold earlier reports (and their Verdicts) from other workers. You ADD yours; you never overwrite theirs.
 
@@ -14,7 +14,7 @@ There is ONE canon: `brain/`. Your authority is **chapter-scoped, not file-type-
 
 ---
 
-## Step 0 — Author stamp + confirm you're in a worktree
+## Step 0 — Author stamp + confirm checkout isolation
 
 Detect the author stamp (labels your entries only):
 
@@ -22,13 +22,18 @@ Detect the author stamp (labels your entries only):
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
 - neither set → stamp `· Agent` (treat as a full-capability host)
 
-Confirm your location and the declared integration branch. You must be on a dedicated worktree branch, not the integration branch.
+Confirm your location and the declared integration branch.
+
+- **Worktree:** use it. Ensure it has a named chapter branch (create one from the intended base if the app supplied detached HEAD).
+- **Local checkout:** show the one-time worktree recommendation before editing. If the user continues locally, require a clean checkout and a dedicated `ch-NN-name` branch; never perform worker edits directly on the integration branch.
+
+Checkout topology does not grant worker authority; the invoked role and chapter contract do.
 
 ---
 
-## Step 1 — Sync the latest canon into this worktree
+## Step 1 — Sync the latest canon into this worker branch
 
-Pull the newest `brain/` (canon + the chapter brief the CEO just wrote) into your worktree. Worktrees sync locally through the shared `.git` — no GitHub needed:
+Bring the newest `brain/` (canon + the chapter brief the CEO just wrote) into the worker branch. Worktrees in the same repository sync through the shared `.git`; a local worker branch uses the same merge:
 
 ```bash
 git merge <integration-branch>
@@ -54,7 +59,7 @@ You may edit any code or canon file that the chapter explicitly requires. Do not
 
 - `STATUS.md`, `agenda.md`, `CHANGELOG.md`, and CEO Verdicts remain CEO reconciliation responsibilities unless the chapter explicitly names them.
 - BRIEF, ROADMAP, DESIGN, BRAND, STRUCTURE, TOOLING, TASTE, DISCOVERIES, and extended context may change when the chapter requires it.
-- Never copy worker canon manually into the CEO chat or main checkout. The CEO reviews and merges the branch diff.
+- Never copy worker canon manually into the CEO chat or integration checkout. The CEO reviews and merges the branch diff.
 - Conflicting canon is a Flag; do not guess through it.
 
 ---
@@ -89,7 +94,7 @@ If anything is ambiguous, contradictory, or outside this chapter's scope: do NOT
 
 ---
 
-## Step 6 — Commit on your worktree branch
+## Step 6 — Commit on your worker branch
 
 Commit the code AND the report together, author-stamped:
 

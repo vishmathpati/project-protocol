@@ -17,7 +17,7 @@ Two facts drive every rule below:
 
 ## Step 0 — Detect context
 
-Two things to detect: which **tool** is running, and whether you're in a **worktree**.
+Detect the **tool**, checkout topology, current branch/commit, and declared integration branch. The application chooses Local vs Worktree before `/ceo`, `/worker`, or `/solo` is invoked; checkout topology never selects the role.
 
 **Tool** (this is the author stamp, and decides whether you can push):
 
@@ -40,7 +40,13 @@ Recognize the worktree flavor:
 - **Manual worktree** — created by a plain `git worktree add`, any path/branch.
 - **Not a worktree** — usually the integration checkout. Confirm its actual branch; do not assume it is named `main`.
 
-The CEO works on the declared integration branch. Workers work on chapter branches in dedicated worktrees. If a worker is on the integration branch, stop before editing.
+If already in a worktree, use it regardless of role. If in the local checkout, show this notice once before the first edit:
+
+> This session is using the shared local checkout. A worktree is recommended for isolation, parallel work, and easier review. Continue locally only if that was intentional.
+
+Honor the user's choice. CEO and solo may continue locally. A local worker must use a clean dedicated chapter branch and must never edit on the integration branch.
+
+If an app-created worktree starts at detached HEAD, create a named branch before the first commit: `ch-NN-name` for a worker, and a clear task branch for CEO or solo. The detached checkpoint remains recoverable, but unnamed commits are a poor continuation contract.
 
 ---
 
@@ -75,8 +81,8 @@ chore(session): save session 2026-06-24 · Claude Code
 
 ## Step 2 — Branch naming
 
-- The **CEO works on the declared integration branch**. Do not hardcode `main` when the project uses another integration branch.
-- **Worker branches are named `ch-NN-name`** — matching the chapter (`brain/chapters/NN-name.md`). One chapter → one branch → one worktree.
+- The **declared integration branch** is where accepted canon lands; do not hardcode `main`. A CEO session may itself run in a worktree proposal branch and reconcile through the checkout that holds the integration branch.
+- **Worker branches are named `ch-NN-name`** — matching the chapter (`brain/chapters/NN-name.md`). One chapter → one branch → normally one worktree; deliberate local mode uses the same branch contract without a linked worktree.
 
 ```
 ch-03-auth-reset
@@ -105,7 +111,7 @@ If the merge conflicts, **STOP and report it** (a worker records it under Flags)
 
 ## Step 4 — Per-tool worktree setup
 
-The goal in every tool: **new worktrees branch from your LOCAL HEAD of the canon branch, not from the remote.** Branching from `origin/HEAD` is exactly what forces a "push first" — avoid it.
+When the user selects Worktree, **new worktrees branch from the intended LOCAL base branch/checkpoint, not an accidentally stale remote.** When the user selects Local, do not create a worktree behind their back; apply the one-time recommendation and continue under the role's local-checkout rules.
 
 ### Claude Code
 
@@ -228,6 +234,7 @@ git worktree remove <worktree-path>     # add --force only after confirming noth
 ## Rules
 
 - The canon is one folder, `brain/`. Workers may propose any chapter-required code or canon change in their isolated branch; the CEO owns approval, merge, and shared-state reconciliation.
+- Local vs Worktree is a user/application checkout choice; CEO/worker/solo is an independent authority choice. Every role supports an existing worktree, and local mode remains supported with a one-time isolation notice.
 - Worktrees share one local `.git` — sync between them with a **local merge**, never push-then-pull. GitHub is a backup.
 - New worktrees must branch from **local HEAD** of the canon branch (`baseRef: head` in Claude Code; select the canon branch in Codex), or you reintroduce "push first."
 - Don't touch lockfiles/dependencies in two worktrees at once — do them on the canon branch.

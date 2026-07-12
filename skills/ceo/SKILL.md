@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash(ls:*, cat:*, date:*, wc:*, mk
 
 The orchestrator. You set direction, hand units of work to workers, and verify what comes back. You do NOT do the chapter's implementation yourself — that's the worker's job (`/worker`). For work too small to delegate, use `/solo` instead.
 
-There is ONE canon: `brain/`. You own approval, reconciliation, and the integration branch. Workers may propose any chapter-required file change in isolated worktrees; only your approval and merge establish shared canon.
+There is ONE canon: `brain/`. You own approval, reconciliation, and the integration branch. The app may place the CEO session in a worktree or the local checkout; role authority is independent of checkout topology. Workers may propose any chapter-required file change in isolated worktrees; only your approval and merge establish shared canon.
 
 A **chapter** is one meaningful unit of work: one file at `brain/chapters/NN-name.md`. It carries the CEO's Goal + Plan, then **one or more** Completion Reports (one per worker pass — e.g. backend, then UI, then wire-up — possibly by different specialists), each with its own Verdict from you. A small chapter is one report + one verdict; a big one accumulates several in sequence.
 
@@ -63,13 +63,19 @@ Detect the author stamp (used to label every entry you write — never to pick a
 - `CODEX_PLUGIN_ROOT` set → stamp `· Codex`
 - neither set → stamp `· Agent` (treat as a full-capability host)
 
-Confirm where you are with `git rev-parse --abbrev-ref HEAD` and `git worktree list --porcelain`. The CEO works on the declared integration branch; do not assume it is named `main`. Workers live on isolated worktree branches that share the repository's object database.
+Confirm where you are with `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, and `git worktree list --porcelain`. Identify the declared integration branch; do not assume it is named `main`.
+
+- **CEO in the local integration checkout:** write and reconcile there normally.
+- **CEO in an app-created worktree:** stay there. If HEAD is detached, create a named CEO branch before editing. Treat commits on that branch as CEO proposals and reconcile them into the declared integration branch before they become shared canon. Never pretend the worktree branch itself is the integration branch.
+- **CEO in a local non-integration checkout:** show the one-time worktree recommendation, then require an explicit integration plan before writing shared canon.
+
+The user selects Local vs Worktree when creating the session; `/ceo` selects authority afterward. Never reject CEO mode merely because the app created a worktree.
 
 ---
 
 ## Step 1 — Define a chapter
 
-Pick the next number `NN` by listing `brain/chapters/`. Create `brain/chapters/NN-name.md` on the integration branch:
+Pick the next number `NN` by listing `brain/chapters/`. Create `brain/chapters/NN-name.md` in the current CEO checkout:
 
 ```markdown
 # Chapter NN — <name>
@@ -104,7 +110,7 @@ Pick the next number `NN` by listing `brain/chapters/`. Create `brain/chapters/N
 
 Keep the Goal tight enough that you can verify each worker pass by reading a report + a diff. A chapter may take several passes (backend, UI, wire-up) — each appends its own report, and you verify each in turn.
 
-Commit on the integration branch:
+Commit on the current CEO branch. If this is a CEO worktree branch, reconcile that commit into the declared integration branch before delegation; the Git skill owns the safe local merge procedure.
 
 ```bash
 git add brain/chapters/NN-name.md
@@ -172,7 +178,7 @@ Otherwise, **trust the report.** Do NOT line-by-line re-read clean work that mat
 
 ## Step 5 — Approve (merge + fold into canon)
 
-When the chapter passes, merge the worker branch into the integration branch locally:
+When the chapter passes, merge the worker branch into the declared integration branch locally. If this CEO session itself is in a worktree, run the integration operation through the clean checkout that holds the integration branch; do not merge into the CEO proposal branch and call it canon:
 
 ```bash
 git merge --no-ff <worker-branch> -m "merge: chapter NN <name> <author stamp>"
@@ -227,6 +233,7 @@ Commit the chapter verdict on the integration branch, then return the chapter to
 
 - Orient first (Step 0): on a bare `/ceo`, read STATUS, report where things stand, then offer state-aware modes. Offer **Execute** and **Verify** ONLY when something is actually in progress. A direct instruction skips the menu — act on it immediately.
 - You own approval and reconciliation. Workers may propose chapter-required canon changes in their branches.
+- Checkout topology never selects the role. CEO works from either an app-created worktree or the local checkout, but accepted canon must land on the declared integration branch.
 - Stay worktree-aware: read worker output via `git show`/`git diff` against the worker branch; never assume their uncommitted local files are visible.
 - Trust the report by default; deep-check only on a trigger (Step 4).
 - The Completion Report you read in Step 3 is EXACTLY the report `/worker` writes — same template, same sections, including the structured `Verified:` / `Diff:` / (UI chapters only) `UI evidence:` lines. You verify the latest unverified one.
