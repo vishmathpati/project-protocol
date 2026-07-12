@@ -18,6 +18,8 @@ Choose without a menu dump:
 
 Ask only for information that is genuinely missing: target page/surface, exact pinned URLs in provided-reference mode, and research depth (`quick | standard | deep`). Recommend `standard` when the user has no preference. Manual Aside paste-prompt is the default transport. Do not offer the in-app browser or another transport unless the user asks or Aside is unavailable.
 
+Resolve `<brain-abs>` from the current session checkout (`git rev-parse --show-toplevel` + `/brain`). In a worktree, always point Aside at that worktree. Never redirect writes to the main checkout or another worktree merely because it contains older uncommitted research; recover that research into the current checkout deliberately first.
+
 Do not run automatically for standard dashboards, CRUD/settings/table/detail pages, or work where the existing system is sufficient.
 
 ## Discovery mode — Round 1 sweep
@@ -51,6 +53,8 @@ Each teardown records URL, date, page, viewport, capture method, evidence, and c
 Confirm the exact URLs once. Render Variant C from `references/mission-prompt-template.md`. The pinned list is a user-defined boundary, not a target count: inspect every supplied site, discover none, and do not follow competitor/award/agency trails. Scope evidence to the user's named page or region; inspect inner pages only when the user included them.
 
 Preserve prior moodboard/research. Record the locked/provided focus and pinned URLs in `brain/research/concepts.md` without inventing alternatives, then write the same teardown/conventions/manifest outputs as discovery Round 2. If a pinned site is blocked, report it; do not replace it with a different site.
+
+Require evidence integrity from the first pass: distinguish live viewport captures, partial captures, media fallbacks, and no visual capture; validate mobile evidence rather than trusting filenames; separate visible brand colors from framework/widget noise; label evidence, inference, and unresolved gaps. Use the recovery and readiness contract embedded in Variant C. Completion is saturation-based: documented capture gaps may still yield `READY ... WITH DOCUMENTED GAPS` when they cannot materially change the converged direction.
 
 ## Finish
 

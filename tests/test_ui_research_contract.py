@@ -25,6 +25,26 @@ class UIResearchContractTests(unittest.TestCase):
         self.assertIn("discover no additional sites", text)
         self.assertIn("of substituting another site", text)
 
+    def test_provided_reference_mission_enforces_evidence_integrity(self):
+        text = (ROOT / "skills/ui-research/references/mission-prompt-template.md").read_text()
+        self.assertIn("EVIDENCE INTEGRITY", text)
+        self.assertIn("MEDIA FALLBACK ONLY", text)
+        self.assertIn("mobile-invalid-desktop-capture", text)
+        self.assertIn("FRAMEWORK/PLUGIN", text)
+        self.assertIn("READY VERDICT", text)
+
+    def test_aside_skill_classifies_capture_and_saturation_honestly(self):
+        text = (ROOT / "aside-skill/ui-research/SKILL.md").read_text()
+        self.assertIn("Root variables are candidates, not proof", text)
+        self.assertIn("media-fallback", text)
+        self.assertIn("Classify evidence honestly", text)
+        self.assertIn("WITH DOCUMENTED GAPS", text)
+
+    def test_current_worktree_owns_research_writes(self):
+        text = (ROOT / "skills/ui-research/SKILL.md").read_text()
+        self.assertIn("git rev-parse --show-toplevel", text)
+        self.assertIn("always point Aside at that worktree", text)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -62,6 +62,10 @@ next-actions, and inferred opportunities. Ask only for a missing target, missing
 research depth. Manual Aside prompt relay is the default transport; do not offer another browser
 unless the user requests an alternative or Aside is unavailable.
 
+Resolve disk paths from the active session checkout. A worktree mission writes to that worktree's
+`brain/`; it never redirects to the main checkout or another worktree because older dirty research
+lives there.
+
 ## 2. Canon field additions
 
 ### 2a. niche (load-bearing; the sweep keys off it)
@@ -181,13 +185,17 @@ End by printing the ROUND-2 SUMMARY BLOCK.
 ### 5b. `brain/research/teardowns/<slug>.md` (Aside writes)
 ```
 # Teardown — <site name>
-URL: <url> | Captured: <date> | Concept: <letter> | Evidence: <slug>-*.png
+URL: <url> | Captured: <date> | Target: <page/region> | Concept: <letter>
+Desktop viewport: <size> | Mobile viewport: <size/not observed> | Capture method: <method>
+Capture status: <LIVE VIEWPORT COMPLETE | LIVE VIEWPORT PARTIAL | MEDIA FALLBACK ONLY | NO VISUAL CAPTURE>
 
 ## Type system
 Loaded fonts: <family (weight) · family (weight)>   (from document.fonts — actual, not guessed)
 Pairing + scale: <observed>
 ## Color
-Palette: <#hex · #hex · #hex>   (from :root / computed) | Usage: <split>
+BRAND-USED COLORS: <visible element/selector → computed value → usage>
+FRAMEWORK/PLUGIN DEFAULTS: <excluded values | none>
+WIDGET/CONSENT/FORM NOISE: <excluded values | none>
 ## Motion
 Stack detected: <libs from window globals + network>
 Behaviors: <reveals · parallax · hero mechanic · hover moves>
@@ -197,10 +205,37 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Mobile, accessibility and performance
+<observed behavior and costs>
+## Evidence
+<direct observations>
+## Inference
+<labeled interpretations | none>
+## Unresolved gaps
+<exact blockers | none>
 ## Conventions (this niche)
 FOLLOW: <...> | DEVIATE: <...> | REFUSE: <...>
 ```
 Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (design-check enforces).
+
+### 5d. Evidence integrity and readiness
+
+- Rendered viewport screenshots, media fallbacks, partial captures and no-visual states are distinct.
+- Validate mobile from actual dimensions/aspect and recorded CSS viewport, not a filename.
+- Visible computed use establishes brand color; root/framework/widget variables alone do not.
+- Capture recovery uses fresh light contexts, native scroll and stable section targets, then records
+  exact blockers rather than looping indefinitely.
+- A per-site manifest records desktop/mobile status, files, fallbacks and gaps.
+- Readiness is saturation-based. Return `WITH DOCUMENTED GAPS` when gaps cannot materially change
+  convergence; return `NOT READY` only for material unresolved uncertainty.
+
+### 5e. Provided-reference summary
+
+The final relay reports pinned sites and blockers; desktop and mobile capture-status counts;
+convergence, site-specific moves and conventions; files and honest gaps; saturation reasoning; and
+one readiness verdict: ready, ready with documented gaps, or not ready with the material uncertainty.
+The block shape lives in `skills/ui-research/references/round-formats.md` and is rendered verbatim by
+Variant C.
 
 ### 5c. ROUND-2 SUMMARY BLOCK (Aside prints → human pastes to the plugin)
 ```

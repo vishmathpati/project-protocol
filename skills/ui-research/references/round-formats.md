@@ -108,13 +108,17 @@ End by printing the ROUND-2 SUMMARY BLOCK.
 
 ```
 # Teardown — <site name>
-URL: <url> | Captured: <date> | Concept: <letter> | Evidence: <slug>-*.png
+URL: <url> | Captured: <date> | Target: <page/region> | Concept: <letter>
+Desktop viewport: <size> | Mobile viewport: <size/not observed> | Capture method: <method>
+Capture status: <LIVE VIEWPORT COMPLETE | LIVE VIEWPORT PARTIAL | MEDIA FALLBACK ONLY | NO VISUAL CAPTURE>
 
 ## Type system
 Loaded fonts: <family (weight) · family (weight)>   (from document.fonts — actual, not guessed)
 Pairing + scale: <observed>
 ## Color
-Palette: <#hex · #hex · #hex>   (from :root / computed) | Usage: <split>
+BRAND-USED COLORS: <visible element/selector → computed value → usage>
+FRAMEWORK/PLUGIN DEFAULTS: <excluded values | none>
+WIDGET/CONSENT/FORM NOISE: <excluded values | none>
 ## Motion
 Stack detected: <libs from window globals + network>
 Behaviors: <reveals · parallax · hero mechanic · hover moves>
@@ -124,11 +128,28 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Mobile, accessibility and performance
+<observed responsive behavior · controls · reduced motion · delivery costs>
+## Evidence
+<direct DOM/runtime/network/computed-style/live-capture observations>
+## Inference
+<clearly labeled interpretations | none>
+## Unresolved gaps
+<failed channels and exact blockers | none>
 ## Conventions (this niche)
 FOLLOW: <...> | DEVIATE: <...> | REFUSE: <...>
 ```
 
 Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (design-check enforces).
+
+## Provided-reference evidence integrity
+
+- A live screenshot shows rendered page composition; downloaded media is a named fallback, not a shot.
+- Validate mobile evidence from actual dimensions/aspect plus recorded CSS viewport, not filenames.
+- Retry unstable capture through distinct light-page/native-scroll strategies, then report the blocker.
+- Keep a one-row-per-site manifest with desktop/mobile status, live files, fallbacks and gaps.
+- Readiness is saturation-based. Honest gaps do not block when the remaining evidence cannot materially
+  change convergence; return `WITH DOCUMENTED GAPS`. Material uncertainty returns `NOT READY`.
 
 ## ROUND-2 SUMMARY BLOCK — Aside prints for the user to relay (Spec §5c)
 
@@ -149,4 +170,22 @@ FOLLOW: <...> | DEVIATE: <...> | REFUSE: <...>
 
 FILES: brain/research/teardowns/<k> · brain/moodboard/<k> shots
 ═══ END ROUND-2 ═══
+```
+
+## PROVIDED-REFERENCE SUMMARY BLOCK
+
+```
+═══ PROVIDED-REFERENCE SUMMARY · <project> · <target> ═══
+PINNED SITES: <sites actually inspected>
+BLOCKED: <blocked URLs and reason | none>
+DESKTOP: LIVE COMPLETE <count> · PARTIAL <count> · MEDIA FALLBACK ONLY <count> · NO VISUAL <count>
+MOBILE: VALID SCREENSHOT <count> · DOM/RUNTIME ONLY <count> · PARTIAL <count> · NOT OBSERVED <count>
+CONVERGENCE: Type · Color · Motion · Hero · Rhythm · Imagery · Navigation
+SITE-SPECIFIC MOVES: <site → useful evidence>
+CONVENTIONS: FOLLOW <…> | DEVIATE <…> | REFUSE <…>
+FILES: brain/research/concepts.md · brain/research/conventions.md · brain/research/teardowns/<k> · brain/moodboard/<k> shots
+GAPS: <honest unresolved evidence gaps | none>
+SATURATION: <why gaps can or cannot materially change convergence>
+READY VERDICT: READY FOR STYLE LOCK/BUILD PAGE [WITH DOCUMENTED GAPS] | NOT READY — <material uncertainty>
+═══ END PROVIDED-REFERENCE SUMMARY ═══
 ```

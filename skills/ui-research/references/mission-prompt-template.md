@@ -174,13 +174,29 @@ research depth: <research-depth> — <depth-meaning>
 
 TEARDOWN CHECKLIST (per pinned site)
 - Type: fonts actually loaded (`document.fonts`), weights, pairing, scale
-- Color: `:root` / computed palette and usage split
+- Color: computed colors from visible representative elements; separate brand-used colors from
+  framework/plugin defaults and widget/consent/form noise
 - Motion: detected libraries/network/runtime plus actual behaviors
 - Hero: medium, composition, interaction, responsive changes
 - Rhythm: section sequence and transitions for the target page
 - Imagery/video: treatment, crops, masking, delivery
 - Navigation, mobile, accessibility, reduced motion, performance implications
 - FOLLOW / DEVIATE / REFUSE evidence for this project
+
+EVIDENCE INTEGRITY
+- Record target page, inspection date, desktop/mobile viewport, capture method and capture status.
+- Classify visual evidence as `LIVE VIEWPORT COMPLETE`, `LIVE VIEWPORT PARTIAL`,
+  `MEDIA FALLBACK ONLY`, or `NO VISUAL CAPTURE`. Downloaded media is not a screenshot.
+- Name fallbacks `<slug>-<position>-media-fallback.png`; never count them as live captures.
+- Validate mobile from real dimensions/aspect plus the recorded CSS viewport, not the filename.
+  Preserve but rename an invalid one `*-mobile-invalid-desktop-capture.png`.
+- On an unstable screenshot channel, save DOM/runtime evidence, retry in a fresh light page/context,
+  dismiss overlays, pause media/animation, restore native scrolling, and use stable section targets.
+  After distinct recovery strategies fail, record the exact blocker instead of looping.
+- Separate `EVIDENCE`, `INFERENCE`, and `UNRESOLVED GAPS`; never promote inference into convergence.
+- In each Color section write `BRAND-USED COLORS`, `FRAMEWORK/PLUGIN DEFAULTS`, and
+  `WIDGET/CONSENT/FORM NOISE` explicitly.
+- Maintain one manifest row per pinned URL with desktop/mobile status, live files, fallbacks and gaps.
 
 WRITE TO DISK
 - Locked focus + pinned URLs → <brain-abs>/research/concepts.md (preserve existing research)
@@ -194,11 +210,15 @@ Print the PROVIDED-REFERENCE SUMMARY block even when disk writes succeed.
 ═══ PROVIDED-REFERENCE SUMMARY · <project> · <target> ═══
 PINNED SITES: <sites actually inspected>
 BLOCKED: <blocked URLs and reason | none>
+DESKTOP: LIVE COMPLETE <count> · PARTIAL <count> · MEDIA FALLBACK ONLY <count> · NO VISUAL <count>
+MOBILE: VALID SCREENSHOT <count> · DOM/RUNTIME ONLY <count> · PARTIAL <count> · NOT OBSERVED <count>
 CONVERGENCE: Type · Color · Motion · Hero · Rhythm · Imagery · Navigation
 SITE-SPECIFIC MOVES: <site → useful evidence>
 CONVENTIONS: FOLLOW <…> | DEVIATE <…> | REFUSE <…>
 FILES: brain/research/concepts.md · brain/research/conventions.md · brain/research/teardowns/<k> · brain/moodboard/<k> shots
-QUESTIONS: <unresolved evidence gaps | none>
+GAPS: <honest unresolved evidence gaps | none>
+SATURATION: <why gaps can or cannot materially change convergence>
+READY VERDICT: READY FOR STYLE LOCK/BUILD PAGE [WITH DOCUMENTED GAPS] | NOT READY — <material uncertainty>
 ═══ END PROVIDED-REFERENCE SUMMARY ═══
 ```
 

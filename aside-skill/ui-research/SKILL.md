@@ -1,6 +1,6 @@
 ---
 name: ui-research
-description: Two-round UI research skill for the Aside browser. Sweep a niche into named visual concepts, then forensically tear down the selected concept's best real sites. Install once; Project Protocol supplies each mission.
+description: UI research skill for the Aside browser. Sweep a niche into concepts and tear down the selected direction, or directly inspect a closed user-pinned reference set with honest capture evidence. Install once; Project Protocol supplies each mission.
 runtime: aside-browser
 managed-by: project-protocol
 ---
@@ -71,6 +71,7 @@ sweep and concept-choice sequence. Do not use awards, competitors, agencies, or 
 Inspect only the supplied URLs and only the named page/region. If one is blocked, report it instead
 of substituting another site. Write the locked focus/pinned set plus teardowns, conventions,
 screenshots, and manifest to the mission paths, then print the required provided-reference summary.
+Follow the mission's evidence-integrity contract from the first site; do not wait for a repair pass.
 
 ---
 
@@ -171,12 +172,14 @@ Google Fonts (`fonts.gstatic.com`) vs Adobe Typekit (`use.typekit.net`) vs self-
 - DOM: `document.querySelector('video[autoplay]')` (usually `muted loop`).
 - Otherwise it's an image: read `getComputedStyle(heroEl).backgroundImage` (or the `<img>` src).
 
-**The jackpot — the whole token system in one shot.** Many sites expose their entire palette and
-spacing scale as CSS custom properties on the root:
+**Root variables are candidates, not proof.** Many sites expose palette and spacing candidates as
+CSS custom properties on the root:
 ```js
 getComputedStyle(document.documentElement)  // then read the --custom-property values
 ```
-This frequently dumps the site's real color palette, spacing scale, and type scale at once. Grab it.
+Cross-check candidates against computed styles on visible canvas, heading, body, navigation, primary
+action, accent and representative content elements. Separate brand-used colors from framework/plugin
+defaults and widget/consent/form noise. Only visible brand-used colors enter convergence.
 
 **Page-builder tells (flag template aesthetics).** If a site was built on a page builder, say so —
 its "look" is partly the builder's defaults, not an original design decision:
@@ -192,8 +195,8 @@ Run every item on each torn-down site. This matches the teardown file format bel
 
 - **Type system** — fonts ACTUALLY loaded (`document.fonts`, per above) + weights + the pairing +
   the scale. Real families, not guesses.
-- **Color** — the palette from `:root` / computed styles (real hex values) + how it's used (the split:
-  background / text / one accent / etc.).
+- **Color** — computed colors from visible representative elements + usage. Report root candidates
+  separately and exclude framework/plugin defaults and widget/consent/form noise from convergence.
 - **Motion inventory** — the detected stack (from `window` globals + network) + the behaviors it drives
   (scroll reveals, parallax, hover moves, the hero mechanic).
 - **Hero mechanics** — exactly what the hero does and how it's built (video, canvas, split text, pinned
@@ -217,6 +220,12 @@ You run for a long time on the open web. Handle the friction; never fight it.
 - **Scroll-jacked / heavily animated sites** → scroll **incrementally** with a settle pause (2s, or 4–5s
   on animation-heavy sites), and capture **viewport by viewport** (hero / mid / end). NEVER take one
   full-page screenshot — on these sites it captures mid-transition garbage or hangs.
+- **Unstable screenshot channel** → save DOM/runtime findings first; retry with a fresh light page or
+  context, dismiss overlays, pause media/animation, restore native scrolling, and move to stable DOM
+  targets. After distinct recovery strategies fail, record the exact error and continue; never loop.
+- **Capture truth** → a live screenshot must show rendered page composition. Downloaded media is a
+  `*-media-fallback` and never counts as a screenshot. Validate mobile evidence from real image
+  dimensions/aspect plus recorded CSS viewport; rename invalid desktop-shaped mobile captures.
 - **Write findings to disk incrementally.** Finish a site → write its file → move on. If the run drops
   mid-way (auto-update, network blip), you lose at most the one in-progress site, never the whole round.
 
@@ -228,6 +237,9 @@ The mission prompt gives you absolute `brain/` paths. Write there directly (you 
 
 - **Screenshots** → the `brain/moodboard/` path in the prompt. Name them `<slug>-hero.png`,
   `<slug>-mid.png`, `<slug>-end.png` per site.
+- **Fallback media** → name `<slug>-<position>-media-fallback.png`; never reuse live-shot names.
+- **Evidence manifest** → one row per site with desktop/mobile capture status, live files, fallbacks,
+  teardown path and blockers/gaps.
 - **Round-1 research doc** → `brain/research/concepts.md` (format below).
 - **Round-2 research docs** → `brain/research/teardowns/<slug>.md`, one per torn-down site (format below).
 
@@ -298,13 +310,17 @@ QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
 
 ```
 # Teardown — <site name>
-URL: <url> | Captured: <date> | Concept: <letter> | Evidence: <slug>-*.png
+URL: <url> | Captured: <date> | Target: <page/region> | Concept: <letter>
+Desktop viewport: <size> | Mobile viewport: <size/not observed> | Capture method: <method>
+Capture status: <LIVE VIEWPORT COMPLETE | LIVE VIEWPORT PARTIAL | MEDIA FALLBACK ONLY | NO VISUAL CAPTURE>
 
 ## Type system
 Loaded fonts: <family (weight) · family (weight)>   (from document.fonts — actual, not guessed)
 Pairing + scale: <observed>
 ## Color
-Palette: <#hex · #hex · #hex>   (from :root / computed) | Usage: <split>
+BRAND-USED COLORS: <visible element/selector → computed value → usage>
+FRAMEWORK/PLUGIN DEFAULTS: <excluded values | none>
+WIDGET/CONSENT/FORM NOISE: <excluded values | none>
 ## Motion
 Stack detected: <libs from window globals + network>
 Behaviors: <reveals · parallax · hero mechanic · hover moves>
@@ -314,6 +330,14 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Mobile, accessibility and performance
+<observed responsive behavior · controls · reduced motion · delivery costs>
+## Evidence
+<direct observations>
+## Inference
+<clearly labeled interpretations | none>
+## Unresolved gaps
+<failed channels and exact blockers | none>
 ## Conventions (this niche)
 FOLLOW: <...> | DEVIATE: <...> | REFUSE: <...>
 ```
@@ -378,6 +402,10 @@ decide — but never dress a refused pattern up as a discovery.
   Never full-page-screenshot a scroll-jacked site; capture hero/mid/end with settle pauses.
 - **Write to disk incrementally**, and **always print the paste SUMMARY BLOCK** regardless — the paste
   block is the guaranteed channel and must stand alone.
+- **Classify evidence honestly.** File count is not capture quality; fallbacks and invalid mobile files
+  never count as live screenshots. Keep evidence, inference and gaps separate.
+- **Finish by saturation, not perfection.** Return `READY ... WITH DOCUMENTED GAPS` when capture gaps
+  cannot materially change convergence; material uncertainty is `NOT READY`.
 - **Extracted values are evidence, never tokens to copy.**
 - **Honor the prompt's refusal list.** The field average is not the ceiling.
 - **The prompt wins on project values; this skill wins on method.**
