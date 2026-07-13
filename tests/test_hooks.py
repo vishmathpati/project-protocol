@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import subprocess
 import tempfile
 import unittest
@@ -15,53 +14,11 @@ HOOKS = ROOT / "hooks/scripts"
 def run(script: str, cwd: Path, extra_env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["CODEX_PLUGIN_ROOT"] = str(ROOT)
-    env.setdefault("PROJECT_PROTOCOL_PRIVATE_CANON_CONFIG", str(cwd / ".test-private-canons.json"))
     env.update(extra_env or {})
     return subprocess.run(["python3", str(HOOKS / script)], cwd=cwd, env=env, text=True, capture_output=True)
 
 
 class HookSmokeTests(unittest.TestCase):
-    def test_session_start_attaches_private_canon_in_a_new_worktree(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            base = Path(tmp)
-            project = base / "project"
-            canon = base / "private-canon"
-            worktree = base / "worktree"
-            config = base / "private-canons.json"
-            project.mkdir()
-            (canon / "brain").mkdir(parents=True)
-            (canon / "CLAUDE.md").write_text("# Private project index\n")
-            (canon / "brain/.plugin-version").write_text("5.0.1\n")
-            subprocess.run(["git", "init", "-b", "main"], cwd=project, check=True, capture_output=True)
-            subprocess.run(["git", "config", "user.name", "Test"], cwd=project, check=True)
-            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=project, check=True)
-            subprocess.run(["git", "remote", "add", "origin", "git@example.com:test/project.git"], cwd=project, check=True)
-            (project / "README.md").write_text("# Test\n")
-            (project / "hooks/scripts").mkdir(parents=True)
-            shutil.copy2(HOOKS / "private_canon.py", project / "hooks/scripts/private_canon.py")
-            subprocess.run(["git", "add", "README.md", "hooks/scripts/private_canon.py"], cwd=project, check=True)
-            subprocess.run(["git", "commit", "-m", "init"], cwd=project, check=True, capture_output=True)
-            env = os.environ.copy()
-            env["PROJECT_PROTOCOL_PRIVATE_CANON_CONFIG"] = str(config)
-            registered = subprocess.run(
-                ["python3", str(HOOKS / "private_canon.py"), "register", "--repo", str(project), "--canon", str(canon)],
-                env=env,
-                text=True,
-                capture_output=True,
-            )
-            self.assertEqual(registered.returncode, 0, registered.stdout + registered.stderr)
-            subprocess.run(["git", "worktree", "add", "-b", "feature", str(worktree)], cwd=project, env=env, check=True, capture_output=True)
-            self.assertEqual((worktree / "brain").resolve(), (canon / "brain").resolve())
-            self.assertEqual((worktree / "CLAUDE.md").resolve(), (canon / "CLAUDE.md").resolve())
-            result = run("session_start.py", worktree, {"PROJECT_PROTOCOL_PRIVATE_CANON_CONFIG": str(config)})
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("Private canon attached", result.stdout)
-            self.assertFalse((HOOKS / "__pycache__").exists())
-            self.assertEqual((worktree / "brain").resolve(), (canon / "brain").resolve())
-            self.assertEqual((worktree / "CLAUDE.md").resolve(), (canon / "CLAUDE.md").resolve())
-            status = subprocess.run(["git", "status", "--porcelain"], cwd=worktree, text=True, capture_output=True, check=True)
-            self.assertEqual(status.stdout, "")
-
     def test_session_start_reports_drift_but_does_not_write(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); (project / "brain").mkdir()

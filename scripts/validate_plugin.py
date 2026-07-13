@@ -59,6 +59,16 @@ def main() -> int:
         if (ROOT / "skills" / directory).exists():
             errors.append(f"retired skill directory remains: {directory}")
 
+    private_development_paths = (
+        ROOT / ".claude/skills/edit-plugin",
+        ROOT / "hooks/scripts/private_canon.py",
+        ROOT / "brain",
+        ROOT / "CLAUDE.md",
+    )
+    for path in private_development_paths:
+        if path.exists():
+            errors.append(f"private development path in public source: {path.relative_to(ROOT)}")
+
     hooks_path = ROOT / "hooks/hooks.json"
     try:
         hooks = json.loads(hooks_path.read_text())

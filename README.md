@@ -168,7 +168,7 @@ project_doc_fallback_filenames = ["CLAUDE.md"]
 
 ## Developing this plugin
 
-Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when a contributor opens this repository and does not join the installed skill set. The plugin dogfoods Project Protocol through a separately registered private canon: internal CLAUDE/brain/session files stay outside the public source repository, while a local Git checkout hook and Session Start safely attach that canon to source worktrees. `edit-plugin` adds source safety and validation on top of CEO/worker/solo; implementation, versioning, integration, and release remain separate decisions.
+Contributor-specific instructions, private project canon, and personal workshop skills intentionally live outside this public repository. This repository contains only distributable plugin source, tests, migrations, and public documentation. Contributors should use their own private project-management layer and must never commit private canon or installed/cache artifacts here.
 
 Only a human-approved release chapter may release. At that point run `scripts/bump-version.sh <new-version>` (syncs both plugin.json files + marketplace.json), add `migrations/vX.Y.Z.md` and a CHANGELOG entry, then run `scripts/bump-version.sh --audit`. The audit structurally validates manifests, skills, sidecars, hooks, migration presence, and package cleanliness before integration.
 

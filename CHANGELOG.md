@@ -6,7 +6,6 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Added
-- **Private canon attachment for public repositories.** An opt-in local mapping resolves repository identity across worktrees, attaches external `CLAUDE.md` and `brain/` without overwriting existing paths, and excludes those paths through the shared Git info directory so internal operating state never enters the public repository.
 - **Universal Foundation.** `init-project` now inspects first, captures universal project truth once, creates only the core canon, and routes to specialist groups without asking brand, marketing, design, research, or implementation questions.
 - **Universal canon templates.** Added concise templates for CLAUDE, BRIEF, STATUS, STRUCTURE ownership, WORKLOG, CHANGELOG, agenda, WONT-DO, and chapters.
 - **Separated brand and visual workflows.** Added Brand Foundation and Style Lock so brand truth, research evidence, and design tokens have distinct owners. Style Lock preserves the rich real-content preview as a deterministic HTML asset.
@@ -18,7 +17,6 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Structural release audit.** Release validation now checks manifests, migration presence, skill metadata, hook targets/events, retired source, and packaging debris instead of grepping historical prose or hardcoding a skill count.
 
 ### Changed
-- **Plugin development now dogfoods the current session model.** The workshop-only Edit Plugin gate uses CEO/worker/solo, Recap, chapters, Completion Check, Save Session, and separate public-source/private-canon commits. Source implementation no longer forces a version bump, merge, push of main, or marketplace release.
 - **CEO/worker authority is chapter-scoped.** Workers may propose any chapter-required code or canon change in isolated worktrees; only CEO approval and merge establish shared canon.
 - **Session continuity redesigned.** Recap is role-aware orientation; Handoff carries exact repo/worktree/branch/checkpoint identity; Save Session persists role-owned state without conflating save, completion, approval, or merge.
 - **Chapter contracts expanded.** Goal, Why, Method, Done When, Plan, dependencies, constraints, carry-over, reports, and verdicts now form one durable review unit.
@@ -47,6 +45,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Monolithic `design-direction`.** Its brand diagnosis moved to Brand Foundation, token/preview work to Style Lock, research to UI Research, and implementation to Build Page/Component. Forced three-direction generation was removed.
 - **Unsafe/duplicated marketing references.** Removed layout ownership, forced SaaS structures, and fictional proof/testimonial guidance.
 - **Hook noise and mutation.** Removed UserPromptSubmit classification, PreToolUse WORKLOG warnings, SubagentStart/Stop logging, cleared-WORKLOG assumptions, and backup-file accumulation.
+- **Private workshop and canon-attachment machinery.** Removed the repo-local `edit-plugin`, repository-identity private-canon resolver, Session Start attachment, and post-checkout workflow. Contributor canon and personal workshop skills belong outside the distributable public source; normal consumer worktree support is unchanged.
 
 ## [4.1.0] — 2026-07-11
 

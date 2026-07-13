@@ -6,11 +6,7 @@ from __future__ import annotations
 import json
 import os
 import re
-import sys
 from pathlib import Path
-
-sys.dont_write_bytecode = True
-from private_canon import attach
 
 
 def version(value: str) -> tuple[int, int, int]:
@@ -23,13 +19,6 @@ plugin_root = Path(root_value) if root_value else Path(__file__).resolve().paren
 project_root = Path.cwd()
 
 print("[project-protocol] Invoke /ceo, /worker, or /solo; that role runs /recap from live Git and canon.")
-
-private = attach(project_root)
-if private.canon_root:
-    if private.conflicts:
-        print("[project-protocol] Private canon needs attention: " + "; ".join(private.conflicts))
-    else:
-        print(f"[project-protocol] Private canon attached: {private.canon_root}")
 
 try:
     plugin_version = json.loads((plugin_root / ".claude-plugin" / "plugin.json").read_text())["version"]
