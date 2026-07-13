@@ -1,6 +1,7 @@
 interface:
   display_name: "Edit Plugin"
-  short_description: "Mandatory discipline gate whenever this plugin's own source (skills, hooks, templates, manifest) is being changed"
+  short_description: "Safely edit Project Protocol source using private canon"
+  default_prompt: "Use the active Project Protocol role and private chapter to change the plugin source, verify it, and keep implementation separate from versioning and release."
   brand_color: "#7C2D12"
 
 policy:

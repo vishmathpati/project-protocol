@@ -168,9 +168,9 @@ project_doc_fallback_filenames = ["CLAUDE.md"]
 
 ## Developing this plugin
 
-Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when you open *this* repo in Claude Code, and it never ships to users (the installed plugin loads `skills/` only). It chains commit + push to every source edit and enforces manifest discipline on version bumps. End users never edit this plugin, so they never see it.
+Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when a contributor opens this repository and does not join the installed skill set. The plugin dogfoods Project Protocol through a separately registered private canon: internal CLAUDE/brain/session files stay outside the public source repository, while source worktrees attach that canon locally. `edit-plugin` adds source safety and validation on top of CEO/worker/solo; implementation, versioning, integration, and release remain separate decisions.
 
-To release: run `scripts/bump-version.sh <new-version>` (syncs both plugin.json files + marketplace.json), add `migrations/vX.Y.Z.md` and a CHANGELOG entry, then run `scripts/bump-version.sh --audit`. The audit structurally validates manifests, skills, sidecars, hooks, migration presence, and package cleanliness before commit/push.
+Only a human-approved release chapter may release. At that point run `scripts/bump-version.sh <new-version>` (syncs both plugin.json files + marketplace.json), add `migrations/vX.Y.Z.md` and a CHANGELOG entry, then run `scripts/bump-version.sh --audit`. The audit structurally validates manifests, skills, sidecars, hooks, migration presence, and package cleanliness before integration.
 
 ---
 

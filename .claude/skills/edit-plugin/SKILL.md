@@ -1,162 +1,165 @@
 ---
 name: edit-plugin
-description: Mandatory discipline gate when editing this plugin's own source (skills, hooks, manifest, templates, README, build scripts). Use whenever this plugin's own files are being changed. Triggers — "edit the plugin", "update the X skill", "change the X hook", "modify the protocol", "fix the plugin", "edit save-session", or any change to files under skills/, hooks/, templates/, .claude-plugin/, .codex-plugin/.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git:*,ls:*,cat:*,date:*,wc:*)
+description: Mandatory workshop overlay for changing Project Protocol source. Uses the active role and chapter, keeps private development canon outside the public repository, verifies source changes, and separates implementation from release.
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash(git:*,python3:*,ls:*,cat:*,date:*,wc:*)
 ---
 
-# Edit Plugin — Self-Discipline for project-protocol
+# Edit Plugin — Project Protocol Dogfooding Gate
 
-This skill fires whenever an agent (Claude Code, Codex) edits the **project-protocol plugin's own source code** — skills, hooks, commands, manifests, templates, version scripts, README, CHANGELOG.
+Use Project Protocol to build Project Protocol. This workshop-only skill adds
+source-repository safety; it does not replace CEO, worker, solo, chapters,
+Recap, Save Session, Completion Check, or the Git skill.
 
-The problem it solves: an agent edits a skill, the user thanks them, the session moves on — but the change was never committed or pushed. The next time the user pulls from GitHub or reinstalls the plugin, the change is gone. This skill makes that impossible by chaining commit + push to every edit.
+## Governing model
 
----
+There are two independent stores:
+
+1. **Public source repository** — shipped skills, hooks, templates, migrations,
+   tests, manifests, README, and public CHANGELOG.
+2. **Private development canon** — CLAUDE, brain, agenda, chapters, WORKLOG,
+   internal decisions, reports, and dashboard. It lives in a separate local Git
+   repository and is attached through the private-canon resolver.
+
+Never stage private canon in the public source repository. Never treat the
+public CHANGELOG as the private project's session history.
 
 ## When this fires
 
-- User asks to edit, update, fix, or change anything in this plugin: a skill, hook, command, template, manifest, README, build script, CHANGELOG.
-- About to call `Edit` or `Write` on any file under:
-  - `skills/<name>/SKILL.md` or `skills/<name>/agents/openai.yaml` or `skills/<name>/references/`
-  - `hooks/hooks.json` or any `hooks/*.md`
-  - `templates/*.md`
-  - `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`
-  - `README.md`, `CHANGELOG.md`, `scripts/bump-version.sh`
-- Slash command: `/edit-plugin`
+Invoke for any change to the Project Protocol source repository, including:
 
-**Does NOT fire for:** edits to *projects that use this plugin* (their `brain/` files). That work uses `save-session` for its git hygiene. This skill is only for changes to the plugin source itself.
+- `skills/`, `hooks/`, `templates/`, `migrations/`, `tests/`, `scripts/`
+- `.claude-plugin/`, `.codex-plugin/`, `.claude/skills/edit-plugin/`
+- public `README.md` or `CHANGELOG.md`
 
----
+It does not fire for a consumer project such as Singh Empire.
 
-## The 8 steps
+## 1. Confirm both locations
 
-### 1. Confirm location
-
-Verify the file you're about to touch lives in the plugin source repo, not in a dist copy or installed copy.
+Before editing, verify:
 
 ```bash
-git -C "<file's parent dir>" rev-parse --show-toplevel
+git rev-parse --show-toplevel
+git status --short --branch
+git worktree list --porcelain
+python3 hooks/scripts/private_canon.py status --repo "$PWD"
 ```
 
-The output must be the project-protocol repo root. If the path contains `/rpm/plugin_` or any other installed-copy location: **STOP**. Tell the user — "That's a build artifact / installed copy. The source is at `<source path>`. Edit there instead."
+The source root must be the Project Protocol source repository. Never edit a
+marketplace cache, installed plugin copy, or generated package.
 
-### 2. Read before edit
+Private canon must resolve outside the source root. If it is absent, stop and
+register the private canon before continuing. If `brain` or `CLAUDE.md` is a
+conflicting real path, do not overwrite it.
 
-Always `Read` the current file before changing it. No edits from memory. If touching `SKILL.md`, also read the sibling `agents/openai.yaml` (Codex sidecar) — many changes need to be mirrored there.
+## 2. Enter through the normal session model
 
-### 3. Make the edit
+The human invokes CEO, worker, or solo. Run Recap and read:
 
-Use `Edit` (preferred) or `Write` (for new files). Match the conventions of the surrounding files:
+- private `CLAUDE.md`
+- private `brain/STATUS.md` and useful WORKLOG tail
+- the active private chapter
+- only the additional canon relevant to the chapter
 
-- SKILL.md frontmatter: `name`, `description`, `allowed-tools` (comma-separated, Bash with explicit subcommand allowlist)
-- Codex sidecar at `skills/<name>/agents/openai.yaml` if the skill is meant to work in Codex too
-- New skill ⇒ create both `SKILL.md` and `agents/openai.yaml`
-- README's skill count and skill list must be kept in sync if you add/remove a skill
+Do not create an uncontracted feature because the source request sounds small.
+Truly trivial maintenance may use the solo trivial-work rule.
 
-### 4. Check `git status` and stage
+## 3. Respect authority
+
+- **CEO** owns planning, approval, source integration, and shared private canon.
+- **Worker** changes chapter-required source in an isolated source worktree and
+  appends evidence to the assigned private chapter. Worker output remains a
+  proposal until CEO approval.
+- **Solo** may plan and implement in one session, while still recording the
+  contract and evidence for non-trivial work.
+
+Private canon is shared operational state for this public repository. Workers
+may read it but must not rewrite shared BRIEF, STATUS, agenda, or WONT-DO;
+proposed durable changes belong in the chapter report for CEO reconciliation.
+
+## 4. Read source before editing
+
+Read every source file being changed. For a shipped skill, also read its
+`agents/openai.yaml`. Follow references only when needed to understand the
+contract. Check current tests and validation scripts before inventing a new
+verification method.
+
+## 5. Make one chapter-scoped change
+
+- Preserve unrelated dirty files.
+- Keep Claude Code and Codex behavior aligned.
+- New or renamed shipped skills require matching `agents/openai.yaml` metadata.
+- Update README only when public behavior or contributor instructions changed.
+- Update public CHANGELOG under Unreleased for user-visible behavior.
+- Do not edit installed copies to test a source fix.
+
+## 6. Verify proportionally
+
+Run the narrow tests for the changed contract, then the structural audit. For a
+release candidate, run the full release verification bundle from the active
+chapter. Record commands and exact results in the private chapter report.
+
+Minimum structural check:
 
 ```bash
-cd <repo-root>
-git status --porcelain
+python3 scripts/validate_plugin.py
 ```
 
-Stage every file you actually changed. Do not bulk-add. Do not stage unrelated dirty files left over from prior work — show them to the user and ask first.
+## 7. Keep implementation separate from release
 
-```bash
-git add <each file you edited>
+A source edit does **not** automatically authorize a version bump, marketplace
+release, merge to main, or push of main.
+
+Only an explicit, human-approved release chapter may change versions. When it
+does, the same release series must include:
+
+- aligned `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and
+  `.claude-plugin/marketplace.json`
+- `migrations/vX.Y.Z.md`, including a no-project-deltas declaration when true
+- public CHANGELOG entry
+- release audit evidence
+
+Use `scripts/bump-version.sh` for an approved release. Never bump merely because
+user-facing behavior changed during development.
+
+## 8. Commit the two stores independently
+
+### Public source repository
+
+Stage explicit source files only. Commit with a structured message:
+
+```text
+plugin(<area>): <short summary>
 ```
 
-### 5. Manifest discipline (version bumps only)
+Push the feature branch when Save Session or the human requests a durable
+remote checkpoint. CEO approval controls integration into main.
 
-If this edit bumps the plugin version — i.e., it changes the `"version"` field in `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json` — the commit MUST also include a `migrations/vX.Y.Z.md` manifest file documenting all project-side deltas introduced in this release.
+### Private development canon repository
 
-**Check before committing:**
+Commit chapter reports, STATUS, agenda, WORKLOG folding, and durable decisions
+in the private canon repository. Do not add a public remote unless the human
+explicitly chooses a private backup destination. A local private commit is a
+valid persistence checkpoint; it is not a public release.
 
-```bash
-ls migrations/vX.Y.Z.md 2>/dev/null || echo "MISSING"
-```
+Never run `git add brain` or `git add CLAUDE.md` in the public source repo.
 
-If the manifest file is absent: **HALT**. Do not commit. Tell the user:
+## 9. Close through Project Protocol
 
-> Version bump without migration manifest. Add `migrations/vX.Y.Z.md` before committing. See `migrations/v2.5.0.md` for the expected schema.
+Run Completion Check against the chapter. Then Save Session folds recovery
+state, commits the correct owner files in the correct repository, and reports:
 
-If no project-side deltas exist for this release (pure internal refactoring with no changes to project templates, rules, or canonical files), create the manifest anyway with:
-
-```markdown
-# Migration — vX.Y.Z
-(no project-side deltas — internal plugin changes only)
-```
-
-This keeps the manifest chain unbroken for `migrate-project` to walk.
-
-### 6. Commit with a structured message
-
-```bash
-git commit -m "plugin(<area>): <short summary>
-
-<optional body explaining why or what cascades>"
-```
-
-`<area>` is one of:
-- `skill:<skill-name>` — e.g. `skill:save-session`
-- `hook` — for `hooks/`
-- `template:<name>` — e.g. `template:DESIGN`
-- `manifest` — for plugin.json edits
-- `build` — for scripts/ (bump-version.sh)
-- `docs` — for README / CHANGELOG
-
-If the edit changes user-facing behavior of an installed skill, also bump the version in **both** `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` and add a `### Changed` / `### Added` / `### Fixed` line to `CHANGELOG.md` under `## [Unreleased]`. The plugin version + changelog edits go into the **same commit** as the source change.
-
-### 7. Push to GitHub
-
-```bash
-git push origin <current-branch>
-```
-
-If the current branch is not `main` (you're on a worktree branch): push the branch, then follow `save-session` Step 10d to fast-forward / merge into `main`. The plugin's source-of-truth is `origin/main` on GitHub.
-
-If push fails (auth, non-fast-forward, network): **STOP** and report the exact error. Do not leave the user thinking the change shipped when it didn't.
-
-### 8. Report + activation instructions
-
-Confirm to the user with this template:
-
-```
-✅ Edited: <file(s)>
-✅ Committed: <SHA> — <commit subject>
-✅ Pushed: origin/<branch> (and merged to main if applicable)
-✅ GitHub now has the change.
-
-To activate locally:
-  • Hot-copy (no version bump): copy <file> to the installed plugin path.
-    Resolve the path from $CLAUDE_PLUGIN_ROOT (Claude Code) or
-    $CODEX_PLUGIN_ROOT (Codex) — both point to the installed plugin root.
-  • Marketplace update (with version bump): push to main, then run
-    /plugin marketplace update project-protocol and /reload-plugins.
-```
-
-If the change was a version bump → recommend the clean install path.
-If it was a fix or tweak between releases → hot-copy is fine.
-
----
+- public source branch, commit, push, and integration state
+- private canon commit state, without exposing private contents
+- tests and validation evidence
+- release state separately from implementation state
 
 ## Strict rules
 
-- **Never edit the installed copy** at `~/Library/Application Support/Claude/.../rpm/plugin_*`. That's the runtime copy; it gets clobbered on reinstall.
-- **One logical change = one commit.** Don't bundle a save-session fix + a new skill + a README rewrite into one commit. Multiple commits, each pushed, each verifiable.
-- **No silent skips.** If you decided not to commit (because the edit was reverted, or it's only a scratch), say so explicitly: "Not committing — this was an exploratory edit and I'm reverting it."
-- **Codex parity.** If you add or rename a skill, you must create/rename the matching `agents/openai.yaml` sidecar in the same commit, or the plugin breaks for Codex users.
-- **README skill count stays in sync** with the actual number of skill directories. If you add a skill, update the count in README.md (and in `.claude-plugin/plugin.json` description if it mentions a count).
-
----
-
-## Why this exists
-
-When an agent edits the plugin and forgets to commit, the work *looks done* on the user's screen (the file changed locally) but it doesn't propagate to GitHub. Future installs, future worktrees, and any teammate pulling the repo see the *old* version. The bug is invisible until something breaks downstream.
-
-The plugin is the discipline mechanism for every other project. The plugin itself needs the same discipline applied to it.
-
----
-
-## Difference from `save-session`
-
-`save-session` syncs **a project that uses this plugin** — its `brain/` markdown files. `edit-plugin` syncs **changes to this plugin itself**. The user's local folder for project-protocol is the plugin source repo, and it must always match `origin/main` on GitHub.
+- Source repo and private canon repo are never staged together.
+- No automatic version bump.
+- No automatic merge or release.
+- No editing installed copies.
+- No claim that GitHub contains private canon.
+- No claim that implementation is released merely because a branch was pushed.
+- No source edit without live Git, current source, active role, and chapter
+  context.
