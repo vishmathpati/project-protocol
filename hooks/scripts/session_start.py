@@ -6,8 +6,10 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 from pathlib import Path
 
+sys.dont_write_bytecode = True
 from private_canon import attach
 
 

@@ -51,6 +51,7 @@ class HookSmokeTests(unittest.TestCase):
             result = run("session_start.py", worktree, {"PROJECT_PROTOCOL_PRIVATE_CANON_CONFIG": str(config)})
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("Private canon attached", result.stdout)
+            self.assertFalse((HOOKS / "__pycache__").exists())
             self.assertEqual((worktree / "brain").resolve(), (canon / "brain").resolve())
             self.assertEqual((worktree / "CLAUDE.md").resolve(), (canon / "CLAUDE.md").resolve())
             status = subprocess.run(["git", "status", "--porcelain"], cwd=worktree, text=True, capture_output=True, check=True)
