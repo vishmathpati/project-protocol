@@ -26,6 +26,39 @@
 
 - [constraint]
 
+## Approved Site Direction
+
+Use only after the complete research-led marketing submission has passed agent compatibility review and
+the human explicitly approves it. Follow `build-page/references/site-direction-lock.md`. Submitted is not locked.
+
+- Status: `locked`
+- Submission ID:
+- Submission revision:
+- Project root:
+- Branch:
+- HEAD:
+- Approved by:
+- Approved at:
+- Site direction recommendation ID:
+- Global shell: `<approved recommendation IDs | not_needed>`
+- Unresolved conflicts: `none`
+
+### Approved page and family matrix
+
+| Target ID | Family ID | Routes | Approved recommendation IDs | Compatibility | Required adaptations | Exceptions |
+|---|---|---|---|---|---|---|
+
+## Page Execution Decisions
+
+Use for an active page chapter; remove when not applicable.
+
+- Active page/family:
+- Locked site-direction reference:
+- Global shell/home/prior-page context:
+- Compatibility verdict and adaptations:
+- Whole-page/connected-section/override decisions:
+- Page Asset Request and replacement gates:
+
 ---
 
-Append Carry-over, Completion Reports, and CEO Verdicts below. Page-specific research and composition choices belong under `## Page Execution Decisions` when applicable.
+Append Carry-over, Completion Reports, and CEO Verdicts below.

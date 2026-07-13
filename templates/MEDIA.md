@@ -1,7 +1,7 @@
 # Marketing Media
 
-| ID | Page/section job | Type | What it must communicate | Role/spec | Source route | Rights/provenance | Current path | Stage | Replacement gate |
-|---|---|---|---|---|---|---|---|---|---|
+| ID | Page/section job | Type | What it must communicate | Role/spec | Source route | Rights/provenance | Current path | Availability / next action | Stage | Replacement gate |
+|---|---|---|---|---|---|---|---|---|---|---|
 
 Source routes: `owned/client-supplied` · `commissioned` · `ai-generated` · `licensed-stock/render` · `neutral-placeholder` · `reference-only` · `not-needed`.
 

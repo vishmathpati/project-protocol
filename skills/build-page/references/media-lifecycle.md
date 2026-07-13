@@ -20,6 +20,8 @@ For each required slot record: page/section job; still/video/icon/illustration t
 
 Video additionally records duration, poster, autoplay/muted/loop, sound, controls, mobile treatment, reduced-motion/static fallback, and hosting source.
 
+Before a page build, collect its slots into **one consolidated request** grouped as available, required, provisional, and blocked. Include quantity, purpose, specification, current path, availability / next action, source/rights, and replacement gate. Include other load-bearing assets such as logos, custom glyphs, illustrations, 3D, audio, maps, embeds, or documents only when the approved composition actually requires them.
+
 Stages are `required`, `awaiting-source`, `prototype-ready`, `final-ready`, `blocked`, or `retired`. Replacement gates are `none`, `before visual approval`, or `before completion`.
 
 ## Acquisition packets

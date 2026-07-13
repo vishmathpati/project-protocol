@@ -52,7 +52,7 @@ Examples:
 - `LogoBar` (the customer logos strip).
 - `FAQAccordion` (the marketing FAQ list with the project's actual questions baked in).
 
-Marketing components can read from `brain/marketing/CONTENT.md` if it exists (features list, comparisons, testimonials registry). Otherwise they take props or use ad-hoc copy.
+Marketing components consume approved page content through the active Build Page and the project's actual content architecture. They never invent ad-hoc copy merely because a registry is absent.
 
 ### App
 

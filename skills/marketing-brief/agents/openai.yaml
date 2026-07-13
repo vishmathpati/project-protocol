@@ -1,7 +1,7 @@
 interface:
   display_name: "Marketing Brief"
   short_description: "Build brand-facing content and marketing canon"
-  default_prompt: "Read the project and brand foundations, resume the appropriate marketing stage, ask only marketing gaps, and write content intent without choosing page composition."
+  default_prompt: "Use $marketing-brief to classify unique pages and genuine page families, ask only marketing gaps, and write content intent without choosing visual composition."
 
 policy:
   allow_implicit_invocation: false

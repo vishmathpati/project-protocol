@@ -13,6 +13,8 @@ Read STRUCTURE, DESIGN, FUNDAMENTALS, relevant TASTE, chapter/page decisions, an
 
 Consume the approved page narrative, pattern, and media-slot decision; never choose the page story or acquire media on the component's behalf. `reference-only` research assets cannot enter implementation. Use only owned/client-authorized, licensed, approved generated, or explicitly temporary neutral media, and preserve its replacement gate.
 
+For a research-led marketing website, a dashboard request is only **queued** until an active Build Page names the target page/section and supplies its approved page decision, pattern, media slots, and compatibility verdict. Stop instead of building a free-floating marketing component. Standalone generic components and ordinary product/dashboard components remain valid outside this marketing gate.
+
 ## 2. Selection ladder
 
 Use this order:

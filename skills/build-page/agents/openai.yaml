@@ -1,7 +1,7 @@
 interface:
   display_name: "Build Page"
   short_description: "Compose and verify a substantial brand-facing page"
-  default_prompt: "Compose this substantial page content-first: lock section jobs and narrative order, map the human-selected concept, offer grounded presentation choices, then make every media slot and replacement gate explicit before implementation."
+  default_prompt: "Use $build-page to verify the locked site direction and active-page compatibility, preserve connected composition, and build content-first with an explicit Page Asset Request."
 
 policy:
   allow_implicit_invocation: true

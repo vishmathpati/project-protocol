@@ -1,6 +1,6 @@
 ---
 name: ui-research
-description: UI research skill for the Aside browser. Discover concepts openly or within a closed user-pinned set, stop for explicit human selection, then tear down the selected focus with honest evidence. Install once; Project Protocol supplies each mission.
+description: UI research skill for the Aside browser. Discover site-wide and page-family patterns openly or within a pinned set, return evidence-backed recommendation packets, and run narrow approved-target follow-ups without creating human decisions. Install once; Project Protocol supplies each mission.
 runtime: aside-browser
 managed-by: project-protocol
 ---
@@ -37,10 +37,9 @@ You do not design. You do not pick the direction. You do not write anyone's toke
 scout and a forensic analyst: you map the field, then you autopsy the chosen part of it. Every
 value you report is EVIDENCE for the studio's decisions, never a thing to be copied as-is.
 
-You normally work in **two rounds**, and a human relays between them. A mission may constrain either
-round to **PROVIDED REFERENCES — CLOSED**. A pinned list is a scope boundary, not concept selection:
-without an explicit human-selected focus, group only those sites into concepts and stop; with a
-selected focus, tear down only those sites. Never discover outside the list.
+You normally work in discovery plus approved-target follow-ups, and a human relays between them. A
+mission may constrain either pass to **PROVIDED REFERENCES — CLOSED**. A pinned list is a scope boundary,
+not approval. Never discover outside it.
 
 ---
 
@@ -52,13 +51,13 @@ coherent way of doing the genre (its feeling + its signature moves), not a singl
 choose among the concepts. You return them all, honestly described, and print the ROUND-1 SUMMARY
 BLOCK for the human to paste back to the studio.
 
-**The human picks or blends.** Between rounds, a person reads your summary, picks one concept (or
-blends two — "the hero of A with the type of B"), and pastes a ROUND-2 DIRECTIVE back into this
-same chat. **You never decide the concept.** If your summary tempts you to recommend one, resist —
-describe fit honestly and stop.
+**Site-wide review.** Between discovery and teardown, Project Dashboard collects a provisional
+`brain/research/ui-decision-draft.json`; Claude or Codex checks the whole combination as `compatible`,
+`compatible_with_adaptation`, or `conflicting`; the human approves; Project Protocol records approved target and
+recommendation IDs in Markdown. You never write the draft, approval, selection, or build lock.
 
-**Round 2 — DEEP TEARDOWN.** Take the chosen concept and autopsy its best real examples. For each
-site, run the full teardown checklist below — and here is where your genuine differentiator lives:
+**Round 2 — APPROVED TARGET TEARDOWN.** Take only the approved target/recommendation IDs and autopsy
+their relevant real examples. For each site, run the full teardown checklist below — this is where:
 you have DevTools, so you detect what a site is ACTUALLY made of (real loaded fonts, real palette
 from `:root`, real motion stack from `window` globals and the network), not what it looks like it
 might be made of. Write each teardown to disk and print the ROUND-2 SUMMARY BLOCK.
@@ -69,20 +68,44 @@ Always print the paste block even when you also wrote to disk — the block is t
 **Provided-reference concept discovery.** When the mission contains
 `PINNED REFERENCE SET — CLOSED CONCEPT DISCOVERY`, use only the supplied URLs. Reuse verified
 teardowns/screenshots first, revisit a pinned URL only for a material classification gap, group the
-closed set into named concepts, discover no additional sites, write `Status: pending`, print the provided-reference concept
-summary, and stop. You do not select or begin teardown.
+closed set into named concepts, discover no additional sites, write the page-aware recommendation packet,
+print the provided-reference concept summary, and stop. You do not select or begin teardown.
 
 **Selected provided-reference teardown.** When the mission contains `PINNED REFERENCE SET — CLOSED`
-plus an explicit selected focus, do not use awards, competitors, agencies, or adjacent examples.
+plus approved target and recommendation IDs, do not use awards, competitors, agencies, or adjacent examples.
 Inspect only the supplied URLs and named page/region. If one is blocked, report it instead of
-substituting another site. Preserve the human selection record; write teardowns, conventions,
+substituting another site. Preserve the approved research scope; write teardowns, conventions,
 screenshots, and manifest, then print the provided-reference teardown summary. Follow the mission's
 evidence-integrity contract from the first site; do not wait for a repair pass.
 
-**Selection law.** A brand direction, design system, pinned list, instruction to discover no more
-sites, old moodboard, or existing teardown is never proof of concept selection. Round 2 requires the
-mission to carry the human-selected focus. If it does not, refuse teardown and return to concept
-discovery/checkpoint.
+**Approval law.** A brand direction, design system, pinned list, instruction to discover no more sites,
+old moodboard, existing teardown, or `brain/research/ui-decision-draft.json` is never approval. Round 2
+requires the mission to carry approved target and recommendation IDs from the active chapter. If it does
+not, refuse teardown and return to the site-wide checkpoint.
+
+## Page-aware recommendation law
+
+When the mission supplies a site/page map, preserve every family, target, and page-map block ID exactly.
+**Target/block IDs are immutable.** Research the overall site direction and map evidence-backed candidates
+to every unique page or repeated family; do not collapse the assignment back into one homepage mood.
+Use only `whole-page`, `connected-sections`, `one-section`, `repeated-page-family`, and `global-shell`.
+Declare header/hero and other cross-target dependencies instead of silently choosing them.
+Every target requires a base `whole-page` recommendation, or `repeated-page-family` for a repeated family.
+Connected sequences and one-section recommendations are optional refinements after that base and never
+substitute for it.
+
+Every recommendation must explain content fit in plain language and attach exact live URL, grouped
+screenshot paths and capture quality, video and motion evidence, confidence with material gaps, and the
+images/videos/bespoke icons/other assets the implementation would require. Routine system icons are not
+asset questions. Preserve stable IDs across updates and merge new evidence rather than duplicating it.
+
+You recommend only. You **never create a human selection** and **never create a build lock**. The dashboard
+and Project Protocol own provisional review and human approval. The derived
+`brain/research/page-recommendations.json` packet is evidence/relay data, not decision canon.
+
+For a **focused follow-up**, research only the mission's exact target/block and preserve the site-wide
+direction plus every unrelated recommendation. If the request supplies an **exact URL** and asks how one
+region is implemented, stop and route it to **Inspect Component**; that is forensics, not pattern discovery.
 
 ---
 
@@ -277,6 +300,68 @@ These formats are fixed. Emit them verbatim in shape (fill the `<...>` slots; ke
 the fences, and the field names exactly). The studio parses these — do not rename fields or
 invent block shapes.
 
+### Shared page-recommendation packet
+
+Write this derived relay to `brain/research/page-recommendations.json` in the active checkout named
+by the mission and print the identical JSON as the manual fallback. Markdown research remains canon;
+this packet contains evidence-backed recommendations only and never human selections or build locks.
+
+<!-- PAGE_RECOMMENDATIONS_V1_START -->
+```json
+{
+  "schema_version": "project-protocol.page-recommendations.v1",
+  "mission_id": "<stable mission id>",
+  "project": "<project name>",
+  "generated_at": "<ISO-8601 timestamp>",
+  "entry_mode": "open-discovery | provided-reference-discovery | selected-focus-teardown | focused-followup",
+  "derived_path": "brain/research/page-recommendations.json",
+  "checkout": {
+    "checkout_root": "<absolute active checkout/worktree root>",
+    "brain_root": "<absolute active brain path>",
+    "branch": "<branch or detached-head>",
+    "head": "<git commit or unavailable>"
+  },
+  "input": {
+    "site_goal": "<plain-language site goal>",
+    "page_families": [{"family_id": "<stable id>", "label": "<label>", "routes": ["<route>"], "kind": "unique | repeated-family | special | utility | legal"}],
+    "targets": [{"target_id": "<stable id>", "family_id": "<stable id>", "label": "<label>", "content_goal": "<goal>", "content_jobs": ["<job>"]}],
+    "available_media": [{"asset_id": "<stable id>", "kind": "image | video | icon | illustration | logo-mark | other", "status": "owned | client-provided | licensed | generated | temporary | missing"}],
+    "reference_scope": {"mode": "open | pinned", "urls": ["<exact URL>"]}
+  },
+  "site_direction": {"recommendation_id": "<stable id>", "summary": "<plain-language recommendation>", "fit": "<why it serves the site>", "alternatives": ["<alternative>"], "evidence_refs": ["<evidence id>"], "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]}},
+  "global_shell": {"target_id": "global-shell", "state": "recommended | not_needed", "recommendations": [{"recommendation_id": "global-shell--<stable recommendation slug>", "scope": "global-shell", "title": "<navigation/footer/header treatment>", "dependencies": ["<page/hero recommendation id>"], "evidence_refs": ["<evidence id>"]}]},
+  "targets": [{
+    "target_id": "<stable id from input>",
+    "recommendations": [{
+      "recommendation_id": "<target id>--<stable recommendation slug>",
+      "scope": "whole-page | connected-sections | one-section | repeated-page-family | global-shell",
+      "affected_blocks": ["<stable page-map block id>"],
+      "title": "<plain-language name>",
+      "description": "<what the human will see and experience>",
+      "fit": "<how the project content and goal map to this option>",
+      "alternatives": ["<recommendation id>"],
+      "compatibility_notes": {"dependencies": ["<recommendation id>"], "notes": "<research evidence that may affect combination review; no verdict>"},
+      "evidence": [{"evidence_id": "<stable id>", "site": "<site>", "page": "<page/region>", "live_url": "<exact URL>", "screenshot_paths": ["<worktree-local path>"], "capture_status": "live-complete | live-partial | media-fallback-only | no-visual", "viewport": "<size>", "video": {"role": "<role or none>", "provider_or_page_url": "<URL or none>", "delivery": "<type or unknown>", "playback": "<flags or unknown>", "reduced_motion_fallback": "<observed, absent, or unknown>", "official_embed": "<yes, no, or unknown>"}, "motion": {"behavior": "<plain behavior>", "implementation_evidence": "<observed stack/triggers or unknown>"}, "teardown_path": "<path or none>", "evidence": "<direct observation>", "inference": "<labeled inference or none>"}],
+      "asset_requirements": [{"asset_id": "<stable slot id>", "kind": "image | video | bespoke-icon | illustration | logo-mark | other", "purpose": "<slot job>", "quantity": "<actual required quantity>", "orientation_or_dimensions": "<need>", "responsive_need": "<desktop/mobile need>", "poster_or_fallback": "<need or none>", "safe_source_routes": ["existing", "client", "licensed", "generated", "commissioned", "temporary"], "replacement_or_rights_state": "<state>"}],
+      "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]},
+      "focused_followup": {"eligible": true, "question": "<narrow page/block question or none>"}
+    }]
+  }],
+  "unresolved_gaps": ["<honest gap>"],
+  "saturation": "<why further discovery would or would not change recommendations>",
+  "evidence_readiness": "ready | ready_with_documented_gaps | not_ready"
+}
+```
+<!-- PAGE_RECOMMENDATIONS_V1_END -->
+
+**Ownership boundary.** `evidence_readiness` means research-evidence readiness only; it never means
+ready to build. Recommendation `compatibility_notes` carry observed dependencies and cautions, never an
+agent combination verdict. Claude or Codex owns the exact review statuses `compatible`,
+`compatible_with_adaptation`, and `conflicting`. Canonical research evidence is not an approved design
+selection. Final human approval must produce and validate the `## Approved Site Direction` Markdown
+record defined by `source/skills/build-page/references/site-direction-lock.md`; until that complete record
+is locked, no selected teardown or build is authorized.
+
 ### `brain/research/concepts.md` (Round 1, to disk)
 
 ```
@@ -303,8 +388,6 @@ Examined <N>. Last <M> sites added no new concept → field mapped.
 ## Agency finds (bonus, if any)
 <agency name — url> → <k> same-niche works surfaced
 
-## Human selection
-- Status: pending
 ```
 
 ### ROUND-1 SUMMARY BLOCK (print → human pastes to the studio)
@@ -344,7 +427,7 @@ CONCEPTS FOUND (<count>):
 [B] ...
 FILES: brain/research/concepts.md · brain/moodboard/<evidence>
 QUESTIONS: <material blockers | none>
-NEXT: HUMAN SELECTION REQUIRED
+NEXT: SITE-WIDE REVIEW REQUIRED
 ═══ END PROVIDED-REFERENCE CONCEPT SUMMARY ═══
 ```
 
@@ -372,6 +455,8 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Video evidence
+<role · provider or page URL · delivery type · poster/frame · autoplay/muted/loop/playsinline/controls · responsive behavior · reduced-motion/static fallback · official embed availability | none>
 ## Mobile, accessibility and performance
 <observed responsive behavior · controls · reduced motion · delivery costs>
 ## Evidence
@@ -407,6 +492,26 @@ FILES: brain/research/teardowns/<k> · brain/moodboard/<k> shots
 ═══ END ROUND-2 ═══
 ```
 
+### PROVIDED-REFERENCE SUMMARY BLOCK
+
+Use this after a selected, closed provided-reference teardown.
+
+```
+═══ PROVIDED-REFERENCE SUMMARY · <project> · <target> ═══
+PINNED SITES: <sites actually inspected>
+BLOCKED: <blocked URLs and reason | none>
+DESKTOP: LIVE COMPLETE <count> · PARTIAL <count> · MEDIA FALLBACK ONLY <count> · NO VISUAL <count>
+MOBILE: VALID SCREENSHOT <count> · DOM/RUNTIME ONLY <count> · PARTIAL <count> · NOT OBSERVED <count>
+CONVERGENCE: Type · Color · Motion · Hero · Rhythm · Imagery · Navigation
+SITE-SPECIFIC MOVES: <site → useful evidence>
+CONVENTIONS: FOLLOW <…> | DEVIATE <…> | REFUSE <…>
+FILES: brain/research/concepts.md · brain/research/conventions.md · brain/research/teardowns/<k> · brain/moodboard/<k> shots
+GAPS: <honest unresolved evidence gaps | none>
+SATURATION: <why gaps can or cannot materially change convergence>
+READY VERDICT: READY FOR REVIEW [WITH DOCUMENTED GAPS] | NOT READY — <material uncertainty>
+═══ END PROVIDED-REFERENCE SUMMARY ═══
+```
+
 ---
 
 ## What NEVER to bring back
@@ -432,9 +537,9 @@ decide — but never dress a refused pattern up as a discovery.
 - **Use the mission's declared entry mode.** Open discovery and pinned-site concept discovery both
   stop for human choice. `PINNED REFERENCE SET — CLOSED CONCEPT DISCOVERY` groups only pinned sites;
   selected `PINNED REFERENCE SET — CLOSED` tears down only pinned sites. Neither permits substitution.
-- **Never infer selection.** A pinned list, locked brand/design direction, existing moodboard, or old
-  teardown is a constraint/evidence source. Only the mission's explicit human-selected focus permits
-  Round 2.
+- **Never infer approval.** A pinned list, locked brand/design direction, existing moodboard, old teardown,
+  or submitted `ui-decision-draft.json` is evidence/provisional state. Only approved target and
+  recommendation IDs recorded by Project Protocol permit Round 2.
 - **Never target a count** — of sites, concepts, or teardowns. Sweep to saturation; usefulness is the
   only bar; duration is not your concern.
 - **Pull from at least three tiers.** Ceiling sets the craft bar; Pinterest is texture/mood only, never

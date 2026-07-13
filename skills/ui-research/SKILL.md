@@ -1,89 +1,116 @@
 ---
 name: ui-research
-description: "Optional real-site UI research for brand-facing or inspiration-dependent work. Discover concepts openly or within user-pinned sites, require explicit human selection, then tear down the selected focus. Does not auto-trigger for ordinary dashboards."
+description: "Optional real-site UI research for inspiration-dependent marketing work. Map a site and its page families to evidence-backed recommendations, support open or pinned discovery and focused follow-ups, and stop for site-wide human review. Does not auto-trigger for ordinary dashboards."
 ---
 
 # UI Research
 
-Ground a visual direction in real sites before Style Lock or Build Page. Research is evidence, not authority.
+Ground a marketing site's direction in real evidence before Build Page. Research recommends; the
+human decides; Claude or Codex validates the submitted combination; only approved Markdown becomes canon.
 
-## Resolve the invocation
+## Resolve project state
 
-Read BRIEF, STRUCTURE, BRAND, Marketing Stage A outputs, the user-stated target surface/page, DESIGN refusals, and TASTE. The user's explicit target and reference constraint outrank STATUS/ROADMAP next actions. Never redirect homepage research to the next queued page.
+Read BRIEF, STRUCTURE, BRAND, DESIGN, TASTE, Marketing Stage A outputs, sitemap, page briefs/copy,
+available MEDIA, current chapter, and the user's stated scope. The user's explicit target and reference
+constraint outrank STATUS/ROADMAP next actions. Never redirect homepage research to the next queued page.
 
-Choose without a menu dump. There are exactly three entry modes:
+Build a **site and page map** before composing the mission. Preserve stable family and target IDs from
+the sitemap; when absent, create deterministic slug IDs without changing routes. Represent every unique
+page or repeated page family once, including special, utility, and legal groups when they require visual
+review. Each target carries its routes, content goal, and content jobs. A single-page project has one
+target. Do not invent missing content strategy; ask only when a missing goal would change the research.
 
-- **Open discovery** — no pinned reference set and no explicit human-selected research concept. Sweep the field into concepts.
-- **Provided-reference concept discovery** — the user supplies or limits research to websites, but has not explicitly selected a research concept or blend. Analyze only that closed set, group it into concepts, then stop for the human checkpoint.
-- **Selected-focus teardown** — `brain/research/concepts.md` contains an explicit human selection record with status, focus, selected by, date, and included moves. Tear down that selected concept; when its reference set is pinned, inspect only those URLs.
+Use the five scope labels exactly: `whole-page`, `connected-sections`, `one-section`,
+`repeated-page-family`, and `global-shell`. A header that depends on a hero is a declared dependency,
+not an automatic global choice. Routine design-system icons are not asset questions; bespoke marks are.
 
-A supplied URL list, a prohibition on finding more sites, or an existing BRAND/DESIGN direction is a constraint—not concept selection. Never infer selection from words such as `locked`, an existing design system, a prior moodboard, STATUS/ROADMAP, or the presence of teardowns. If the explicit selection record is missing or incomplete, route to concept discovery or the human checkpoint, never teardown.
+Choose the entry mode without a menu dump:
 
-Ask only for information that is genuinely missing: target page/surface, exact pinned URLs when the set is closed, and research depth (`quick | standard | deep`). Recommend `standard` when the user has no preference. Do not ask the user whether a concept was selected when canon lacks the explicit record: it was not selected. Manual Aside paste-prompt is the default transport. Do not offer the in-app browser or another transport unless the user asks or Aside is unavailable.
+- **Open discovery** — search the field to saturation and create site-wide/page-aware recommendations.
+- **Provided-reference concept discovery** — use every pinned URL and no others, reuse verified evidence,
+  group the closed set, and create the same page-aware recommendations.
+- **Selected-focus teardown** — after an approved site-wide direction exists, inspect the selected page,
+  connected sequence, or section deeply enough to support its eventual build.
+- **Focused pattern follow-up** — find additional alternatives for one exact target/block whose current
+  recommendations are insufficient. Preserve all other target recommendations and site direction.
 
-Resolve `<brain-abs>` from the current session checkout (`git rev-parse --show-toplevel` + `/brain`). In a worktree, always point Aside at that worktree. Never redirect writes to the main checkout or another worktree merely because it contains older uncommitted research; recover that research into the current checkout deliberately first.
+A supplied URL list, existing design system, old moodboard, current homepage, or agent recommendation is
+a constraint—not concept selection. Aside must never create a human selection or build lock.
 
-Do not run automatically for standard dashboards, CRUD/settings/table/detail pages, or work where the existing system is sufficient.
+Ask only for genuinely missing target/scope, pinned URLs, material page goal, or research depth
+(`quick | standard | deep`). Recommend `standard` when unstated. Manual Aside paste-prompt is the default
+transport. Do not offer another browser unless requested or Aside is unavailable.
 
-## Open discovery — Round 1 sweep
+## Worktree identity and relay
 
-Render the Round 1 mission from `references/mission-prompt-template.md` for the standalone Aside UI Research skill. Aside explores until saturation and returns named concepts grounded in real sites.
+Resolve the current checkout with `git rev-parse --show-toplevel`, branch, and HEAD. `<brain-abs>` is that
+checkout plus `/brain`. In a worktree, always point Aside at that worktree; never a sibling or main checkout.
+Include a stable mission ID and the checkout identity in the mission and packet.
 
-Capture representative hero and signature evidence—not every page and component. Ingest into:
+Aside writes canonical Markdown evidence under `brain/research/` and `brain/moodboard/`. It also writes
+the optional derived relay `brain/research/page-recommendations.json` using the exact packet in
+`references/round-formats.md`, preserving stable IDs on update. It prints the identical packet every time;
+if disk access fails, the paste packet is self-sufficient and Project Protocol writes it into this checkout.
 
-- `brain/research/concepts.md`
-- `brain/moodboard/manifest.md`
-- local screenshots under `brain/moodboard/`
+## Discovery — site-wide recommendation pass
 
-## Provided-reference concept discovery — closed Round 1
+Render Variant A for open discovery or Variant C for a pinned set. Append the PAGE_RECOMMENDATIONS packet
+contract to the rendered mission. Aside first identifies field concepts, then maps evidence-backed options
+to every target in the site/page map. Recommendations explain content fit in plain language and attach live
+URLs, grouped screenshots, video/motion evidence, confidence, material gaps, dependencies, and required
+images/videos/bespoke icons/other assets. Research stops by saturation, never a target count.
 
-Render Variant C from `references/mission-prompt-template.md`. Aside inspects or reuses evidence from every pinned URL, discovers no additional websites, and groups only that closed set into named concepts. A fixed website list constrains where concepts come from; it does not remove concept discovery.
+For every target, return at least one base recommendation with `whole-page` scope, or
+`repeated-page-family` when the target represents a repeated family. Connected sequences and
+`one-section` recommendations are optional refinements after that base; they never replace it.
 
-When verified teardowns and screenshots already exist, reuse them before browsing. Browse again only for a material concept-classification gap and report why. Preserve the existing evidence; do not overwrite teardown conclusions merely to create concepts.
+Ingest and validate:
 
-Write the same Round-1 concept and moodboard outputs as open discovery, with `## Human selection` initialized to `Status: pending`.
+- `brain/research/concepts.md`, `conventions.md`, and `teardowns/` where produced;
+- `brain/moodboard/manifest.md` and local evidence;
+- `brain/research/page-recommendations.json` as derived relay data.
 
-## Human checkpoint
+Reject a packet with a wrong checkout root, missing target IDs, missing recommendation scope, dangling
+evidence/dependency IDs, absent material-gap classification, a global-shell target other than exactly
+`global-shell`, or a global-shell state outside `recommended | not_needed`. Every target must have a base
+whole-page/page-family recommendation or an explicit material blocker; section-only output is incomplete.
+`evidence_readiness` reports research-evidence readiness
+only; it never authorizes teardown or implementation.
 
-After ingesting either Round-1 mode, explicitly invoke Project Dashboard to generate or refresh `brain/project-dashboard.html`. Report its path and present the Research / Moodboard tab before asking for a decision. The dashboard must summarize concepts and show one concept/site at a time with large grouped evidence, live-site links, evidence-quality warnings, and any video role/playback evidence; a raw Markdown mirror or flat image wall does not satisfy the checkpoint. Dashboard generation is part of this checkpoint, not a hook or Save Session side effect. If generation fails, report the blocker and do not advance to teardown.
+## Site-wide human checkpoint
 
-Show the concepts and evidence. The human picks one, blends explicit parts, or requests more sweep. Never choose, recommend-and-assume, or translate an old brand direction into a selection on the human's behalf.
+After discovery, explicitly invoke Project Dashboard. It presents the overall direction, global shell,
+and every page/page-family recommendation before any page build. The dashboard may collect provisional
+review state, but Aside and the derived recommendation packet never record human choices.
 
-Record this exact block inside `brain/research/concepts.md`:
+The checkpoint is a visual decision interface, not a raw Markdown mirror. It shows each recommendation
+at a useful viewing scale, one recommendation at a time within its target, with grouped site evidence,
+live links, scope, content fit, dependencies, asset needs, confidence, and gaps.
 
-```markdown
-## Human selection
-- Status: selected
-- Focus: <concept letter/name or explicit blend>
-- Selected by: <human name/identifier>
-- Selected at: <YYYY-MM-DD>
-- Included moves: <explicit hero/type/navigation/rhythm/etc. picks; "whole concept" when unblended>
-```
+The human reviews the entire site and uses one universal submit action. Project Dashboard writes the
+provisional `brain/research/ui-decision-draft.json`; Claude or Codex reads it and owns the exact combination
+statuses `compatible`, `compatible_with_adaptation`, and `conflicting`, asking only about material conflicts.
+Recommendation-level research carries notes and dependencies, not this verdict. After explicit human
+approval, write and validate the canonical `## Approved Site Direction` Markdown record using
+`source/skills/build-page/references/site-direction-lock.md`. It must be complete and locked; canonical
+research evidence is not an approved design selection. Until then, no selected-focus teardown or Build Page
+is authorized.
 
-Before selection the block must say `Status: pending` and leave the other fields absent. Do not write BRAND or DESIGN and do not create a global selected-decisions file.
+## Focused follow-up and selected teardown
 
-## Selected-focus teardown — Round 2
+Use Variant E when the user requests another pattern for one exact target/block. Carry the current mission
+ID, checkout identity, target/block IDs, content job, current candidates, constraints, and narrow question.
+Do not reopen the site-wide direction, replace unrelated recommendations, or broaden into a new sweep.
+Merge new candidates by stable recommendation/evidence IDs.
 
-Read and validate the complete `## Human selection` record before rendering any teardown mission. Missing status, focus, selector, date, or included moves blocks Round 2 and returns to the human checkpoint. Use the same Aside chat. Deeply inspect the selected concept until saturation. Capture hero, meaningful middle/end sections, navigation, mobile, imagery/video, type, palette, motion, and inner pages/components only when they add materially new evidence.
+Use selected-focus teardown only for approved target/recommendation IDs and the named page/region. Require
+honest desktop/mobile capture states; loaded fonts/images/video/layout; live URL; screenshot paths; actual
+video role/playback/fallback; motion behavior; evidence versus inference; and confidence/material gaps.
 
-Write:
-
-- `brain/research/conventions.md`
-- `brain/research/teardowns/<slug>.md`
-- updated moodboard manifest/screenshots
-
-Each teardown records URL, date, page, viewport, capture method, evidence, and clearly labeled inference. Extracted values inform our system; never copy another site's tokens, code, or assets.
-
-### Selected focus with a closed reference set
-
-Confirm the exact URLs once. Render Variant D from `references/mission-prompt-template.md`. The pinned list is a user-defined boundary, not a target count: inspect every supplied site, discover none, and do not follow competitor/award/agency trails. Scope evidence to the user's named page or region; inspect inner pages only when the user included them.
-
-Preserve prior moodboard/research and the human selection record, then write the same teardown/conventions/manifest outputs as open-discovery Round 2. If a pinned site is blocked, report it; do not replace it with a different site.
-
-Require evidence integrity from the first pass: distinguish live viewport captures, partial captures, media fallbacks, and no visual capture; validate mobile evidence rather than trusting filenames; separate visible brand colors from framework/widget noise; label evidence, inference, and unresolved gaps. Use the recovery and readiness contract embedded in Variant D. A capture is complete only after the bounded visual-readiness gate settles fonts, visible imagery, hero video metadata/frame, loaders, and layout; network idle alone is insufficient. Record video as first-class evidence rather than treating one frame as an image concept. Completion is saturation-based: documented capture gaps may still yield `READY ... WITH DOCUMENTED GAPS` when they cannot materially change the converged direction.
+If the human already has an exact URL and wants to know how one region works, route to **Inspect Component**
+instead. UI Research finds alternatives; Inspect Component performs exact-URL implementation forensics.
 
 ## Finish
 
-Report entry mode, concepts, human-selected focus, convergence, disagreements, gaps, dashboard path, and paths written. Recommend Style Lock or Build Page as appropriate; never auto-chain.
-
-The relay and file shapes live in `references/round-formats.md`. If Aside cannot write project files, the paste blocks remain the guaranteed transport.
+Report entry mode, checkout identity, site/page coverage, recommendation count, evidence gaps, packet path,
+dashboard path, and the single next human action. Never auto-chain to Style Lock, Build Page, or a build.
