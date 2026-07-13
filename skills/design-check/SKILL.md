@@ -24,7 +24,8 @@ Inspect the changed hunks and rendered output, not entire large files. Check:
 - Raw or unmapped visual values.
 - Component-system bypass and native substitutes where shadcn/project primitives exist.
 - Typography, spacing, radius, shadow, color, modes, and per-surface expression.
-- Focus, keyboard, labels, contrast, states, responsive behavior, imagery, and reduced motion.
+- Focus, keyboard, labels, contrast, states, responsive behavior, imagery/video crop and treatment, controls, posters/fallbacks, and reduced motion.
+- Media source stage, permission/provenance, and replacement gates. A required factual or load-bearing placeholder cannot pass as final visual evidence.
 - High-confidence TASTE and explicit BRAND/DESIGN refusals.
 - Unintended changes outside the target region.
 

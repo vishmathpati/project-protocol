@@ -45,7 +45,7 @@ Write the same Round-1 concept and moodboard outputs as open discovery, with `##
 
 ## Human checkpoint
 
-After ingesting either Round-1 mode, explicitly invoke Project Dashboard to generate or refresh `brain/project-dashboard.html`. Report its path and present the Research / Moodboard tab before asking for a decision. Dashboard generation is part of this checkpoint, not a hook or Save Session side effect. If generation fails, report the blocker and do not advance to teardown.
+After ingesting either Round-1 mode, explicitly invoke Project Dashboard to generate or refresh `brain/project-dashboard.html`. Report its path and present the Research / Moodboard tab before asking for a decision. The dashboard must summarize concepts and show one concept/site at a time with large grouped evidence, live-site links, evidence-quality warnings, and any video role/playback evidence; a raw Markdown mirror or flat image wall does not satisfy the checkpoint. Dashboard generation is part of this checkpoint, not a hook or Save Session side effect. If generation fails, report the blocker and do not advance to teardown.
 
 Show the concepts and evidence. The human picks one, blends explicit parts, or requests more sweep. Never choose, recommend-and-assume, or translate an old brand direction into a selection on the human's behalf.
 
@@ -80,7 +80,7 @@ Confirm the exact URLs once. Render Variant D from `references/mission-prompt-te
 
 Preserve prior moodboard/research and the human selection record, then write the same teardown/conventions/manifest outputs as open-discovery Round 2. If a pinned site is blocked, report it; do not replace it with a different site.
 
-Require evidence integrity from the first pass: distinguish live viewport captures, partial captures, media fallbacks, and no visual capture; validate mobile evidence rather than trusting filenames; separate visible brand colors from framework/widget noise; label evidence, inference, and unresolved gaps. Use the recovery and readiness contract embedded in Variant D. Completion is saturation-based: documented capture gaps may still yield `READY ... WITH DOCUMENTED GAPS` when they cannot materially change the converged direction.
+Require evidence integrity from the first pass: distinguish live viewport captures, partial captures, media fallbacks, and no visual capture; validate mobile evidence rather than trusting filenames; separate visible brand colors from framework/widget noise; label evidence, inference, and unresolved gaps. Use the recovery and readiness contract embedded in Variant D. A capture is complete only after the bounded visual-readiness gate settles fonts, visible imagery, hero video metadata/frame, loaders, and layout; network idle alone is insufficient. Record video as first-class evidence rather than treating one frame as an image concept. Completion is saturation-based: documented capture gaps may still yield `READY ... WITH DOCUMENTED GAPS` when they cannot materially change the converged direction.
 
 ## Finish
 

@@ -163,7 +163,10 @@ QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
 The plugin receives the paste, validates (does concepts.md parse? screenshots present?), explicitly
 invokes Project Dashboard to generate/refresh `brain/project-dashboard.html`, presents its Research /
 Moodboard view, then stops for a decision. Dashboard generation is required at this checkpoint; the
-dashboard renders evidence and never chooses. Hooks and Save Session remain non-generators.
+dashboard renders evidence and never chooses. It shows one concept and one site at a time with large
+grouped captures, live-site links, capture-quality warnings, and first-class video evidence. A full
+Markdown dump or flat image gallery does not satisfy this checkpoint. Browser-local review notes are
+explicitly non-canonical. Hooks and Save Session remain non-generators.
 
 The human picks ONE, BLENDS ("hero of A + type of B"), or asks for more. The decision is written to
 canon so all skills see it. Before choice, `Status: pending`. After choice, the exact record is:
@@ -232,6 +235,8 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Video evidence
+<role · provider/page URL · delivery · poster/frame · autoplay/muted/loop/playsinline/controls · responsive and reduced-motion fallback · official embed availability | none>
 ## Mobile, accessibility and performance
 <observed behavior and costs>
 ## Evidence
@@ -248,6 +253,12 @@ Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (d
 ### 5d. Evidence integrity and readiness
 
 - Rendered viewport screenshots, media fallbacks, partial captures and no-visual states are distinct.
+- `LIVE VIEWPORT COMPLETE` requires a bounded visual-readiness gate: `document.fonts.ready`, decoded
+  visible images, hero-video metadata and a usable frame (`readyState >= 2`), no visible loader/skeleton,
+  and two stable layout samples. Network idle alone is insufficient. Timeout becomes PARTIAL/loading-state.
+- Observe live motion before pausing it for a stable representative frame. Record video role, provider/page
+  URL, delivery, poster/frame, playback flags, responsive and reduced-motion fallback, and official embed
+  availability. Never download a reference stream or classify its frame as an image-led concept.
 - Validate mobile from actual dimensions/aspect and recorded CSS viewport, not a filename.
 - Visible computed use establishes brand color; root/framework/widget variables alone do not.
 - Capture recovery uses fresh light contexts, native scroll and stable section targets, then records

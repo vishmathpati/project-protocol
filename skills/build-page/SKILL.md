@@ -24,13 +24,25 @@ UI Research remains optional. But when `brain/research/concepts.md` exists for t
 
 Confirm page goal, audience state, primary conversion, required content, real assets, constraints, and definition of done. Do not re-ask Foundation, Brand, or Marketing questions already answered.
 
-## Compose with the user
+## Create the Page Blueprint with the user
 
-Propose one coherent section sequence tied to real content. Work section by section in a long iterative conversation. For each section, identify its job, content source, visual anchor, selected research evidence if any, existing component reuse, and responsive/motion behavior.
+Do not begin by asking the user to pick components, and do not make a generic wireframe independently of the selected concept. Use this order:
+
+1. **Content inventory** — identify what the page must communicate and what proof/CTA/content is already locked.
+2. **Section jobs and narrative order** — propose the smallest coherent sequence based on meaning. No card/carousel/layout choice yet.
+3. **Concept expression** — map the human-selected concept or blend to the page's hierarchy, rhythm, navigation, imagery, type, and motion.
+4. **Pattern choice** — for each section, offer at most three relevant options grounded in selected research and existing project components (for example editorial band vs cards vs carousel), explain the trade-off in plain language, and let the human choose. Recommend one but never silently assume it.
+5. **Media plan** — convert the approved sections into implementation-ready media slots before promising visual completeness.
+
+Work section by section. For each section record its job, content source, approved presentation pattern, visual anchor, selected research evidence, reuse/build decision, media slot, and responsive/motion behavior. The Page Blueprint is a decision conversation, not a separate source-of-truth file.
 
 External references provide layout or behavior evidence; adapt them to our content, tokens, assets, accessibility, and stack. Never copy proprietary code/assets. If implementation mechanics are unclear, use Inspect Component. If a genuinely missing component is needed, call Build Component.
 
-Record approved page-specific choices in the chapter under `## Page Execution Decisions`: selected research patterns, composition, assets, component paths, and meaningful deviations. Do not create a separate page-state file or append page plans to BRIEF.
+Use `references/media-lifecycle.md` for every meaningful image, video, illustration, or bespoke mark. `brain/marketing/MEDIA.md` owns requirements/source/status. Routine icons come from the locked DESIGN family or existing component system without asking the human; only bespoke marks need an asset decision.
+
+Safe prototypes may use owned/licensed media, approved AI generations, or neutral placeholders. Competitor/reference media remains research-only. A full-bleed or load-bearing placeholder means human approval is structural, not final visual approval. When real photography/video is missing, produce the approved AI prompt packet or photographer/videographer shot list rather than asking vaguely for “some images.”
+
+Record approved page-specific choices in the chapter under `## Page Execution Decisions`: content inventory, section jobs/order, concept mapping, chosen patterns, media-slot IDs and replacement gates, component paths, and meaningful deviations. Do not create a separate page-state file or append page plans to BRIEF.
 
 ## Implement and verify
 

@@ -1,7 +1,7 @@
 interface:
   display_name: "Build Page"
   short_description: "Compose and verify a substantial brand-facing page"
-  default_prompt: "Compose this substantial page from locked content, design canon, explicitly selected optional research, and existing components; stop at the UI Research checkpoint when research exists without human selection."
+  default_prompt: "Compose this substantial page content-first: lock section jobs and narrative order, map the human-selected concept, offer grounded presentation choices, then make every media slot and replacement gate explicit before implementation."
 
 policy:
   allow_implicit_invocation: true

@@ -264,6 +264,12 @@ TEARDOWN CHECKLIST (per pinned site)
 - FOLLOW / DEVIATE / REFUSE evidence for this project
 
 EVIDENCE INTEGRITY
+- Before a `LIVE VIEWPORT COMPLETE` capture, pass a bounded VISUAL READINESS gate: await
+  `document.fonts.ready`; ensure visible hero/content images are complete and `decode()` succeeds;
+  ensure hero video has metadata and `readyState >= 2` with a representative frame; confirm no
+  visible skeleton/loader; and observe two stable layout/viewport samples. Network idle alone is insufficient.
+  If readiness times out, label the capture PARTIAL/loading-state and record why.
+- Observe and record live motion before pausing animations/media for a stable representative frame.
 - Record target page, inspection date, desktop/mobile viewport, capture method and capture status.
 - Classify visual evidence as `LIVE VIEWPORT COMPLETE`, `LIVE VIEWPORT PARTIAL`,
   `MEDIA FALLBACK ONLY`, or `NO VISUAL CAPTURE`. Downloaded media is not a screenshot.
@@ -277,6 +283,9 @@ EVIDENCE INTEGRITY
 - In each Color section write `BRAND-USED COLORS`, `FRAMEWORK/PLUGIN DEFAULTS`, and
   `WIDGET/CONSENT/FORM NOISE` explicitly.
 - Maintain one manifest row per pinned URL with desktop/mobile status, live files, fallbacks and gaps.
+- For video record role, provider or page URL, delivery type, poster/frame, autoplay/muted/loop/
+  playsinline/controls, responsive behavior, reduced-motion/static fallback, and whether an official
+  embed is permitted. Never download a reference stream or treat its screenshot as an image concept.
 
 WRITE TO DISK
 - Preserve human selection + pinned URLs → <brain-abs>/research/concepts.md

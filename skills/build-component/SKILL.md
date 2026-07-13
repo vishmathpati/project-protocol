@@ -11,6 +11,8 @@ Create the smallest missing piece without inventing a parallel design system.
 
 Read STRUCTURE, DESIGN, FUNDAMENTALS, relevant TASTE, chapter/page decisions, and any `research/components/<slug>.md`. Identify the target surface and whether the need is a commodity/accessibility-critical primitive or a brand-expressive composition.
 
+Consume the approved page narrative, pattern, and media-slot decision; never choose the page story or acquire media on the component's behalf. `reference-only` research assets cannot enter implementation. Use only owned/client-authorized, licensed, approved generated, or explicitly temporary neutral media, and preserve its replacement gate.
+
 ## 2. Selection ladder
 
 Use this order:

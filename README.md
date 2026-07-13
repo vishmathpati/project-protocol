@@ -116,14 +116,14 @@ project-root/
     ├── DISCOVERIES.md
     ├── moodboard/         ← local screenshots + manifest.md from UI Research
     ├── research/          ← concepts, conventions, teardowns, component inspections
-    ├── project-dashboard.html  ← generated view; never source of truth
+    ├── project-dashboard.html  ← concise visual review/decision aid; never source of truth
     ├── docs/
     │   ├── INDEX.md
     │   └── detail/
     └── chapters/          ← one .md per chapter (CEO defines, worker executes)
 ```
 
-Root `CLAUDE.md` is the concise constitution, skill router, and source index. Detailed truth stays in its owning canon file. The generated dashboard is only a human-readable projection of those sources.
+Root `CLAUDE.md` is the concise constitution, skill router, and source index. Detailed truth stays in its owning canon file. The generated dashboard summarizes those sources and presents research one concept/site at a time; its browser-local review notes never become canon until the human relays an explicit decision.
 
 ---
 

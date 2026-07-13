@@ -75,6 +75,35 @@ class UIResearchContractTests(unittest.TestCase):
         self.assertIn("route back to UI Research", text)
         self.assertIn("cannot substitute for explicit human selection", text)
 
+    def test_visual_readiness_and_video_evidence_are_first_class(self):
+        mission = (ROOT / "skills/ui-research/references/mission-prompt-template.md").read_text()
+        formats = (ROOT / "skills/ui-research/references/round-formats.md").read_text()
+        aside = (ROOT / "aside-skill/ui-research/SKILL.md").read_text()
+        for text in (mission, formats, aside):
+            self.assertIn("document.fonts.ready", text)
+            self.assertIn("decode()", text)
+            self.assertIn("readyState >= 2", text)
+            self.assertIn("Network idle alone is insufficient", text)
+            self.assertIn("bounded", text)
+            self.assertIn("PARTIAL/loading-state", text)
+            self.assertIn("reduced-motion", text)
+        self.assertIn("never classify one captured video frame as an image-led concept", aside)
+
+    def test_dashboard_checkpoint_is_visual_and_one_at_a_time(self):
+        text = (ROOT / "skills/ui-research/SKILL.md").read_text()
+        self.assertIn("one concept/site at a time", text)
+        self.assertIn("raw Markdown mirror", text)
+
+    def test_build_page_is_content_first_and_media_explicit(self):
+        text = (ROOT / "skills/build-page/SKILL.md").read_text()
+        lifecycle = (ROOT / "skills/build-page/references/media-lifecycle.md").read_text()
+        self.assertLess(text.index("Content inventory"), text.index("Pattern choice"))
+        self.assertLess(text.index("Section jobs and narrative order"), text.index("Media plan"))
+        self.assertIn("let the human choose", text)
+        self.assertIn("reference-only", lifecycle)
+        self.assertIn("before visual approval", lifecycle)
+        self.assertIn("Routine UI icons", lifecycle)
+
 
 if __name__ == "__main__":
     unittest.main()

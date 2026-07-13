@@ -164,6 +164,8 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Video evidence
+<role · provider/page URL · delivery type · poster/frame · autoplay/muted/loop/playsinline/controls · responsive behavior · reduced-motion/static fallback · official embed availability | none>
 ## Mobile, accessibility and performance
 <observed responsive behavior · controls · reduced motion · delivery costs>
 ## Evidence
@@ -181,6 +183,12 @@ Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (d
 ## Provided-reference evidence integrity
 
 - A live screenshot shows rendered page composition; downloaded media is a named fallback, not a shot.
+- Before a complete capture, await `document.fonts.ready`, decode visible images with `decode()`, require
+  hero-video metadata and `readyState >= 2`, clear skeleton/loaders, and observe two stable layout
+  samples inside a bounded wait. Network idle alone is insufficient; timeout means PARTIAL/loading-state.
+- Observe live motion before pausing it for a stable representative capture. Record video role,
+  provider/page URL, delivery, poster/frame, playback flags, responsive/reduced-motion behavior, and
+  official embed availability. Never download a reference stream or classify its frame as an image concept.
 - Validate mobile evidence from actual dimensions/aspect plus recorded CSS viewport, not filenames.
 - Retry unstable capture through distinct light-page/native-scroll strategies, then report the blocker.
 - Keep a one-row-per-site manifest with desktop/mobile status, live files, fallbacks and gaps.

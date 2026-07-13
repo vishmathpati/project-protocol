@@ -21,7 +21,7 @@ Write or update:
 - `brain/marketing/SITEMAP.md` — page hierarchy, intent, primary conversion, and supporting CTA.
 - `brain/marketing/briefs/<slug>.md` — page goal and content contract, not layout.
 - Initial draft copy where enough evidence exists.
-- `brain/marketing/MEDIA.md` — asset requirements, source, rights, treatment, and status.
+- `brain/marketing/MEDIA.md` — source-agnostic asset requirements and their source route, permission/provenance, treatment, stage, and replacement gate. Marketing states what the media must communicate; Build Page later makes each approved slot implementation-ready.
 
 Then UI Research may run for inspiration-dependent brand-facing UI. It is optional.
 

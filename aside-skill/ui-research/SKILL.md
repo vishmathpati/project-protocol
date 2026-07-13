@@ -231,12 +231,22 @@ You run for a long time on the open web. Handle the friction; never fight it.
 - **Scroll-jacked / heavily animated sites** → scroll **incrementally** with a settle pause (2s, or 4–5s
   on animation-heavy sites), and capture **viewport by viewport** (hero / mid / end). NEVER take one
   full-page screenshot — on these sites it captures mid-transition garbage or hangs.
+- **Visual readiness before COMPLETE** → use a bounded wait, not haste and not an infinite loop. Await
+  `document.fonts.ready`; require visible hero/content images to be complete and `decode()` successfully;
+  require hero-video metadata plus `readyState >= 2` and a representative usable frame; confirm no visible
+  skeleton/loader; and observe two stable layout/viewport samples. Network idle alone is insufficient on
+  streaming or animated sites. If the bounded wait expires, classify the capture PARTIAL/loading-state and
+  record the blocker. Observe and record live motion before pausing media/animation for a stable frame.
 - **Unstable screenshot channel** → save DOM/runtime findings first; retry with a fresh light page or
   context, dismiss overlays, pause media/animation, restore native scrolling, and move to stable DOM
   targets. After distinct recovery strategies fail, record the exact error and continue; never loop.
 - **Capture truth** → a live screenshot must show rendered page composition. Downloaded media is a
   `*-media-fallback` and never counts as a screenshot. Validate mobile evidence from real image
   dimensions/aspect plus recorded CSS viewport; rename invalid desktop-shaped mobile captures.
+- **Video truth** → record video as first-class evidence: role, provider or page URL, delivery type,
+  poster/frame, autoplay/muted/loop/playsinline/controls, responsive behavior, reduced-motion/static
+  fallback, and whether an official embed is permitted. Never download or scrape a reference stream,
+  and never classify one captured video frame as an image-led concept.
 - **Write findings to disk incrementally.** Finish a site → write its file → move on. If the run drops
   mid-way (auto-update, network blip), you lose at most the one in-progress site, never the whole round.
 
