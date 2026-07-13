@@ -51,6 +51,7 @@ research depth: <research-depth> — <depth-meaning>
 WRITE TO DISK
 - Concepts doc → <brain-abs>/research/concepts.md
 - Screenshots → <brain-abs>/moodboard/   (name <slug>-hero.png / <slug>-mid.png / <slug>-end.png per site)
+- End concepts.md with `## Human selection` and `- Status: pending`
 
 RETURN
 End by printing the ROUND-1 SUMMARY BLOCK below for me to paste back — even if the disk writes
@@ -136,17 +137,96 @@ FILES: brain/research/teardowns/<k> · brain/moodboard/<k> shots
 
 ```
 <project>         ← brain/BRAND.md ## Product · Name  (also brain/DESIGN.md frontmatter name:)
-<chosen-concept>  ← Round-2 focus recorded in brain/research/concepts.md. Single concept letter/name.
-<blend-picks>     ← same focus when the user blended explicit component-level picks, e.g. "A.hero + B.type"
+<chosen-concept>  ← complete Human selection Focus recorded in brain/research/concepts.md. Single concept letter/name.
+<blend-picks>     ← same selected Focus when the human blended explicit component-level picks, e.g. "A.hero + B.type"
 <brain-abs>       ← this project's brain/ absolute path (e.g. /Users/…/<project>/brain)
 <slug> <count> <k>  ← Aside fills at run time — never a preset target (Spec §1)
 ```
 
 ---
 
-## Variant C — PROVIDED REFERENCES (CONSTRAINED TEARDOWN)
+## Variant C — PROVIDED REFERENCES (CONCEPT DISCOVERY)
 
-Use when the user pins the complete reference set. This is a direct entry, not Round 2 of a sweep.
+Use when the user pins the complete reference set but has not explicitly selected a research concept
+or blend. This is a closed Round 1: concepts come only from the supplied sites.
+
+```
+PROJECT-PROTOCOL UI RESEARCH — PROVIDED REFERENCES CONCEPT ROUND — <project>
+
+Run the ui-research skill you have installed. This prompt is the complete project mission.
+
+PROJECT CONTEXT
+- Target page/surface: <target>
+- Brand/design constraints (not a selected concept): <design-summary>
+- Audience and page goal: <audience-goal>
+- Refusals: <refusals>
+
+PINNED REFERENCE SET — CLOSED CONCEPT DISCOVERY
+<pinned-urls>
+
+SCOPE LAW
+Use every pinned URL and no other website. Do not discover replacements, competitors, award
+examples, agency work, or adjacent references. The supplied sites constrain the evidence pool; they
+do not mean a concept has been selected. Group only these sites into as many genuinely distinct
+homepage/page concepts as the evidence supports.
+
+REUSE FIRST
+Existing verified teardowns and screenshots may already live under <brain-abs>/research/ and
+<brain-abs>/moodboard/. Reuse them before browsing. Browse a pinned URL again only when a material
+concept-classification gap remains, and state the gap. Never reopen or weaken verified evidence just
+to produce concept groups.
+
+FOR EACH CONCEPT
+- Name and emotional read
+- Representative pinned sites and evidence files
+- Hero pattern
+- Navigation pattern
+- Page rhythm
+- Imagery/video treatment
+- Type and motion character
+- Strengths, risks, and fit against the project constraints
+
+DEPTH
+research depth: <research-depth> — <depth-meaning>
+
+WRITE TO DISK
+- Concepts → <brain-abs>/research/concepts.md (preserve existing evidence history)
+- Evidence → <brain-abs>/moodboard/
+- End concepts.md with:
+  ## Human selection
+  - Status: pending
+
+RETURN
+Print the PROVIDED-REFERENCE CONCEPT SUMMARY even when disk writes succeed. Stop after the summary.
+Do not select, blend, tear down a chosen concept, write conventions, run Style Lock, or build a page.
+
+═══ PROVIDED-REFERENCE CONCEPT SUMMARY · <project> · <target> ═══
+PINNED SITES: <sites represented>
+EVIDENCE REUSED: <existing teardown/screenshot paths used | none>
+EVIDENCE REFRESHED: <URLs revisited and material reason | none>
+CONCEPTS FOUND (<count>):
+[A] <name> — <feeling> · Sites <...> · Hero <...> · Navigation <...> · Rhythm <...> · Imagery/motion <...> · Strengths/risks <...> · Project fit <...>
+[B] ...
+FILES: brain/research/concepts.md · brain/moodboard/<evidence>
+QUESTIONS: <material blockers | none>
+NEXT: HUMAN SELECTION REQUIRED
+═══ END PROVIDED-REFERENCE CONCEPT SUMMARY ═══
+```
+
+### Placeholder sources (Variant C)
+
+```
+<project> <target> <audience-goal> <design-summary> <refusals> <pinned-urls>
+<research-depth> <depth-meaning> <brain-abs> ← same canon/invocation sources as the other variants
+<count> <evidence> ← Aside reports actual output; never preset
+```
+
+---
+
+## Variant D — SELECTED PROVIDED REFERENCES (CONSTRAINED TEARDOWN)
+
+Use only when the user pins the complete reference set AND `brain/research/concepts.md` contains a
+complete explicit human selection record. This is selected-focus teardown, not concept discovery.
 
 ```
 PROJECT-PROTOCOL UI RESEARCH — PROVIDED REFERENCES — <project>
@@ -199,7 +279,7 @@ EVIDENCE INTEGRITY
 - Maintain one manifest row per pinned URL with desktop/mobile status, live files, fallbacks and gaps.
 
 WRITE TO DISK
-- Locked focus + pinned URLs → <brain-abs>/research/concepts.md (preserve existing research)
+- Preserve human selection + pinned URLs → <brain-abs>/research/concepts.md
 - Teardowns → <brain-abs>/research/teardowns/<slug>.md
 - Conventions → <brain-abs>/research/conventions.md
 - Screenshots + manifest → <brain-abs>/moodboard/
@@ -222,12 +302,12 @@ READY VERDICT: READY FOR STYLE LOCK/BUILD PAGE [WITH DOCUMENTED GAPS] | NOT READ
 ═══ END PROVIDED-REFERENCE SUMMARY ═══
 ```
 
-### Placeholder sources (Variant C)
+### Placeholder sources (Variant D)
 
 ```
 <project>        ← BRAND/DESIGN project name
 <target>         ← user's explicit page/surface/region; never STATUS next action when they differ
-<locked-focus>   ← user's stated direction or existing approved BRAND/DESIGN decision
+<locked-focus>   ← complete `## Human selection` Focus from research/concepts.md; BRAND/DESIGN alone is invalid
 <audience-goal>  ← target page brief/content plus relevant BRAND audience
 <design-summary> ← concise approved DESIGN identity/expression; never raw full-file paste
 <refusals>       ← relevant DESIGN/BRAND refusals

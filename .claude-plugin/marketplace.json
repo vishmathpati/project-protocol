@@ -8,7 +8,7 @@
     {
       "name": "project-protocol",
       "source": "./",
-      "version": "5.0.0",
+      "version": "5.0.1",
       "description": "A project operating system with universal canon, role-aware sessions, chapter-scoped worktrees, disciplined engineering, and optional brand, marketing, design, and frontend workflows.",
       "author": {
         "name": "Vish Mathpati"

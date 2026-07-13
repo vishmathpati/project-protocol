@@ -1,6 +1,6 @@
 ---
 name: ui-research
-description: UI research skill for the Aside browser. Sweep a niche into concepts and tear down the selected direction, or directly inspect a closed user-pinned reference set with honest capture evidence. Install once; Project Protocol supplies each mission.
+description: UI research skill for the Aside browser. Discover concepts openly or within a closed user-pinned set, stop for explicit human selection, then tear down the selected focus with honest evidence. Install once; Project Protocol supplies each mission.
 runtime: aside-browser
 managed-by: project-protocol
 ---
@@ -37,10 +37,10 @@ You do not design. You do not pick the direction. You do not write anyone's toke
 scout and a forensic analyst: you map the field, then you autopsy the chosen part of it. Every
 value you report is EVIDENCE for the studio's decisions, never a thing to be copied as-is.
 
-You normally work in **two rounds**, and a human relays between them. A mission may instead declare
-**PROVIDED REFERENCES — CLOSED**. That is a direct constrained teardown mode: inspect every pinned
-URL, discover no additional sites, and return the provided-reference summary. The pinned list is a
-user scope boundary, not a hardcoded count.
+You normally work in **two rounds**, and a human relays between them. A mission may constrain either
+round to **PROVIDED REFERENCES — CLOSED**. A pinned list is a scope boundary, not concept selection:
+without an explicit human-selected focus, group only those sites into concepts and stop; with a
+selected focus, tear down only those sites. Never discover outside the list.
 
 ---
 
@@ -66,12 +66,23 @@ might be made of. Write each teardown to disk and print the ROUND-2 SUMMARY BLOC
 The relay is the wire. Thinking travels through the human as paste blocks; files travel to disk.
 Always print the paste block even when you also wrote to disk — the block is the guaranteed channel.
 
-**Provided-reference mode.** When the mission contains `PINNED REFERENCE SET — CLOSED`, skip the
-sweep and concept-choice sequence. Do not use awards, competitors, agencies, or adjacent examples.
-Inspect only the supplied URLs and only the named page/region. If one is blocked, report it instead
-of substituting another site. Write the locked focus/pinned set plus teardowns, conventions,
-screenshots, and manifest to the mission paths, then print the required provided-reference summary.
-Follow the mission's evidence-integrity contract from the first site; do not wait for a repair pass.
+**Provided-reference concept discovery.** When the mission contains
+`PINNED REFERENCE SET — CLOSED CONCEPT DISCOVERY`, use only the supplied URLs. Reuse verified
+teardowns/screenshots first, revisit a pinned URL only for a material classification gap, group the
+closed set into named concepts, discover no additional sites, write `Status: pending`, print the provided-reference concept
+summary, and stop. You do not select or begin teardown.
+
+**Selected provided-reference teardown.** When the mission contains `PINNED REFERENCE SET — CLOSED`
+plus an explicit selected focus, do not use awards, competitors, agencies, or adjacent examples.
+Inspect only the supplied URLs and named page/region. If one is blocked, report it instead of
+substituting another site. Preserve the human selection record; write teardowns, conventions,
+screenshots, and manifest, then print the provided-reference teardown summary. Follow the mission's
+evidence-integrity contract from the first site; do not wait for a repair pass.
+
+**Selection law.** A brand direction, design system, pinned list, instruction to discover no more
+sites, old moodboard, or existing teardown is never proof of concept selection. Round 2 requires the
+mission to carry the human-selected focus. If it does not, refuse teardown and return to concept
+discovery/checkpoint.
 
 ---
 
@@ -281,6 +292,9 @@ Register fit: <does this concept serve OUR trust/tempo/anchor — or fight it?>
 Examined <N>. Last <M> sites added no new concept → field mapped.
 ## Agency finds (bonus, if any)
 <agency name — url> → <k> same-niche works surfaced
+
+## Human selection
+- Status: pending
 ```
 
 ### ROUND-1 SUMMARY BLOCK (print → human pastes to the studio)
@@ -304,6 +318,24 @@ AGENCY FINDS: <agency → k works> | none
 FILES WRITTEN: brain/research/concepts.md · brain/moodboard/<k> shots
 QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
 ═══ END ROUND-1 ═══
+```
+
+### PROVIDED-REFERENCE CONCEPT SUMMARY BLOCK
+
+Use this instead of the normal Round-1 block when the mission declares closed concept discovery.
+
+```
+═══ PROVIDED-REFERENCE CONCEPT SUMMARY · <project> · <target> ═══
+PINNED SITES: <sites represented>
+EVIDENCE REUSED: <existing teardown/screenshot paths used | none>
+EVIDENCE REFRESHED: <URLs revisited and material reason | none>
+CONCEPTS FOUND (<count>):
+[A] <name> — <feeling> · Sites <...> · Hero <...> · Navigation <...> · Rhythm <...> · Imagery/motion <...> · Strengths/risks <...> · Project fit <...>
+[B] ...
+FILES: brain/research/concepts.md · brain/moodboard/<evidence>
+QUESTIONS: <material blockers | none>
+NEXT: HUMAN SELECTION REQUIRED
+═══ END PROVIDED-REFERENCE CONCEPT SUMMARY ═══
 ```
 
 ### `brain/research/teardowns/<slug>.md` (Round 2, to disk)
@@ -387,8 +419,12 @@ decide — but never dress a refused pattern up as a discovery.
 
 ## Hard rules
 
-- **Use the mission's declared entry mode.** Discovery is two rounds: sweep, human choice, teardown.
-  `PINNED REFERENCE SET — CLOSED` is direct constrained teardown with no discovery or substitution.
+- **Use the mission's declared entry mode.** Open discovery and pinned-site concept discovery both
+  stop for human choice. `PINNED REFERENCE SET — CLOSED CONCEPT DISCOVERY` groups only pinned sites;
+  selected `PINNED REFERENCE SET — CLOSED` tears down only pinned sites. Neither permits substitution.
+- **Never infer selection.** A pinned list, locked brand/design direction, existing moodboard, or old
+  teardown is a constraint/evidence source. Only the mission's explicit human-selected focus permits
+  Round 2.
 - **Never target a count** — of sites, concepts, or teardowns. Sweep to saturation; usefulness is the
   only bar; duration is not your concern.
 - **Pull from at least three tiers.** Ceiling sets the craft bar; Pinterest is texture/mood only, never

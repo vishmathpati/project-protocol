@@ -51,11 +51,20 @@ inspect every supplied URL and discover no additional sites.
 
 ## 1.1 Entry modes and precedence (v5 amendment)
 
-- **Discovery mode** — use when the user wants the field explored or has not selected references.
-  Run Round 1, human checkpoint, then Round 2.
-- **Provided-reference mode** — use when the user supplies/pins websites or explicitly requests a
-  locked set. Skip discovery and render the provided-reference teardown mission. Record the locked
-  focus and pinned URLs in `research/concepts.md`; do not invent alternative concepts or sites.
+There are exactly three entry modes:
+
+- **Open discovery** — no pinned set and no explicit human-selected research concept. Run Round 1,
+  dashboard-backed human checkpoint, then Round 2.
+- **Provided-reference concept discovery** — the user supplies/pins websites but has not explicitly
+  selected a research concept or blend. Use only the pinned set, group it into concepts, generate the
+  dashboard, and stop for human selection. Discover no additional websites.
+- **Selected-focus teardown** — `research/concepts.md` contains the complete human selection record.
+  Run Round 2. If its references are pinned, inspect only those URLs and substitute none.
+
+A pinned set, "find no more sites", existing BRAND/DESIGN direction, prior moodboard, or completed
+teardowns are constraints/evidence—not selection. They never authorize Round 2. Existing verified
+teardowns/screenshots should be reused during provided-reference concept discovery before browsing;
+revisit a pinned URL only for a material classification gap.
 
 The user's explicit target page/surface and reference constraints outrank STATUS, ROADMAP, prior
 next-actions, and inferred opportunities. Ask only for a missing target, missing pinned URLs, and
@@ -151,14 +160,32 @@ QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
 
 ## 4. CHECKPOINT (plugin-side, with the human)
 
-The plugin receives the paste, validates (does concepts.md parse? screenshots present?), then
-presents the concepts for a decision. The human picks ONE, or BLENDS ("hero of A + type of B"),
-or asks for more. The decision is written to canon so all skills see it:
-- Record the Round-2 focus inside `brain/research/concepts.md`; do not mutate BRAND or DESIGN.
-- Express a blend as explicit page/component-level picks.
+The plugin receives the paste, validates (does concepts.md parse? screenshots present?), explicitly
+invokes Project Dashboard to generate/refresh `brain/project-dashboard.html`, presents its Research /
+Moodboard view, then stops for a decision. Dashboard generation is required at this checkpoint; the
+dashboard renders evidence and never chooses. Hooks and Save Session remain non-generators.
+
+The human picks ONE, BLENDS ("hero of A + type of B"), or asks for more. The decision is written to
+canon so all skills see it. Before choice, `Status: pending`. After choice, the exact record is:
+
+```
+## Human selection
+- Status: selected
+- Focus: <concept letter/name or explicit blend>
+- Selected by: <human name/identifier>
+- Selected at: <YYYY-MM-DD>
+- Included moves: <explicit hero/type/navigation/rhythm/etc. picks; "whole concept" when unblended>
+```
+
+All five selected fields are required. Do not mutate BRAND or DESIGN. Express a blend as explicit
+page/component-level picks. An agent recommendation never becomes selection without the human's
+explicit answer.
 This is a conversation, not a menu dump. Research describes evidence and never becomes design authority.
 
 ## 5. Round 2 — DEEP TEARDOWN
+
+Round 2 begins only after the complete `## Human selection` record validates. Missing or pending
+selection routes back to Section 4 even when a design direction is locked or teardown evidence exists.
 
 ### 5a. ROUND-2 DIRECTIVE (plugin composes → human pastes into SAME Aside chat)
 ```
@@ -229,13 +256,15 @@ Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (d
 - Readiness is saturation-based. Return `WITH DOCUMENTED GAPS` when gaps cannot materially change
   convergence; return `NOT READY` only for material unresolved uncertainty.
 
-### 5e. Provided-reference summary
+### 5e. Provided-reference summaries
 
-The final relay reports pinned sites and blockers; desktop and mobile capture-status counts;
+Before selection, the provided-reference concept relay reports concept groups sourced only from the
+pinned set, reused/refreshed evidence, and `NEXT: HUMAN SELECTION REQUIRED`. After selection, the
+provided-reference teardown relay reports pinned sites and blockers; desktop and mobile capture-status counts;
 convergence, site-specific moves and conventions; files and honest gaps; saturation reasoning; and
 one readiness verdict: ready, ready with documented gaps, or not ready with the material uncertainty.
-The block shape lives in `skills/ui-research/references/round-formats.md` and is rendered verbatim by
-Variant C.
+The block shapes live in `skills/ui-research/references/round-formats.md` and are rendered verbatim by
+Variants C and D.
 
 ### 5c. ROUND-2 SUMMARY BLOCK (Aside prints → human pastes to the plugin)
 ```
@@ -280,7 +309,8 @@ relevant chapter; Style Lock or Build Page consumes the evidence later only when
   the two SUMMARY BLOCK formats to print, the disk-write paths convention, the "no hardcoded counts"
   law. NO project specifics — those come in the prompt.
 - **`skills/ui-research/references/mission-prompt-template.md`**: the fill-in-the-blanks template
-  UI Research renders from canon, discovery Round-1/Round-2 and provided-reference variants
+  UI Research renders from canon: open Round 1, pinned-site concept Round 1, selected Round 2, and
+  selected provided-reference teardown variants
   sources.
 - **`skills/ui-research/references/round-formats.md`**: the relay/file formats shared by both sides.
 - **`skills/ui-research/SKILL.md`**: selects the entry mode, renders the Aside mission, ingests

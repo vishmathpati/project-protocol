@@ -52,6 +52,9 @@ Register fit: <does this concept serve OUR trust/tempo/anchor — or fight it?>
 Examined <N>. Last <M> sites added no new concept → field mapped.
 ## Agency finds (bonus, if any)
 <agency name — url> → <k> same-niche works surfaced
+
+## Human selection
+- Status: pending
 ```
 
 ## ROUND-1 SUMMARY BLOCK — Aside prints for the user to relay (Spec §3c)
@@ -75,6 +78,39 @@ AGENCY FINDS: <agency → k works> | none
 FILES WRITTEN: brain/research/concepts.md · brain/moodboard/<k> shots
 QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
 ═══ END ROUND-1 ═══
+```
+
+## PROVIDED-REFERENCE CONCEPT SUMMARY BLOCK
+
+Same checkpoint contract as Round 1, but every concept must come only from the closed user-pinned
+set. Existing verified teardowns/screenshots are reused before any revisit.
+
+```
+═══ PROVIDED-REFERENCE CONCEPT SUMMARY · <project> · <target> ═══
+PINNED SITES: <sites represented>
+EVIDENCE REUSED: <existing teardown/screenshot paths used | none>
+EVIDENCE REFRESHED: <URLs revisited and material reason | none>
+CONCEPTS FOUND (<count>):
+[A] <name> — <feeling> · Sites <...> · Hero <...> · Navigation <...> · Rhythm <...> · Imagery/motion <...> · Strengths/risks <...> · Project fit <...>
+[B] ...
+FILES: brain/research/concepts.md · brain/moodboard/<evidence>
+QUESTIONS: <material blockers | none>
+NEXT: HUMAN SELECTION REQUIRED
+═══ END PROVIDED-REFERENCE CONCEPT SUMMARY ═══
+```
+
+## Human selection record — Project Protocol writes after the checkpoint
+
+Round 2 is forbidden until this exact block is complete. Pinned sites, locked BRAND/DESIGN, prior
+moodboards, existing teardowns, or agent recommendations never substitute for it.
+
+```
+## Human selection
+- Status: selected
+- Focus: <concept letter/name or explicit blend>
+- Selected by: <human name/identifier>
+- Selected at: <YYYY-MM-DD>
+- Included moves: <explicit hero/type/navigation/rhythm/etc. picks; "whole concept" when unblended>
 ```
 
 ---

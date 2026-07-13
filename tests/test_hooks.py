@@ -32,7 +32,7 @@ class HookSmokeTests(unittest.TestCase):
     def test_session_start_is_quiet_about_drift_when_current(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); (project / "brain").mkdir()
-            (project / "brain/.plugin-version").write_text("5.0.0\n")
+            (project / "brain/.plugin-version").write_text("5.0.1\n")
             result = run("session_start.py", project)
             self.assertEqual(result.returncode, 0)
             self.assertNotIn("Plugin drift", result.stdout)

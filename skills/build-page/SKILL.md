@@ -18,6 +18,8 @@ Own page composition and implementation. Marketing owns meaning; Style Lock owns
 
 Read the chapter, BRIEF, STRUCTURE, BRAND, DESIGN, FUNDAMENTALS, TASTE, applicable marketing brief/copy/media, relevant UI research, and existing route/component system. Follow the project's actual architecture.
 
+UI Research remains optional. But when `brain/research/concepts.md` exists for this page/surface, verify its `## Human selection` block before claiming the composition is research-grounded. `Status: pending`, a missing block, or an incomplete focus/selector/date/included-moves record means the human checkpoint was not completed: stop and route back to UI Research. A BRAND/DESIGN lock, pinned URL list, existing dashboard, or completed teardowns cannot substitute for explicit human selection.
+
 ## Lock page intent
 
 Confirm page goal, audience state, primary conversion, required content, real assets, constraints, and definition of done. Do not re-ask Foundation, Brand, or Marketing questions already answered.
