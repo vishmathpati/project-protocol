@@ -105,6 +105,34 @@ def _exclude_private_paths(repo: Path) -> None:
     exclude.write_text("\n".join(lines) + "\n")
 
 
+def _install_post_checkout(repo: Path) -> None:
+    """Install a local-only worktree attachment hook without replacing user hooks."""
+    common = _git(repo, "rev-parse", "--git-common-dir")
+    if not common:
+        return
+    common_path = Path(common)
+    if not common_path.is_absolute():
+        common_path = repo / common_path
+    hook = common_path.resolve() / "hooks/post-checkout"
+    marker = "# project-protocol-private-canon"
+    if hook.is_file():
+        if marker in hook.read_text(errors="ignore"):
+            return
+        raise ValueError(f"existing post-checkout hook requires manual integration: {hook}")
+    hook.parent.mkdir(parents=True, exist_ok=True)
+    hook.write_text(
+        "#!/bin/sh\n"
+        f"{marker}\n"
+        "repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0\n"
+        "resolver=\"$repo_root/hooks/scripts/private_canon.py\"\n"
+        "if [ -f \"$resolver\" ]; then\n"
+        "  PYTHONDONTWRITEBYTECODE=1 python3 \"$resolver\" attach --repo \"$repo_root\" >/dev/null 2>&1 || true\n"
+        "fi\n"
+        "exit 0\n"
+    )
+    hook.chmod(0o755)
+
+
 def resolve(path: Path) -> Path | None:
     identity = repository_identity(path)
     if identity is None:
@@ -134,6 +162,7 @@ def register(repo_path: Path, canon_root: Path) -> Path:
     data["repositories"][identity] = {"canon_root": str(canon)}
     _write(path, data)
     _exclude_private_paths(repo)
+    _install_post_checkout(repo)
     return canon
 
 

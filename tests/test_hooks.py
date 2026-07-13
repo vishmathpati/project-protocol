@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -36,7 +37,9 @@ class HookSmokeTests(unittest.TestCase):
             subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=project, check=True)
             subprocess.run(["git", "remote", "add", "origin", "git@example.com:test/project.git"], cwd=project, check=True)
             (project / "README.md").write_text("# Test\n")
-            subprocess.run(["git", "add", "README.md"], cwd=project, check=True)
+            (project / "hooks/scripts").mkdir(parents=True)
+            shutil.copy2(HOOKS / "private_canon.py", project / "hooks/scripts/private_canon.py")
+            subprocess.run(["git", "add", "README.md", "hooks/scripts/private_canon.py"], cwd=project, check=True)
             subprocess.run(["git", "commit", "-m", "init"], cwd=project, check=True, capture_output=True)
             env = os.environ.copy()
             env["PROJECT_PROTOCOL_PRIVATE_CANON_CONFIG"] = str(config)
@@ -47,7 +50,9 @@ class HookSmokeTests(unittest.TestCase):
                 capture_output=True,
             )
             self.assertEqual(registered.returncode, 0, registered.stdout + registered.stderr)
-            subprocess.run(["git", "worktree", "add", "-b", "feature", str(worktree)], cwd=project, check=True, capture_output=True)
+            subprocess.run(["git", "worktree", "add", "-b", "feature", str(worktree)], cwd=project, env=env, check=True, capture_output=True)
+            self.assertEqual((worktree / "brain").resolve(), (canon / "brain").resolve())
+            self.assertEqual((worktree / "CLAUDE.md").resolve(), (canon / "CLAUDE.md").resolve())
             result = run("session_start.py", worktree, {"PROJECT_PROTOCOL_PRIVATE_CANON_CONFIG": str(config)})
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("Private canon attached", result.stdout)
