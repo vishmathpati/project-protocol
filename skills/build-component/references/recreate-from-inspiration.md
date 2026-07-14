@@ -21,7 +21,7 @@ The signal is "**like X from [library]**". The library is named, and it's an ins
 
 ## Phase 1 — Structure detection
 
-Same as default. Read or write `brain/STRUCTURE.md`. The recreated component lands in **Generic** (it's a primitive — variants + ref + className merge will apply).
+Read `brain/STRUCTURE.md` and detect the existing Generic location. Build Component never creates STRUCTURE; update it only after an authorized physical architecture change. The recreated component lands in **Generic** (it's a primitive — variants + ref + className merge will apply).
 
 ---
 

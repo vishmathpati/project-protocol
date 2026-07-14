@@ -1,5 +1,14 @@
 # Page Brief — [Page]
 
+## Placement
+
+- Page/family ID:
+- Scope: `unique-page | page-family`
+- Family members:
+- Representative page:
+- Shared content contract:
+- Exceptions:
+
 ## Goal
 
 - Audience state on arrival:

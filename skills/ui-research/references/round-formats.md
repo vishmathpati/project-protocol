@@ -9,6 +9,68 @@
 > **Fill the `<...>` slots; keep the headers, fences, and field names exactly.** Do not rename a
 > field or invent a block shape — the studio parses these.
 
+## Shared page-recommendation packet
+
+Aside writes this derived relay to `brain/research/page-recommendations.json` in the active checkout
+and prints the identical JSON as the manual fallback. Markdown research remains canon; this packet
+contains evidence-backed recommendations only and never human selections or build locks.
+
+<!-- PAGE_RECOMMENDATIONS_V1_START -->
+```json
+{
+  "schema_version": "project-protocol.page-recommendations.v1",
+  "mission_id": "<stable mission id>",
+  "project": "<project name>",
+  "generated_at": "<ISO-8601 timestamp>",
+  "entry_mode": "open-discovery | provided-reference-discovery | selected-focus-teardown | focused-followup",
+  "derived_path": "brain/research/page-recommendations.json",
+  "checkout": {
+    "checkout_root": "<absolute active checkout/worktree root>",
+    "brain_root": "<absolute active brain path>",
+    "branch": "<branch or detached-head>",
+    "head": "<git commit or unavailable>"
+  },
+  "input": {
+    "site_goal": "<plain-language site goal>",
+    "page_families": [{"family_id": "<stable id>", "label": "<label>", "routes": ["<route>"], "kind": "unique | repeated-family | special | utility | legal"}],
+    "targets": [{"target_id": "<stable id>", "family_id": "<stable id>", "label": "<label>", "content_goal": "<goal>", "content_jobs": ["<job>"]}],
+    "available_media": [{"asset_id": "<stable id>", "kind": "image | video | icon | illustration | logo-mark | other", "status": "owned | client-provided | licensed | generated | temporary | missing"}],
+    "reference_scope": {"mode": "open | pinned", "urls": ["<exact URL>"]}
+  },
+  "site_direction": {"recommendation_id": "<stable id>", "summary": "<plain-language recommendation>", "fit": "<why it serves the site>", "alternatives": ["<alternative>"], "evidence_refs": ["<evidence id>"], "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]}},
+  "global_shell": {"target_id": "global-shell", "state": "recommended | not_needed", "recommendations": [{"recommendation_id": "global-shell--<stable recommendation slug>", "scope": "global-shell", "title": "<navigation/footer/header treatment>", "dependencies": ["<page/hero recommendation id>"], "evidence_refs": ["<evidence id>"]}]},
+  "targets": [{
+    "target_id": "<stable id from input>",
+    "recommendations": [{
+      "recommendation_id": "<target id>--<stable recommendation slug>",
+      "scope": "whole-page | connected-sections | one-section | repeated-page-family | global-shell",
+      "affected_blocks": ["<stable page-map block id>"],
+      "title": "<plain-language name>",
+      "description": "<what the human will see and experience>",
+      "fit": "<how the project content and goal map to this option>",
+      "alternatives": ["<recommendation id>"],
+      "compatibility_notes": {"dependencies": ["<recommendation id>"], "notes": "<research evidence that may affect combination review; no verdict>"},
+      "evidence": [{"evidence_id": "<stable id>", "site": "<site>", "page": "<page/region>", "live_url": "<exact URL>", "screenshot_paths": ["<worktree-local path>"], "capture_status": "live-complete | live-partial | media-fallback-only | no-visual", "viewport": "<size>", "video": {"role": "<role or none>", "provider_or_page_url": "<URL or none>", "delivery": "<type or unknown>", "playback": "<flags or unknown>", "reduced_motion_fallback": "<observed, absent, or unknown>", "official_embed": "<yes, no, or unknown>"}, "motion": {"behavior": "<plain behavior>", "implementation_evidence": "<observed stack/triggers or unknown>"}, "teardown_path": "<path or none>", "evidence": "<direct observation>", "inference": "<labeled inference or none>"}],
+      "asset_requirements": [{"asset_id": "<stable slot id>", "kind": "image | video | bespoke-icon | illustration | logo-mark | other", "purpose": "<slot job>", "quantity": "<actual required quantity>", "orientation_or_dimensions": "<need>", "responsive_need": "<desktop/mobile need>", "poster_or_fallback": "<need or none>", "safe_source_routes": ["existing", "client", "licensed", "generated", "commissioned", "temporary"], "replacement_or_rights_state": "<state>"}],
+      "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]},
+      "focused_followup": {"eligible": true, "question": "<narrow page/block question or none>"}
+    }]
+  }],
+  "unresolved_gaps": ["<honest gap>"],
+  "saturation": "<why further discovery would or would not change recommendations>",
+  "evidence_readiness": "ready | ready_with_documented_gaps | not_ready"
+}
+```
+<!-- PAGE_RECOMMENDATIONS_V1_END -->
+
+**Ownership boundary.** `evidence_readiness` means research-evidence readiness only; it never means
+ready to build. Recommendation `compatibility_notes` carry observed dependencies and cautions, never an
+agent combination verdict. Claude or Codex owns the exact review statuses `compatible`,
+`compatible_with_adaptation`, and `conflicting`. Canonical research evidence is not an approved design
+selection. Final human approval must produce and validate the `## Approved Site Direction` Markdown
+record defined by `source/skills/build-page/references/site-direction-lock.md`; until that complete record
+is locked, no selected teardown or build is authorized.
+
 ---
 
 ## Two governing laws (apply to every block below)
@@ -53,8 +115,6 @@ Examined <N>. Last <M> sites added no new concept → field mapped.
 ## Agency finds (bonus, if any)
 <agency name — url> → <k> same-niche works surfaced
 
-## Human selection
-- Status: pending
 ```
 
 ## ROUND-1 SUMMARY BLOCK — Aside prints for the user to relay (Spec §3c)
@@ -95,23 +155,17 @@ CONCEPTS FOUND (<count>):
 [B] ...
 FILES: brain/research/concepts.md · brain/moodboard/<evidence>
 QUESTIONS: <material blockers | none>
-NEXT: HUMAN SELECTION REQUIRED
+NEXT: SITE-WIDE REVIEW REQUIRED
 ═══ END PROVIDED-REFERENCE CONCEPT SUMMARY ═══
 ```
 
-## Human selection record — Project Protocol writes after the checkpoint
+## Site-wide review and approval boundary
 
-Round 2 is forbidden until this exact block is complete. Pinned sites, locked BRAND/DESIGN, prior
-moodboards, existing teardowns, or agent recommendations never substitute for it.
-
-```
-## Human selection
-- Status: selected
-- Focus: <concept letter/name or explicit blend>
-- Selected by: <human name/identifier>
-- Selected at: <YYYY-MM-DD>
-- Included moves: <explicit hero/type/navigation/rhythm/etc. picks; "whole concept" when unblended>
-```
+Project Dashboard persists provisional choices only to `brain/research/ui-decision-draft.json` after the
+human uses the universal submit action. Claude or Codex then checks the full combination as `compatible`,
+`compatible_with_adaptation`, or `conflicting`. A draft does not authorize Round 2 or a build. Only explicit human approval,
+recorded by Project Protocol in the active chapter with approved target and recommendation IDs, crosses
+the gate. Aside never writes the draft, the approval, a human selection, or a build lock.
 
 ---
 
@@ -121,9 +175,12 @@ moodboards, existing teardowns, or agent recommendations never substitute for it
 
 ```
 ═══ ROUND-2 DIRECTIVE · <project> ═══
-CHOSEN CONCEPT: <letter/name>   [or BLEND: <A.hero> + <B.type> + ...]
-GO DEEP on this concept. Find and tear down its best real examples (saturation-driven —
-as many as are genuinely good; no target count). For each site run the full teardown.
+APPROVED TARGET: <target-id>
+APPROVED RECOMMENDATION IDS: <recommendation-ids>
+SCOPE: <scope> · BLOCK IDS: <block-ids>
+CONTENT GOAL/JOB: <content-job>
+GO DEEP only on the approved target/region and selected evidence. Do not reopen the site-wide direction
+or another page family. Stop by saturation, not a target count.
 
 TEARDOWN CHECKLIST (per site):
 - Type: fonts ACTUALLY loaded (document.fonts) + weights + pairing + scale
@@ -164,6 +221,8 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Video evidence
+<role · provider/page URL · delivery type · poster/frame · autoplay/muted/loop/playsinline/controls · responsive behavior · reduced-motion/static fallback · official embed availability | none>
 ## Mobile, accessibility and performance
 <observed responsive behavior · controls · reduced motion · delivery costs>
 ## Evidence
@@ -181,6 +240,12 @@ Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (d
 ## Provided-reference evidence integrity
 
 - A live screenshot shows rendered page composition; downloaded media is a named fallback, not a shot.
+- Before a complete capture, await `document.fonts.ready`, decode visible images with `decode()`, require
+  hero-video metadata and `readyState >= 2`, clear skeleton/loaders, and observe two stable layout
+  samples inside a bounded wait. Network idle alone is insufficient; timeout means PARTIAL/loading-state.
+- Observe live motion before pausing it for a stable representative capture. Record video role,
+  provider/page URL, delivery, poster/frame, playback flags, responsive/reduced-motion behavior, and
+  official embed availability. Never download a reference stream or classify its frame as an image concept.
 - Validate mobile evidence from actual dimensions/aspect plus recorded CSS viewport, not filenames.
 - Retry unstable capture through distinct light-page/native-scroll strategies, then report the blocker.
 - Keep a one-row-per-site manifest with desktop/mobile status, live files, fallbacks and gaps.

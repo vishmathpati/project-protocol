@@ -1,7 +1,7 @@
 interface:
   display_name: "UI Research"
-  short_description: "Discover, select, then inspect evidence-backed UI concepts"
-  default_prompt: "Respect the target, worktree, and reference scope; distinguish open discovery, pinned-site concept discovery, and explicitly selected teardown; generate the dashboard for human selection before any deep teardown."
+  short_description: "Map page-aware UI recommendations from live evidence"
+  default_prompt: "Respect the active checkout, site/page map, stable IDs, and reference boundary; return the versioned page-recommendations packet with honest screenshot, video, motion, confidence, gap, and asset evidence; then stop for site-wide dashboard review without creating selections or build locks."
 
 policy:
   allow_implicit_invocation: false

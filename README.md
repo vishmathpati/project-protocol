@@ -80,13 +80,13 @@ Invoked explicitly — via `Skill()` calls from other skills, slash commands, or
 ### Build skills
 
 - **`build-component`** — Per-component build skill. Reads `brain/STRUCTURE.md` and relevant canon, scans for reusable existing components, proposes a strategy, generates the component, then fires `design-check`.
-- **`build-page`** — Iterative composition and implementation for substantial brand-facing pages. Conventional dashboard/product pages may use established project and shadcn patterns directly.
+- **`build-page`** — Iterative composition and implementation for substantial brand-facing pages. Research-led marketing builds require one approved site-wide direction before page-by-page execution; conventional dashboard/product pages may use established project and shadcn patterns directly.
 - **`brand-foundation`** — Establishes differentiation, emotional transformation, voice, cultural context, trust, archetype, distinctive assets, and refusals without repeating Universal Foundation questions.
 - **`marketing-brief`** — Resumable Stage A/B workflow for conversion goals, offers, audiences, proof, sitemap, page intent, copy, and media requirements. It never owns page layout.
-- **`ui-research`** — Optional two-round Aside workflow: sweep a niche into named concepts, let the human pick/blend, then deeply tear down the selected concept.
+- **`ui-research`** — Optional Aside workflow that turns sitemap families, content goals, available media, and evidence into page-aware recommendations. Focused follow-up and exact component inspection remain separate lanes.
 - **`inspect-component`** — Investigates one exact external UI region when its implementation mechanics are unclear.
 - **`style-lock`** — Converts brand, content, research, existing tokens, and surface needs into an approved visual system through a real-content preview.
-- **`project-dashboard`** — Deterministically renders Project, Brand, Design, Research/Moodboard, and Build Progress tabs from Markdown canon; `--check` detects staleness.
+- **`project-dashboard`** — Deterministically renders bounded Project, Brand, Design, Research/Moodboard, and Build Progress views. Its loopback server persists only an explicitly submitted/updated provisional decision draft; `--check` detects staleness.
 
 The Aside package ships standalone `ui-research` and `inspect-component` skills under `aside-skill/`. Upload them into Aside; Project Protocol supplies each project mission and ingests the evidence.
 
@@ -115,15 +115,15 @@ project-root/
     ├── STRUCTURE.md
     ├── DISCOVERIES.md
     ├── moodboard/         ← local screenshots + manifest.md from UI Research
-    ├── research/          ← concepts, conventions, teardowns, component inspections
-    ├── project-dashboard.html  ← generated view; never source of truth
+    ├── research/          ← evidence plus derived page recommendations and provisional decision draft
+    ├── project-dashboard.html  ← concise visual review/decision aid; never source of truth
     ├── docs/
     │   ├── INDEX.md
     │   └── detail/
     └── chapters/          ← one .md per chapter (CEO defines, worker executes)
 ```
 
-Root `CLAUDE.md` is the concise constitution, skill router, and source index. Detailed truth stays in its owning canon file. The generated dashboard is only a human-readable projection of those sources.
+Root `CLAUDE.md` is the concise constitution, skill router, and source index. Detailed truth stays in its owning canon file. The generated dashboard summarizes those sources and presents research one concept/site/recommendation at a time. Candidate choices remain browser-local until universal Submit/Update writes one provisional JSON draft; Claude or Codex validates the complete combination, and only explicit human approval produces the exact Markdown site-direction lock.
 
 ---
 
@@ -168,7 +168,7 @@ project_doc_fallback_filenames = ["CLAUDE.md"]
 
 ## Developing this plugin
 
-Editing the plugin's own source is governed by a **workshop-only** skill, `edit-plugin`, which lives at `.claude/skills/edit-plugin/` — the repo's local skills folder, **not** the shipped `skills/` set. It auto-loads only when a contributor opens this repository and does not join the installed skill set. The plugin dogfoods Project Protocol through a separately registered private canon: internal CLAUDE/brain/session files stay outside the public source repository, while a local Git checkout hook and Session Start safely attach that canon to source worktrees. `edit-plugin` adds source safety and validation on top of CEO/worker/solo; implementation, versioning, integration, and release remain separate decisions.
+Contributor-specific instructions, private project canon, and personal workshop skills intentionally live outside this public repository. This repository contains only distributable plugin source, tests, migrations, and public documentation. Contributors should use their own private project-management layer and must never commit private canon or installed/cache artifacts here.
 
 Only a human-approved release chapter may release. At that point run `scripts/bump-version.sh <new-version>` (syncs both plugin.json files + marketplace.json), add `migrations/vX.Y.Z.md` and a CHANGELOG entry, then run `scripts/bump-version.sh --audit`. The audit structurally validates manifests, skills, sidecars, hooks, migration presence, and package cleanliness before integration.
 

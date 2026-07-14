@@ -126,13 +126,13 @@ Allow at most 2 edit rounds. After that, recommend taking it to discuss for deep
 
 ## 5.4 — Write
 
-On approve, do the actual write. One file, one path:
+On approve, write the smallest approved file set. Prefer one component file; include a colocated style, test, or support file only when the approved strategy and project convention require it. List every path before writing.
 
 ```bash
 mkdir -p $(dirname src/components/marketing/pricing-card.tsx)
 ```
 
-Then `Write` the contents. Do not touch any other file. Do not modify `DESIGN.md`. Do not add to a barrel `index.ts` — let the user import the component directly.
+Then write only the listed paths. Do not modify `DESIGN.md`. Do not add a barrel export unless the existing project convention and authorized scope require it.
 
 If the parent folder didn't exist before this (e.g. `src/components/marketing/` is brand new):
 
@@ -150,9 +150,9 @@ After the write, explicitly invoke `design-check` via a `Skill` call:
 Skill("design-check")
 ```
 
-This is deterministic — the explicit `Skill` call guarantees the chain fires regardless of host environment. The PostToolUse dispatcher hook from Phase A backs this up (Risk 2: double-fire is accepted; design-check is idempotent). Do not add a conditional or "if the host supports it" guard — the call is unconditional.
+This is deterministic — the explicit skill call guarantees the chain regardless of host environment. The post-write hook emits a routing reminder only; it does not perform Design Check on the agent's behalf.
 
-Do not duplicate `design-check`'s 8 steps here. The two skills chain — `build-component` writes, `design-check` audits.
+Do not duplicate the Design Check procedure here. The two skills chain — Build Component writes, Design Check audits.
 
 ---
 

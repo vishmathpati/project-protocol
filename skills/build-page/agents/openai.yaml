@@ -1,7 +1,7 @@
 interface:
   display_name: "Build Page"
   short_description: "Compose and verify a substantial brand-facing page"
-  default_prompt: "Compose this substantial page from locked content, design canon, explicitly selected optional research, and existing components; stop at the UI Research checkpoint when research exists without human selection."
+  default_prompt: "Use $build-page to verify the locked site direction and active-page compatibility, preserve connected composition, and build content-first with an explicit Page Asset Request."
 
 policy:
   allow_implicit_invocation: true

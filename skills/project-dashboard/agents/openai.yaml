@@ -1,7 +1,7 @@
 interface:
   display_name: "Project Dashboard"
-  short_description: "Generate the human-readable project dashboard"
-  default_prompt: "Generate or check the deterministic Project Dashboard from Markdown canon and local research assets without creating a second source of truth."
+  short_description: "Review and submit provisional visual decisions"
+  default_prompt: "Generate or serve the active worktree's Project Dashboard, present page-aware recommendations and evidence for site-wide human review, and keep submitted decisions provisional until Claude or Codex validates and records approved Markdown canon."
 
 policy:
   allow_implicit_invocation: false

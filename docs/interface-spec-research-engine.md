@@ -8,6 +8,68 @@
 > orchestrator must all use these exact formats. Authors: obey this verbatim. Do not invent
 > alternative field names or block shapes.
 
+## Shared page-recommendation packet
+
+Aside writes this derived relay to `brain/research/page-recommendations.json` in the active checkout
+and prints the identical JSON as the manual fallback. Markdown research remains canon; this packet
+contains evidence-backed recommendations only and never human selections or build locks.
+
+<!-- PAGE_RECOMMENDATIONS_V1_START -->
+```json
+{
+  "schema_version": "project-protocol.page-recommendations.v1",
+  "mission_id": "<stable mission id>",
+  "project": "<project name>",
+  "generated_at": "<ISO-8601 timestamp>",
+  "entry_mode": "open-discovery | provided-reference-discovery | selected-focus-teardown | focused-followup",
+  "derived_path": "brain/research/page-recommendations.json",
+  "checkout": {
+    "checkout_root": "<absolute active checkout/worktree root>",
+    "brain_root": "<absolute active brain path>",
+    "branch": "<branch or detached-head>",
+    "head": "<git commit or unavailable>"
+  },
+  "input": {
+    "site_goal": "<plain-language site goal>",
+    "page_families": [{"family_id": "<stable id>", "label": "<label>", "routes": ["<route>"], "kind": "unique | repeated-family | special | utility | legal"}],
+    "targets": [{"target_id": "<stable id>", "family_id": "<stable id>", "label": "<label>", "content_goal": "<goal>", "content_jobs": ["<job>"]}],
+    "available_media": [{"asset_id": "<stable id>", "kind": "image | video | icon | illustration | logo-mark | other", "status": "owned | client-provided | licensed | generated | temporary | missing"}],
+    "reference_scope": {"mode": "open | pinned", "urls": ["<exact URL>"]}
+  },
+  "site_direction": {"recommendation_id": "<stable id>", "summary": "<plain-language recommendation>", "fit": "<why it serves the site>", "alternatives": ["<alternative>"], "evidence_refs": ["<evidence id>"], "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]}},
+  "global_shell": {"target_id": "global-shell", "state": "recommended | not_needed", "recommendations": [{"recommendation_id": "global-shell--<stable recommendation slug>", "scope": "global-shell", "title": "<navigation/footer/header treatment>", "dependencies": ["<page/hero recommendation id>"], "evidence_refs": ["<evidence id>"]}]},
+  "targets": [{
+    "target_id": "<stable id from input>",
+    "recommendations": [{
+      "recommendation_id": "<target id>--<stable recommendation slug>",
+      "scope": "whole-page | connected-sections | one-section | repeated-page-family | global-shell",
+      "affected_blocks": ["<stable page-map block id>"],
+      "title": "<plain-language name>",
+      "description": "<what the human will see and experience>",
+      "fit": "<how the project content and goal map to this option>",
+      "alternatives": ["<recommendation id>"],
+      "compatibility_notes": {"dependencies": ["<recommendation id>"], "notes": "<research evidence that may affect combination review; no verdict>"},
+      "evidence": [{"evidence_id": "<stable id>", "site": "<site>", "page": "<page/region>", "live_url": "<exact URL>", "screenshot_paths": ["<worktree-local path>"], "capture_status": "live-complete | live-partial | media-fallback-only | no-visual", "viewport": "<size>", "video": {"role": "<role or none>", "provider_or_page_url": "<URL or none>", "delivery": "<type or unknown>", "playback": "<flags or unknown>", "reduced_motion_fallback": "<observed, absent, or unknown>", "official_embed": "<yes, no, or unknown>"}, "motion": {"behavior": "<plain behavior>", "implementation_evidence": "<observed stack/triggers or unknown>"}, "teardown_path": "<path or none>", "evidence": "<direct observation>", "inference": "<labeled inference or none>"}],
+      "asset_requirements": [{"asset_id": "<stable slot id>", "kind": "image | video | bespoke-icon | illustration | logo-mark | other", "purpose": "<slot job>", "quantity": "<actual required quantity>", "orientation_or_dimensions": "<need>", "responsive_need": "<desktop/mobile need>", "poster_or_fallback": "<need or none>", "safe_source_routes": ["existing", "client", "licensed", "generated", "commissioned", "temporary"], "replacement_or_rights_state": "<state>"}],
+      "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]},
+      "focused_followup": {"eligible": true, "question": "<narrow page/block question or none>"}
+    }]
+  }],
+  "unresolved_gaps": ["<honest gap>"],
+  "saturation": "<why further discovery would or would not change recommendations>",
+  "evidence_readiness": "ready | ready_with_documented_gaps | not_ready"
+}
+```
+<!-- PAGE_RECOMMENDATIONS_V1_END -->
+
+**Ownership boundary.** `evidence_readiness` means research-evidence readiness only; it never means
+ready to build. Recommendation `compatibility_notes` carry observed dependencies and cautions, never an
+agent combination verdict. Claude or Codex owns the exact review statuses `compatible`,
+`compatible_with_adaptation`, and `conflicting`. Canonical research evidence is not an approved design
+selection. Final human approval must produce and validate the `## Approved Site Direction` Markdown
+record defined by `source/skills/build-page/references/site-direction-lock.md`; until that complete record
+is locked, no selected teardown or build is authorized.
+
 ---
 
 ## 0. The architecture in one picture
@@ -24,7 +86,8 @@
    ui-research (plugin) ──gen prompt──▶ human ──paste──▶ Aside chat ──research──▶ summary block
                                         ▲                                          │
                                         └──────────── paste summary ◀──────────────┘
-   ui-research reads summary ──▶ decide/pick concept (with human) ──▶ gen Round-2 directive ──▶ paste ──▶ same Aside chat
+   dashboard reads packet ──▶ human submits whole-site draft ──▶ Claude/Codex checks ──▶ human approves
+   approved target/recommendation IDs ──▶ focused Round-2 directive ──▶ paste ──▶ same Aside chat
 ```
 
 Two lanes:
@@ -41,7 +104,7 @@ NOWHERE in any authored file may a fixed count appear as a target: not "20–40 
 "5–8 teardowns", not "3 concepts". Every quantity is **saturation-driven**:
 - Sweep ends when new sites stop revealing new concepts (last few added nothing).
 - Concept count is whatever the field actually contains — 2, 4, 6, free.
-- Teardown count is however many good examples the chosen concept has.
+- Teardown count is however many good examples the approved target and recommendation scope has.
 Usefulness is the only bar: a site earns its place by adding a concept, a better example of one,
 or a convention data point. Duration is never our concern — state this explicitly.
 Depth dial (quick/standard/deep) tunes *appetite/thoroughness*, NOT hard counts.
@@ -51,18 +114,20 @@ inspect every supplied URL and discover no additional sites.
 
 ## 1.1 Entry modes and precedence (v5 amendment)
 
-There are exactly three entry modes:
+There are four entry modes:
 
-- **Open discovery** — no pinned set and no explicit human-selected research concept. Run Round 1,
-  dashboard-backed human checkpoint, then Round 2.
+- **Open discovery** — no pinned set and no approved site-wide direction. Run the site-wide/page-aware
+  discovery pass, then stop at the dashboard-backed human checkpoint.
 - **Provided-reference concept discovery** — the user supplies/pins websites but has not explicitly
-  selected a research concept or blend. Use only the pinned set, group it into concepts, generate the
-  dashboard, and stop for human selection. Discover no additional websites.
-- **Selected-focus teardown** — `research/concepts.md` contains the complete human selection record.
-  Run Round 2. If its references are pinned, inspect only those URLs and substitute none.
+  approved a site-wide direction. Use only the pinned set, group it into concepts, produce page-aware
+  recommendations, generate the dashboard, and stop for site-wide review. Discover no additional websites.
+- **Selected-focus teardown** — the active chapter contains approved target and recommendation IDs
+  after compatibility review and explicit human approval. Inspect only that target/region.
+- **Focused pattern follow-up** — one target/block lacks suitable options. Find alternatives for that
+  immutable ID without reopening site direction or modifying unrelated recommendations.
 
 A pinned set, "find no more sites", existing BRAND/DESIGN direction, prior moodboard, or completed
-teardowns are constraints/evidence—not selection. They never authorize Round 2. Existing verified
+teardowns are constraints/evidence—not approval. They never authorize Round 2. Existing verified
 teardowns/screenshots should be reused during provided-reference concept discovery before browsing;
 revisit a pinned URL only for a material classification gap.
 
@@ -74,6 +139,11 @@ unless the user requests an alternative or Aside is unavailable.
 Resolve disk paths from the active session checkout. A worktree mission writes to that worktree's
 `brain/`; it never redirects to the main checkout or another worktree because older dirty research
 lives there.
+
+Every mission carries a stable mission ID; checkout root, brain root, branch and HEAD; site goal;
+stable family/target/block IDs; routes; content goals/jobs; available media; and reference law. Aside
+writes the derived `brain/research/page-recommendations.json` packet and prints the identical fallback.
+It never writes `brain/research/ui-decision-draft.json`, a human selection, approval, or build lock.
 
 ## 2. Canon field additions
 
@@ -108,8 +178,10 @@ Header line: `PROJECT-PROTOCOL DESIGN RESEARCH — ROUND 1 (SWEEP) — <project 
    Tier discipline applies (ceiling sets craft bar; Pinterest texture-only). Agency-portfolio
    mining is a bonus move when a build credit appears, never the spine — sites first."
 4. **Depth**: invocation depth value + its meaning.
-5. **Write to disk** (absolute paths given): `brain/research/concepts.md`, screenshots to `brain/moodboard/`.
-6. **Return**: "End by printing the ROUND-1 SUMMARY BLOCK below for me to paste back."
+5. **Write to disk**: canonical evidence plus derived `brain/research/page-recommendations.json`.
+6. **Page-aware output**: a site direction, global-shell candidates, and a recommendation or material
+   blocker for every unique page/repeated family, using shared scope labels and evidence/asset fields.
+7. **Return**: print the identical recommendation packet and summary block.
 
 ### 3b. `brain/research/concepts.md` (Aside writes to disk)
 ```
@@ -163,36 +235,32 @@ QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
 The plugin receives the paste, validates (does concepts.md parse? screenshots present?), explicitly
 invokes Project Dashboard to generate/refresh `brain/project-dashboard.html`, presents its Research /
 Moodboard view, then stops for a decision. Dashboard generation is required at this checkpoint; the
-dashboard renders evidence and never chooses. Hooks and Save Session remain non-generators.
+dashboard renders evidence and never chooses. It shows one concept and one site at a time with large
+grouped captures, live-site links, capture-quality warnings, and first-class video evidence. A full
+Markdown dump or flat image gallery does not satisfy this checkpoint. Browser-local review notes are
+explicitly non-canonical. Hooks and Save Session remain non-generators.
 
-The human picks ONE, BLENDS ("hero of A + type of B"), or asks for more. The decision is written to
-canon so all skills see it. Before choice, `Status: pending`. After choice, the exact record is:
-
-```
-## Human selection
-- Status: selected
-- Focus: <concept letter/name or explicit blend>
-- Selected by: <human name/identifier>
-- Selected at: <YYYY-MM-DD>
-- Included moves: <explicit hero/type/navigation/rhythm/etc. picks; "whole concept" when unblended>
-```
-
-All five selected fields are required. Do not mutate BRAND or DESIGN. Express a blend as explicit
-page/component-level picks. An agent recommendation never becomes selection without the human's
-explicit answer.
-This is a conversation, not a menu dump. Research describes evidence and never becomes design authority.
+The dashboard presents site direction, global shell, and every unique page/repeated family. The human
+reviews everything, then uses one universal submit action. Dashboard writes provisional
+`brain/research/ui-decision-draft.json`; Claude or Codex reports the full combination as `compatible`,
+`compatible_with_adaptation`, or `conflicting` and discusses material conflicts. A draft is not canon
+and authorizes nothing.
+Explicit human approval records final target/recommendation IDs in the active chapter's Markdown owner.
 
 ## 5. Round 2 — DEEP TEARDOWN
 
-Round 2 begins only after the complete `## Human selection` record validates. Missing or pending
-selection routes back to Section 4 even when a design direction is locked or teardown evidence exists.
+Round 2 begins only after the active chapter records approved target and recommendation IDs following
+Section 4 review. A draft, design direction, pinned list, or prior teardown is insufficient.
 
 ### 5a. ROUND-2 DIRECTIVE (plugin composes → human pastes into SAME Aside chat)
 ```
 ═══ ROUND-2 DIRECTIVE · <project> ═══
-CHOSEN CONCEPT: <letter/name>   [or BLEND: <A.hero> + <B.type> + ...]
-GO DEEP on this concept. Find and tear down its best real examples (saturation-driven —
-as many as are genuinely good; no target count). For each site run the full teardown.
+APPROVED TARGET: <target-id>
+APPROVED RECOMMENDATION IDS: <recommendation-ids>
+SCOPE: <scope> · BLOCK IDS: <block-ids>
+CONTENT GOAL/JOB: <content-job>
+GO DEEP only on the approved target/region and selected evidence. Do not reopen the site-wide direction
+or another page family. Stop by saturation, not a target count.
 
 TEARDOWN CHECKLIST (per site):
 - Type: fonts ACTUALLY loaded (document.fonts) + weights + pairing + scale
@@ -232,6 +300,8 @@ Behaviors: <reveals · parallax · hero mechanic · hover moves>
 <section-by-section grammar; varies or repeats>
 ## Imagery treatment
 <photography/render · grain · masking · aspect>
+## Video evidence
+<role · provider/page URL · delivery · poster/frame · autoplay/muted/loop/playsinline/controls · responsive and reduced-motion fallback · official embed availability | none>
 ## Mobile, accessibility and performance
 <observed behavior and costs>
 ## Evidence
@@ -248,6 +318,12 @@ Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (d
 ### 5d. Evidence integrity and readiness
 
 - Rendered viewport screenshots, media fallbacks, partial captures and no-visual states are distinct.
+- `LIVE VIEWPORT COMPLETE` requires a bounded visual-readiness gate: `document.fonts.ready`, decoded
+  visible images, hero-video metadata and a usable frame (`readyState >= 2`), no visible loader/skeleton,
+  and two stable layout samples. Network idle alone is insufficient. Timeout becomes PARTIAL/loading-state.
+- Observe live motion before pausing it for a stable representative frame. Record video role, provider/page
+  URL, delivery, poster/frame, playback flags, responsive and reduced-motion fallback, and official embed
+  availability. Never download a reference stream or classify its frame as an image-led concept.
 - Validate mobile from actual dimensions/aspect and recorded CSS viewport, not a filename.
 - Visible computed use establishes brand color; root/framework/widget variables alone do not.
 - Capture recovery uses fresh light contexts, native scroll and stable section targets, then records
@@ -258,9 +334,9 @@ Law: extracted values are EVIDENCE FOR our tokens, never copied AS our tokens (d
 
 ### 5e. Provided-reference summaries
 
-Before selection, the provided-reference concept relay reports concept groups sourced only from the
-pinned set, reused/refreshed evidence, and `NEXT: HUMAN SELECTION REQUIRED`. After selection, the
-provided-reference teardown relay reports pinned sites and blockers; desktop and mobile capture-status counts;
+Before approval, the provided-reference discovery relay reports concept groups sourced only from the
+pinned set, reused/refreshed evidence, page-aware recommendations, and `NEXT: SITE-WIDE REVIEW REQUIRED`.
+After approval, the provided-reference teardown relay reports pinned sites and blockers; desktop and mobile capture-status counts;
 convergence, site-specific moves and conventions; files and honest gaps; saturation reasoning; and
 one readiness verdict: ready, ready with documented gaps, or not ready with the material uncertainty.
 The block shapes live in `skills/ui-research/references/round-formats.md` and are rendered verbatim by
@@ -268,7 +344,7 @@ Variants C and D.
 
 ### 5c. ROUND-2 SUMMARY BLOCK (Aside prints → human pastes to the plugin)
 ```
-═══ ROUND-2 SUMMARY · <project> · concept <X> ═══
+═══ ROUND-2 SUMMARY · <project> · target <target-id> ═══
 Sites torn down (<count>): <name, name, ...>
 
 CONVERGENCE (what the best examples share):
@@ -285,6 +361,13 @@ FOLLOW: <...> | DEVIATE: <...> | REFUSE: <...>
 FILES: brain/research/teardowns/<k> · brain/moodboard/<k> shots
 ═══ END ROUND-2 ═══
 ```
+
+### 5f. Focused pattern follow-up
+
+When one exact target/block needs more alternatives, compose Variant E with its immutable IDs, content
+job, current candidates, constraints, reference boundary and narrow question. Merge by stable IDs into the
+same packet. Do not reopen site direction. An exact known URL/region whose mechanics are unclear belongs
+to Inspect Component, not focused discovery.
 
 ## 6. Ingest without changing design authority
 
@@ -309,9 +392,8 @@ relevant chapter; Style Lock or Build Page consumes the evidence later only when
   the two SUMMARY BLOCK formats to print, the disk-write paths convention, the "no hardcoded counts"
   law. NO project specifics — those come in the prompt.
 - **`skills/ui-research/references/mission-prompt-template.md`**: the fill-in-the-blanks template
-  UI Research renders from canon: open Round 1, pinned-site concept Round 1, selected Round 2, and
-  selected provided-reference teardown variants
-  sources.
+  UI Research renders from canon: open discovery, pinned-site discovery, approved-target teardown,
+  selected provided-reference teardown, and focused pattern follow-up variants plus their sources.
 - **`skills/ui-research/references/round-formats.md`**: the relay/file formats shared by both sides.
 - **`skills/ui-research/SKILL.md`**: selects the entry mode, renders the Aside mission, ingests
   evidence, and stops before Style Lock or Build Page.

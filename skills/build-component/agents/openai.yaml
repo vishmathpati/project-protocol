@@ -1,7 +1,7 @@
 interface:
   display_name: "Build Component"
   short_description: "Build a genuinely missing on-system UI component"
-  default_prompt: "Search for reuse first, choose the project's configured primitive system, build only the genuinely missing component, and verify it against design and accessibility canon."
+  default_prompt: "Use $build-component to search for reuse first and build only the missing on-system component, requiring an active approved page for research-led marketing work."
 
 policy:
   allow_implicit_invocation: true

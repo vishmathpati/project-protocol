@@ -17,6 +17,8 @@ Keep UI changes on-system. This skill does not choose the brand, approve Style L
 
 Stop when DESIGN is genuinely required but absent. A conventional existing product system may proceed from its established tokens/components while Style Lock is scheduled only if the project needs a new visual direction.
 
+For a research-led marketing build, also confirm the site-wide direction is locked and read the active page compatibility verdict. A submitted or conflicting direction stops visual implementation. Design Check verifies this gate; it does not choose or repair the direction.
+
 ## Postflight
 
 Inspect the changed hunks and rendered output, not entire large files. Check:
@@ -24,8 +26,10 @@ Inspect the changed hunks and rendered output, not entire large files. Check:
 - Raw or unmapped visual values.
 - Component-system bypass and native substitutes where shadcn/project primitives exist.
 - Typography, spacing, radius, shadow, color, modes, and per-surface expression.
-- Focus, keyboard, labels, contrast, states, responsive behavior, imagery, and reduced motion.
+- Focus, keyboard, labels, contrast, states, responsive behavior, imagery/video crop and treatment, controls, posters/fallbacks, and reduced motion.
+- Media source stage, permission/provenance, and replacement gates. A required factual or load-bearing placeholder cannot pass as final visual evidence.
 - High-confidence TASTE and explicit BRAND/DESIGN refusals.
+- Drift from the global shell, approved homepage, prior pages, and family siblings named in the active page contract.
 - Unintended changes outside the target region.
 
 Mechanical fixes may be proposed or applied within the authorized scope. Human-judgment issues require a recommendation and user/owner decision. New tokens route through Style Lock; do not silently edit DESIGN.

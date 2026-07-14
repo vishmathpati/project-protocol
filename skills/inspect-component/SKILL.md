@@ -11,12 +11,14 @@ Investigate one exact external UI region, not a design field.
 
 Require exact URL, component/region, liked behavior, target stack, and relevant captures. Do not run for ordinary components whose implementation is clear.
 
+For a research-led marketing website, a dashboard inspection request is only **queued** until an active Build Page identifies the exact approved page region and explains the unresolved implementation question. Do not inspect a detached pattern before its page context is active. Standalone inspection for an ordinary product/dashboard component remains valid when the target and implementation question are already concrete.
+
 ## Aside mission
 
-Generate a mission for `aside-skill/inspect-component`. Inspect DOM structure, computed styles, assets, network requests, libraries, motion timing/triggers, responsive behavior, states, performance, and accessibility. Separate evidence from inference. Never request proprietary source code, copyrighted assets, credentials, or protected content.
+Generate a mission for `aside-skill/inspect-component`. Inspect DOM structure, computed styles, asset type and delivery, network requests, libraries, motion timing/triggers, responsive behavior, states, performance, and accessibility. Determine whether the behavior is image, video, canvas, mask, or composition and state the characteristics our replacement asset requires. Separate evidence from inference. Never request proprietary source code, copyrighted assets, credentials, protected content, or scraped stream URLs.
 
 ## Output
 
-Write `brain/research/components/<slug>.md`: source URL/date/page/viewport/region/method; observed behavior; DOM/style/network/asset/library evidence; responsive/motion/state/accessibility/performance notes; labeled inference; adaptation plan for project stack/tokens/content/assets; required user assets; unresolved questions.
+Write `brain/research/components/<slug>.md`: source URL/date/page/viewport/region/method; observed behavior; DOM/style/network/asset/library evidence; responsive/motion/state/accessibility/performance notes; labeled inference; adaptation plan for project stack/tokens/content/assets; required asset characteristics and safe source route; unresolved questions.
 
 Build Component consumes the report. Inspect Component never writes DESIGN or implementation code.

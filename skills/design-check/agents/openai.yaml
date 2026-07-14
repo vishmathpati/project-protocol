@@ -1,7 +1,7 @@
 interface:
   display_name: "Design Check"
   short_description: "Keep visual changes aligned with the design system"
-  default_prompt: "Run Design Check in preflight or postflight mode for this exact UI scope, using the existing surface, tokens, components, changed hunks, and rendered evidence."
+  default_prompt: "Use $design-check for this exact UI scope, including applicable site/page compatibility, existing tokens/components, changed hunks, media gates, and rendered evidence."
 
 policy:
   allow_implicit_invocation: true
