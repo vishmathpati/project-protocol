@@ -1,6 +1,6 @@
 {
   "name": "project-protocol",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "A project operating system for Claude Code and Codex: universal canon, role-aware sessions, chapter-scoped worktrees, disciplined engineering, and optional brand, marketing, design, and frontend workflows.",
   "author": {
     "name": "Vish Mathpati"

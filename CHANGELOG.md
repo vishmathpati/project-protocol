@@ -3,7 +3,24 @@
 All notable changes to project-protocol are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased]
+## [5.1.0] — 2026-07-14
+
+### Added
+- **Content identity chain (packet v2).** Content jobs are born with stable IDs in Marketing Stage A and carried everywhere: the research packet's `content_jobs` are objects with `job_id`, `label`, a verbatim `copy_excerpt`, and `copy_ref`; recommendations declare `serves_jobs`; job IDs are the page-map block namespace, so `affected_blocks` reference only supplied IDs; media entries carry one-line descriptions; evidence supports a `first_impression` flag. Consumers accept v1 packets unchanged.
+- **PAGE-COPY template.** Copy finally has a contract: `brain/marketing/copy/<page-or-family-id>.md` with sections keyed by job ID and Element/Copy/Tag rows. Stage A drafts are organized by content jobs only (layout naming forbidden before an approved direction), and every copy line is an editable proposal — human edits win.
+- **Decision survival.** Shortlisted candidates, human-provided references, and focused-research outcomes are recorded verbatim in the `## Approved Site Direction` record; Build Page explicitly reads them, presents shortlisted patterns by name, and names the submission's `asset_requirements` as Page Asset Request input.
+- **Human satisfaction loop.** Build Page must render, present, collect feedback, revise, and repeat until explicit human approval, recorded per page; Design Check and Completion Check no longer stand in for it.
+- **Copy staleness badge.** The review dashboard compares each v2 copy excerpt against its source section at generation time and marks drifted rows "copy changed since research."
+- **Throwaway style proof.** Style Lock's mandatory pre-DESIGN preview is a rendered slice of the lead page's hero using the project's real copy in the approved direction — never token swatches alone.
+- **Format stamps.** Every shipped template carries `> Format: project-protocol/<name>.v1`, and generated files keep the stamp so format generations are detectable.
+
+### Changed
+- **Review dashboard redesigned as a decision workbench.** Warm editorial system, fixed journey sidebar (Direction → Global shell → Pages) with decided-state dots, your-content-vs-recommended-pattern comparison per card, bounded first-impression evidence with accessible carousel controls and keyboard navigation, plain-language scope explanations, and a single always-visible submit path. With v2 packets the left wireframe shows each job with its real copy inline.
+- **Marketing Stage B split.** B1 locks shared/site-wide copy after the approved direction (with a submitted≠locked guard and explicit research reads); B2 finalizes each page's remaining copy inside that page's Build Page conversation, where words meet the chosen composition.
+- **Sequence repaired.** Style Lock has a mandated slot (after direction approval, before Stage B and builds; explicit reuse allowed), and locked design canon joined Build Page's hard gate for research-led marketing pages.
+- **Relay hardened.** Round-2 teardown missions re-carry refusals, anti-cliché lists, and asset availability; the paste fallback truthfully requires the packet JSON as a mandatory second block.
+
+### Earlier v5 redesign (shipped on main before this release)
 
 ### Added
 - **Deferred own-component intent.** The visual review can now record “I’ll bring my own component later” against an exact page/family recommendation and affected block without asking for an upload during research review. The validated intent is relayed to Build Page and requested only when that page becomes active.

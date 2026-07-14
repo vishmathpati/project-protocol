@@ -30,9 +30,11 @@ class HookSmokeTests(unittest.TestCase):
             self.assertEqual(before, sorted(str(path.relative_to(project)) for path in project.rglob("*")))
 
     def test_session_start_is_quiet_about_drift_when_current(self):
+        import json
+        current = json.loads((Path(__file__).resolve().parents[1] / ".claude-plugin/plugin.json").read_text())["version"]
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); (project / "brain").mkdir()
-            (project / "brain/.plugin-version").write_text("5.0.1\n")
+            (project / "brain/.plugin-version").write_text(f"{current}\n")
             result = run("session_start.py", project)
             self.assertEqual(result.returncode, 0)
             self.assertNotIn("Plugin drift", result.stdout)
