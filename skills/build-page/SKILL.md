@@ -36,6 +36,8 @@ Activate only the page or representative family page named by the chapter. Load 
 
 For the homepage chapter, follow FUNDAMENTALS: implement and verify the **shell slice first** (navigation structure, footer, page skeleton, and base primitives), then compose homepage sections. A page-coupled header may be reviewed with its hero, but it must still honor the locked navigation architecture and other-page behavior.
 
+Read any validated `deferred_component_intents` in the approved submission. A deferred component intent is not a component choice and never bypasses the site-wide gate. Ask the human to provide it **only when its exact page or representative family becomes active** and the named affected block is reached. Then compare it with the locked site direction, global shell, approved homepage and prior pages, page-family siblings, design system, active content job, responsiveness, accessibility, and media needs. Reuse or adapt it when compatible; use Inspect Component when exact mechanics are unclear; use Build Component only when the project genuinely lacks the required component. Record the outcome in the active page's execution decisions.
+
 For a page family, build and verify the representative page/template first, check its shared pattern against every member and recorded exception, then apply the approved family to the remaining members without reopening the direction. A member whose exception changes the composition becomes its own active page decision.
 
 ## Lock page intent

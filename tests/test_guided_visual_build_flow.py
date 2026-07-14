@@ -41,6 +41,29 @@ class GuidedVisualBuildFlowTests(unittest.TestCase):
             self.assertIn(verdict, text)
         self.assertIn("shell slice first", text)
 
+    def test_deferred_own_component_is_requested_only_when_its_page_becomes_active(self):
+        dashboard = (ROOT / "skills/project-dashboard/SKILL.md").read_text()
+        build = (ROOT / "skills/build-page/SKILL.md").read_text()
+        contract = (ROOT / "skills/project-dashboard/references/decision-packet.md").read_text()
+
+        self.assertIn("I’ll bring my own component later", dashboard)
+        self.assertIn("deferred_component_intents", contract)
+        self.assertIn("awaiting_active_page", contract)
+        self.assertIn("deferred component intent", build)
+        self.assertIn("only when its exact page or representative family becomes active", build)
+        self.assertIn("do not ask for it during dashboard review", dashboard)
+
+    def test_static_dashboard_relay_requires_agent_validation_and_server_normalization(self):
+        dashboard = (ROOT / "skills/project-dashboard/SKILL.md").read_text()
+        contract = (ROOT / "skills/project-dashboard/references/decision-packet.md").read_text()
+
+        for text in (dashboard, contract):
+            self.assertIn("human-choice relay", text)
+            self.assertIn("validate", text)
+            self.assertIn("not byte-identical", text)
+        self.assertIn("intentionally omit server-authored", contract)
+        self.assertIn("Never accept browser-supplied path, Git, revision, approval, or build-gate authority", contract)
+
     def test_marketing_component_actions_require_an_active_page(self):
         build = (ROOT / "skills/build-component/SKILL.md").read_text()
         inspect = (ROOT / "skills/inspect-component/SKILL.md").read_text()

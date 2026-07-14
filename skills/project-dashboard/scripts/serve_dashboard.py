@@ -83,7 +83,7 @@ def validate_payload(root: Path, payload: Any) -> dict[str, Any]:
     for key in ("project", "research", "site_direction", "global_shell"):
         if not isinstance(payload.get(key), dict):
             raise PacketError(f"{key} must be an object")
-    for key in ("page_families", "pages", "asset_requirements", "focused_research_requests", "provided_references"):
+    for key in ("page_families", "pages", "asset_requirements", "focused_research_requests", "provided_references", "deferred_component_intents"):
         if not isinstance(payload.get(key), list):
             raise PacketError(f"{key} must be a list")
     if not payload["pages"]:
@@ -178,6 +178,33 @@ def validate_payload(root: Path, payload: Any) -> dict[str, Any]:
         for item in source_packet.get("targets", [])
         if isinstance(item, dict) and item.get("target_id")
     }
+    recommendation_contexts: dict[tuple[str, str], tuple[str, set[str], dict[str, Any]]] = {}
+    for target_id, target in source_targets.items():
+        for recommendation in target.get("recommendations", []):
+            if not isinstance(recommendation, dict) or not recommendation.get("recommendation_id"):
+                continue
+            recommendation_id = str(recommendation["recommendation_id"])
+            recommendation_contexts[(target_id, recommendation_id)] = (
+                SOURCE_SCOPES.get(str(recommendation.get("scope")), ""),
+                {
+                    str(value)
+                    for value in recommendation.get("affected_blocks", [])
+                    if isinstance(value, str) and value.strip()
+                },
+                recommendation,
+            )
+    recommendation_contexts[("site-direction", source_direction_id)] = (
+        "whole_page",
+        {"site-wide feeling", "page-family rhythm", "motion language"},
+        source_direction,
+    )
+    for recommendation in source_shell.get("recommendations", []):
+        if isinstance(recommendation, dict) and recommendation.get("recommendation_id"):
+            recommendation_contexts[("global-shell", str(recommendation["recommendation_id"]))] = (
+                "global_shell",
+                {"navigation", "footer", "header treatment"},
+                recommendation,
+            )
     page_ids: set[str] = set()
     for page in payload["pages"]:
         if not isinstance(page, dict) or not isinstance(page.get("id"), str) or not page["id"].strip():
@@ -224,6 +251,131 @@ def validate_payload(root: Path, payload: Any) -> dict[str, Any]:
             raise PacketError(f"page {page['id']} requires a whole-page or page-family baseline")
     if page_ids != set(source_targets):
         raise PacketError("pages must exactly cover every recommendation target")
+
+    def validate_targeted_relay(item: Any, location: str) -> tuple[dict[str, Any], dict[str, Any]]:
+        if not isinstance(item, dict):
+            raise PacketError(f"{location} must be an object")
+        target_id = item.get("target_id")
+        recommendation_id = item.get("recommendation_id")
+        context = recommendation_contexts.get((str(target_id), str(recommendation_id)))
+        if context is None:
+            raise PacketError(f"{location} does not match a recommendation target")
+        expected_scope, allowed_blocks, source_recommendation = context
+        if item.get("scope") != expected_scope:
+            raise PacketError(f"{location}.scope does not match page recommendations")
+        affected_blocks = item.get("affected_blocks")
+        if (
+            not isinstance(affected_blocks, list)
+            or not affected_blocks
+            or not all(isinstance(value, str) and value.strip() for value in affected_blocks)
+        ):
+            raise PacketError(f"{location}.affected_blocks must be a non-empty string list")
+        if not set(affected_blocks).issubset(allowed_blocks):
+            raise PacketError(f"{location} contains an affected block not present in page recommendations")
+        if "created_at" in item and not isinstance(item["created_at"], str):
+            raise PacketError(f"{location}.created_at must be a string")
+        return item, source_recommendation
+
+    for index, request in enumerate(payload["focused_research_requests"]):
+        location = f"focused_research_requests[{index}]"
+        request, _ = validate_targeted_relay(request, location)
+        if request.get("kind") != "research":
+            raise PacketError(f"{location}.kind must be research")
+        if not isinstance(request.get("missing_need"), str) or not request["missing_need"].strip():
+            raise PacketError(f"{location}.missing_need must be a non-empty string")
+
+    initial_reference_urls = {
+        str(value)
+        for value in source_input.get("reference_scope", {}).get("urls", [])
+        if isinstance(value, str) and value
+    }
+    for index, reference in enumerate(payload["provided_references"]):
+        location = f"provided_references[{index}]"
+        if isinstance(reference, dict) and reference.get("source") == "initial-research-scope":
+            if set(reference) != {"live_url", "source"} or reference.get("live_url") not in initial_reference_urls:
+                raise PacketError(f"{location} does not match the initial research scope")
+            continue
+        reference, _ = validate_targeted_relay(reference, location)
+        if reference.get("kind") != "reference":
+            raise PacketError(f"{location}.kind must be reference")
+        parsed = urlsplit(str(reference.get("live_url") or ""))
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            raise PacketError(f"{location}.live_url must be an http(s) URL")
+        if not isinstance(reference.get("liked_part"), str) or not reference["liked_part"].strip():
+            raise PacketError(f"{location}.liked_part must be a non-empty string")
+
+    asset_keys: set[tuple[str, str, str]] = set()
+    for index, asset in enumerate(payload["asset_requirements"]):
+        location = f"asset_requirements[{index}]"
+        if not isinstance(asset, dict):
+            raise PacketError(f"{location} must be an object")
+        target_id = str(asset.get("target_id") or "")
+        recommendation_id = str(asset.get("recommendation_id") or "")
+        context = recommendation_contexts.get((target_id, recommendation_id))
+        if context is None or target_id not in source_targets:
+            raise PacketError(f"{location} does not match a page recommendation")
+        source_assets = {
+            str(item.get("asset_id")): item
+            for item in context[2].get("asset_requirements", [])
+            if isinstance(item, dict) and item.get("asset_id")
+        }
+        asset_id = str(asset.get("asset_id") or "")
+        source_asset = source_assets.get(asset_id)
+        if source_asset is None:
+            raise PacketError(f"{location} references an unknown asset requirement")
+        expected_asset = {**source_asset, "target_id": target_id, "recommendation_id": recommendation_id}
+        if asset != expected_asset:
+            raise PacketError(f"{location} does not match page recommendations")
+        key = (target_id, recommendation_id, asset_id)
+        if key in asset_keys:
+            raise PacketError(f"duplicate asset requirement for {target_id}/{recommendation_id}/{asset_id}")
+        asset_keys.add(key)
+
+    intent_keys: set[tuple[str, str, tuple[str, ...]]] = set()
+    for index, intent in enumerate(payload["deferred_component_intents"]):
+        location = f"deferred_component_intents[{index}]"
+        if not isinstance(intent, dict):
+            raise PacketError(f"{location} must be an object")
+        if intent.get("kind") != "bring_own_component":
+            raise PacketError(f"{location}.kind must be bring_own_component")
+        if intent.get("status") != "awaiting_active_page":
+            raise PacketError(f"{location}.status must be awaiting_active_page")
+        target_id = intent.get("target_id")
+        recommendation_id = intent.get("recommendation_id")
+        source_target = source_targets.get(str(target_id))
+        if source_target is None:
+            raise PacketError(f"{location} references an unknown target")
+        source_recommendations = {
+            str(item.get("recommendation_id")): item
+            for item in source_target.get("recommendations", [])
+            if isinstance(item, dict) and item.get("recommendation_id")
+        }
+        source_recommendation = source_recommendations.get(str(recommendation_id))
+        if source_recommendation is None:
+            raise PacketError(f"{location} references an unknown recommendation")
+        expected_scope = SOURCE_SCOPES.get(str(source_recommendation.get("scope")))
+        if intent.get("scope") != expected_scope:
+            raise PacketError(f"{location}.scope does not match page recommendations")
+        affected_blocks = intent.get("affected_blocks")
+        if (
+            not isinstance(affected_blocks, list)
+            or not affected_blocks
+            or not all(isinstance(value, str) and value.strip() for value in affected_blocks)
+        ):
+            raise PacketError(f"{location}.affected_blocks must be a non-empty string list")
+        allowed_blocks = {
+            str(value)
+            for value in source_recommendation.get("affected_blocks", [])
+            if isinstance(value, str) and value.strip()
+        }
+        if not set(affected_blocks).issubset(allowed_blocks):
+            raise PacketError(f"{location} contains an affected block not present in page recommendations")
+        if not isinstance(intent.get("note", ""), str):
+            raise PacketError(f"{location}.note must be a string")
+        intent_key = (str(target_id), str(recommendation_id), tuple(sorted(affected_blocks)))
+        if intent_key in intent_keys:
+            raise PacketError(f"duplicate deferred component intent for {target_id}/{recommendation_id}")
+        intent_keys.add(intent_key)
     return payload
 
 

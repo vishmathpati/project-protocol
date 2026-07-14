@@ -23,7 +23,7 @@ When UI Research produced `brain/research/page-recommendations.json`, the Resear
 - order each page or family from its whole-page/page-family direction to connected sequences and only then optional section refinements; a refinement never substitutes for the base direction;
 - show one recommendation at a time with large local evidence, exact live URLs, image/video/motion classification, fit, alternatives, dependencies, confidence, gaps, and asset requirements;
 - treat a linked hero/header as a proposal only. The header remains pending until reviewed under Global Shell;
-- let the human mark Recommended, Accept, Shortlist, or Not using; optionally keep/change exact affected parts; request focused research in plain language; or bring an exact live reference plus the exact part liked. Research compatibility is evidence; the browser never manufactures the agent's final compatibility verdict.
+- let the human mark Recommended, Accept, Shortlist, or Not using; optionally keep/change exact affected parts; request focused research in plain language; bring an exact live reference plus the exact part liked; or record **I’ll bring my own component later** for that exact page/section. The last option records a deferred intent only: do not ask for it during dashboard review. Research compatibility is evidence; the browser never manufactures the agent's final compatibility verdict.
 
 The broader concept/site evidence must still:
 
@@ -49,7 +49,7 @@ Candidate clicks remain browser-local. Only the universal **Submit decisions** o
 
 Read `references/decision-packet.md` before ingesting or changing the submitted packet. Claude/Codex reads the packet, checks the complete site for compatibility, discusses adaptations/conflicts with the human, and only after final approval records the result in the existing Markdown owners. The browser never writes Markdown, declares compatibility, locks canon, or enables Build Page.
 
-In static `file://` mode, browser choices cannot write a project file. Use **Export JSON** or **Copy relay** and ingest that exact provisional schema manually. Never claim static HTML is synchronized.
+In static `file://` mode, browser choices cannot write a project file. Use **Export JSON** or **Copy relay** for the human-choice relay, then have Claude or Codex validate it against this active checkout's exact recommendation packet and normalize the server-authored identity/submission/review fields. Static output intentionally carries no path, Git, revision, approval, or build-gate authority; it is not byte-identical to a persisted server packet. Never claim static HTML is synchronized.
 
 Use `--portable` only when the user explicitly requests one embedded private HTML file. It base64-embeds supported local images and may become large. Never embed remote images or assume redistribution rights.
 

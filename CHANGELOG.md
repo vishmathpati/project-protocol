@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Added
+- **Deferred own-component intent.** The visual review can now record “I’ll bring my own component later” against an exact page/family recommendation and affected block without asking for an upload during research review. The validated intent is relayed to Build Page and requested only when that page becomes active.
 - **Page-aware visual decision flow.** UI Research and Aside now exchange one versioned recommendation packet covering sitemap families, content jobs, whole-page/connected/section scopes, exact evidence links, video/motion observations, confidence, gaps, global-shell dependencies, and per-option asset requirements. The Project Dashboard can serve this evidence on loopback and persist only an explicitly submitted or updated provisional draft.
 - **Exact site-direction approval contract.** Research-led marketing builds now use one machine-readable `## Approved Site Direction` Markdown block after Claude/Codex compatibility review and final human approval. Build Page then activates one approved page/family at a time and produces an explicit Page Asset Request.
 - **Universal Foundation.** `init-project` now inspects first, captures universal project truth once, creates only the core canon, and routes to specialist groups without asking brand, marketing, design, research, or implementation questions.
@@ -19,6 +20,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - **Structural release audit.** Release validation now checks manifests, migration presence, skill metadata, hook targets/events, retired source, and packaging debris instead of grepping historical prose or hardcoding a skill count.
 
 ### Changed
+- **Project Dashboard review surface.** The real generated review app now uses a compact, neutral, shadcn-style hierarchy with separate Direction, Global Shell, and Pages/Families stages, bounded evidence previews, live-site links, and one recommendation at a time. The same predefined interface is generated for every project; only its validated project data changes.
 - **Page composition is now content-first and media-explicit.** Build Page derives section jobs and narrative order from locked meaning, maps the human-selected concept, offers a small set of research-grounded presentation patterns for human choice, and then records implementation-ready media slots and replacement gates. `MEDIA.md` now tracks owned, commissioned, generated, licensed, placeholder, reference-only, and unnecessary routes without turning routine design-system icons into user questions.
 - **CEO/worker authority is chapter-scoped.** Workers may propose any chapter-required code or canon change in isolated worktrees; only CEO approval and merge establish shared canon.
 - **Session continuity redesigned.** Recap is role-aware orientation; Handoff carries exact repo/worktree/branch/checkpoint identity; Save Session persists role-owned state without conflating save, completion, approval, or merge.

@@ -71,6 +71,7 @@ def valid_payload() -> dict:
         "asset_requirements": [],
         "focused_research_requests": [],
         "provided_references": [],
+        "deferred_component_intents": [],
     }
 
 
@@ -93,6 +94,7 @@ def write_recommendations(project: Path, checkout_root: Path | None = None) -> N
                 {"target_id": "home", "family_id": "home", "label": "Home"},
                 {"target_id": "family-stay", "family_id": "family-stay", "label": "Stay"},
             ],
+            "reference_scope": {"mode": "pinned", "urls": ["https://example.com/reference"]},
         },
         "site_direction": {"recommendation_id": "site-quiet"},
         "global_shell": {
@@ -104,7 +106,16 @@ def write_recommendations(project: Path, checkout_root: Path | None = None) -> N
             {
                 "target_id": "home",
                 "recommendations": [
-                    {"recommendation_id": "home-direction", "scope": "whole-page"},
+                    {
+                        "recommendation_id": "home-direction",
+                        "scope": "whole-page",
+                        "affected_blocks": ["arrival", "stay-and-dine"],
+                        "asset_requirements": [{
+                            "asset_id": "home-film",
+                            "kind": "video",
+                            "purpose": "Arrival",
+                        }],
+                    },
                     {"recommendation_id": "home-detail", "scope": "one-section"},
                 ],
             },
@@ -120,6 +131,190 @@ def write_recommendations(project: Path, checkout_root: Path | None = None) -> N
 
 
 class DashboardStateTests(unittest.TestCase):
+    def test_submit_accepts_exact_followup_reference_and_asset_relays(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            (project / "brain/research").mkdir(parents=True)
+            write_recommendations(project)
+            process = subprocess.Popen(
+                ["python3", str(SERVER), str(project), "--port", "0"],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            try:
+                assert process.stdout is not None
+                startup = json.loads(process.stdout.readline())
+                payload = valid_payload()
+                payload["focused_research_requests"] = [{
+                    "kind": "research",
+                    "target_id": "home",
+                    "recommendation_id": "home-direction",
+                    "scope": "whole_page",
+                    "affected_blocks": ["arrival"],
+                    "missing_need": "Find a quieter arrival pattern.",
+                }]
+                payload["provided_references"] = [
+                    {"live_url": "https://example.com/reference", "source": "initial-research-scope"},
+                    {
+                        "kind": "reference",
+                        "target_id": "home",
+                        "recommendation_id": "home-direction",
+                        "scope": "whole_page",
+                        "affected_blocks": ["arrival"],
+                        "live_url": "https://example.com/home",
+                        "liked_part": "The opening transition.",
+                    },
+                ]
+                payload["asset_requirements"] = [{
+                    "asset_id": "home-film",
+                    "kind": "video",
+                    "purpose": "Arrival",
+                    "target_id": "home",
+                    "recommendation_id": "home-direction",
+                }]
+                status, submitted = request_json(f"{startup['url']}/api/submit", startup["token"], payload)
+                self.assertEqual(status, 201)
+                self.assertEqual(submitted["focused_research_requests"], payload["focused_research_requests"])
+                self.assertEqual(submitted["provided_references"], payload["provided_references"])
+                self.assertEqual(submitted["asset_requirements"], payload["asset_requirements"])
+            finally:
+                process.terminate()
+                process.wait(timeout=5)
+                if process.stdout:
+                    process.stdout.close()
+                if process.stderr:
+                    process.stderr.close()
+
+    def test_submit_rejects_forged_followup_reference_and_asset_relays(self):
+        cases = {
+                    "focused_research_requests": [{
+                        "kind": "research",
+                        "target_id": "forged-page",
+                        "recommendation_id": "forged-recommendation",
+                        "scope": "whole_page",
+                        "affected_blocks": ["forged-block"],
+                        "missing_need": "Find another pattern.",
+                    }],
+                    "provided_references": [{
+                        "kind": "reference",
+                        "target_id": "forged-page",
+                        "recommendation_id": "forged-recommendation",
+                        "scope": "whole_page",
+                        "affected_blocks": ["forged-block"],
+                        "live_url": "not-a-url",
+                        "liked_part": "The opening treatment.",
+                    }],
+                    "asset_requirements": [{
+                        "asset_id": "forged-asset",
+                        "kind": "video",
+                        "target_id": "forged-page",
+                        "recommendation_id": "forged-recommendation",
+                    }],
+        }
+        for field, forged in cases.items():
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as tmp:
+                project = Path(tmp)
+                (project / "brain/research").mkdir(parents=True)
+                write_recommendations(project)
+                process = subprocess.Popen(
+                    ["python3", str(SERVER), str(project), "--port", "0"],
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+                try:
+                    assert process.stdout is not None
+                    startup = json.loads(process.stdout.readline())
+                    payload = valid_payload()
+                    payload[field] = forged
+                    with self.assertRaises(urllib.error.HTTPError) as caught:
+                        request_json(f"{startup['url']}/api/submit", startup["token"], payload)
+                    self.assertEqual(caught.exception.code, 400)
+                finally:
+                    process.terminate()
+                    process.wait(timeout=5)
+                    if process.stdout:
+                        process.stdout.close()
+                    if process.stderr:
+                        process.stderr.close()
+
+    def test_submit_accepts_a_deferred_own_component_intent_for_the_exact_review_target(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            (project / "brain/research").mkdir(parents=True)
+            write_recommendations(project)
+            process = subprocess.Popen(
+                ["python3", str(SERVER), str(project), "--port", "0"],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            try:
+                assert process.stdout is not None
+                startup = json.loads(process.stdout.readline())
+                payload = valid_payload()
+                payload["deferred_component_intents"] = [{
+                    "kind": "bring_own_component",
+                    "target_id": "home",
+                    "recommendation_id": "home-direction",
+                    "scope": "whole_page",
+                    "affected_blocks": ["arrival"],
+                    "status": "awaiting_active_page",
+                    "note": "I will share the component when Home becomes active.",
+                }]
+                status, submitted = request_json(f"{startup['url']}/api/submit", startup["token"], payload)
+                self.assertEqual(status, 201)
+                self.assertEqual(submitted["deferred_component_intents"], payload["deferred_component_intents"])
+            finally:
+                process.terminate()
+                process.wait(timeout=5)
+                if process.stdout:
+                    process.stdout.close()
+                if process.stderr:
+                    process.stderr.close()
+
+    def test_submit_rejects_a_deferred_component_intent_for_a_forged_target_or_block(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            (project / "brain/research").mkdir(parents=True)
+            write_recommendations(project)
+            process = subprocess.Popen(
+                ["python3", str(SERVER), str(project), "--port", "0"],
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            try:
+                assert process.stdout is not None
+                startup = json.loads(process.stdout.readline())
+                for target_id, affected_blocks in (
+                    ("forged-page", ["arrival"]),
+                    ("home", ["forged-block"]),
+                    ("home", []),
+                ):
+                    payload = valid_payload()
+                    payload["deferred_component_intents"] = [{
+                        "kind": "bring_own_component",
+                        "target_id": target_id,
+                        "recommendation_id": "home-direction",
+                        "scope": "whole_page",
+                        "affected_blocks": affected_blocks,
+                        "status": "awaiting_active_page",
+                        "note": "",
+                    }]
+                    with self.subTest(target_id=target_id, affected_blocks=affected_blocks):
+                        with self.assertRaises(urllib.error.HTTPError) as caught:
+                            request_json(f"{startup['url']}/api/submit", startup["token"], payload)
+                        self.assertEqual(caught.exception.code, 400)
+            finally:
+                process.terminate()
+                process.wait(timeout=5)
+                if process.stdout:
+                    process.stdout.close()
+                if process.stderr:
+                    process.stderr.close()
+
     def test_dashboard_handoff_names_the_active_chapter_as_the_only_approval_owner(self):
         contract = (ROOT / "skills/project-dashboard/references/decision-packet.md").read_text()
         self.assertIn("brain/chapters/<active-chapter>.md", contract)

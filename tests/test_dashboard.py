@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import unittest
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +13,17 @@ GENERATOR = ROOT / "skills/project-dashboard/scripts/generate_dashboard.py"
 
 
 class DashboardTests(unittest.TestCase):
+    def test_generated_inline_javascript_is_syntactically_valid(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp); brain = project / "brain"; brain.mkdir()
+            output = brain / "project-dashboard.html"
+            generated = subprocess.run(["python3", str(GENERATOR), str(project)], text=True, capture_output=True)
+            self.assertEqual(generated.returncode, 0, generated.stderr)
+            scripts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', output.read_text(), re.S)
+            self.assertTrue(scripts)
+            checked = subprocess.run(["node", "--check", "-"], input=scripts[-1], text=True, capture_output=True)
+            self.assertEqual(checked.returncode, 0, checked.stderr)
+
     def test_generate_check_and_staleness(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp); brain = project / "brain"; brain.mkdir()
@@ -100,6 +112,7 @@ class DashboardTests(unittest.TestCase):
             project = Path(tmp); research = project / "brain/research"; moodboard = project / "brain/moodboard"
             research.mkdir(parents=True); moodboard.mkdir(parents=True)
             (moodboard / "aman-hero.png").write_bytes(b"hero")
+            (moodboard / "aman-mid.png").write_bytes(b"mid")
             packet = {
                 "schema_version": "project-protocol.page-recommendations.v1",
                 "mission_id": "mission-1",
@@ -128,7 +141,7 @@ class DashboardTests(unittest.TestCase):
                         "fit": "Carries the supplied content without fragmenting it.",
                         "alternatives": [],
                         "compatibility_notes": {"dependencies": ["shell-overlay"], "notes": "Header is proposed, never auto-selected."},
-                        "evidence": [{"evidence_id": "aman-home", "site": "Aman", "page": "Home", "live_url": "https://www.aman.com/", "screenshot_paths": ["brain/moodboard/aman-hero.png"], "capture_status": "live-complete", "viewport": "1440x900", "video": {"role": "hero", "provider_or_page_url": "https://www.aman.com/", "delivery": "stream", "playback": "muted", "reduced_motion_fallback": "observed", "official_embed": "no"}, "motion": {"behavior": "calm crossfades", "implementation_evidence": "observed"}, "teardown_path": "brain/research/teardowns/aman.md", "evidence": "direct", "inference": "none"}],
+                        "evidence": [{"evidence_id": "aman-home", "site": "Aman", "page": "Home", "live_url": "https://www.aman.com/", "screenshot_paths": ["brain/moodboard/aman-hero.png", "brain/moodboard/aman-mid.png"], "capture_status": "live-complete", "viewport": "1440x900", "video": {"role": "hero", "provider_or_page_url": "https://www.aman.com/", "delivery": "stream", "playback": "muted", "reduced_motion_fallback": "observed", "official_embed": "no"}, "motion": {"behavior": "calm crossfades", "implementation_evidence": "observed"}, "teardown_path": "brain/research/teardowns/aman.md", "evidence": "direct", "inference": "none"}],
                         "asset_requirements": [{"asset_id": "home-film", "kind": "video", "purpose": "Arrival", "quantity": "1", "orientation_or_dimensions": "landscape", "responsive_need": "desktop/mobile", "poster_or_fallback": "required", "safe_source_routes": ["client", "commissioned"], "replacement_or_rights_state": "missing"}],
                         "confidence": {"level": "high", "reason": "direct", "material_gaps": []},
                         "focused_followup": {"eligible": True, "question": "Inspect transition mechanics"},
@@ -143,14 +156,17 @@ class DashboardTests(unittest.TestCase):
             result = subprocess.run(["python3", str(GENERATOR), str(project)], text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             html = output.read_text()
-            for text in ("Home", "Arrival", "Stay and dine", "Connected sections", "Quiet procession", "Open live site", "Video", "home-film", "Submit decisions", "Update decisions", "Export JSON", "Copy relay"):
+            for text in ("Home", "Arrival", "Stay and dine", "Connected sections", "Quiet procession", "Open live site", "Video", "home-film", "Submit decisions"):
                 self.assertIn(text, html)
+            for control_id in ("update-decisions", "export-decisions", "copy-decisions"):
+                self.assertIn(f'id="{control_id}"', html)
             for text in (
                 "Choose this first · Site-wide direction",
                 "Existing content, shown as a rough structure",
                 "Optional: keep or change specific parts",
                 "Research another pattern for this part",
                 "Bring my own reference",
+                "I’ll bring my own component later",
                 "Recommended reference pattern",
             ):
                 self.assertIn(text, html)
@@ -162,11 +178,32 @@ class DashboardTests(unittest.TestCase):
             self.assertIn('<header class="review-header">', html)
             self.assertNotIn('<nav class="dashboard-tabs">', html)
             self.assertNotIn('Concise visual projection of Markdown canon', html)
-            for state_field in ("checkoutIdentity", "selected_parts", "missing_need", "liked_part"):
+            for state_field in ("checkoutIdentity", "selected_parts", "missing_need", "liked_part", "deferred_component_intents"):
                 self.assertIn(state_field, html)
             self.assertIn("choice?.status==='selected'", html)
             self.assertIn("Header remains pending", html)
             self.assertIn("brain/research/ui-decision-draft.json", html)
+
+            direction_stage = html.split('id="direction-stage"', 1)[1].split('id="shell-stage"', 1)[0]
+            shell_stage = html.split('id="shell-stage"', 1)[1].split('id="pages-stage"', 1)[0]
+            pages_stage = html.split('id="pages-stage"', 1)[1]
+            self.assertNotIn('data-request="component"', direction_stage)
+            self.assertNotIn('data-request="component"', shell_stage)
+            self.assertIn('data-request="component"', pages_stage)
+            self.assertIn('data-affected-blocks="[&quot;arrival&quot;, &quot;stay-and-dine&quot;]"', pages_stage)
+            self.assertIn("selectedBlocks.length?selectedBlocks:defaultBlocks", html)
+            self.assertIn('class="evidence-carousel"', html)
+            self.assertEqual(html.count('class="evidence-slide'), 6)
+            self.assertEqual(html.count('class="evidence-slide active"'), 3)
+            self.assertIn('class="previous-evidence"', html)
+            self.assertIn('class="next-evidence"', html)
+            self.assertIn('<span><b class="evidence-position">1</b> of 2</span>', html)
+            self.assertNotIn('<div class="recommendation-nav">', html)
+            self.assertIn('.decision-workspace{width:100%;max-width:none', html)
+            self.assertIn('.brief{position:static;align-self:start', html)
+            self.assertNotIn('.brief{position:static;align-self:stretch', html)
+            self.assertIn('.dependency-note{background:#f4f4f5;color:#52525b', html)
+            self.assertIn(':where(button,a,summary,input,textarea):focus-visible', html)
 
 
 if __name__ == "__main__":
