@@ -2,6 +2,7 @@
 > Global. Read before any UI work. Same content on every project.
 > Brand-specific values (which colors, which fonts) live in `DESIGN.md`.
 > This file is the craft layer: universal rules that apply regardless of brand.
+> Format: project-protocol/fundamentals.v1
 
 ---
 

@@ -1,6 +1,7 @@
 # Chapter NN — Name
 
 > Defined: YYYY-MM-DD · author
+> Format: project-protocol/chapter.v1
 
 ## Goal
 

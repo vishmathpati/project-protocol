@@ -1,5 +1,7 @@
 # Brand Foundation
 
+> Format: project-protocol/brand.v1
+
 ## Product context
 
 - Name:

@@ -1,5 +1,7 @@
 # Marketing Content
 
+> Format: project-protocol/content.v1
+
 Adaptive registry for shared brand-facing meaning. Keep only sections relevant to this business. Page-specific copy may remain in its page copy file; repeated facts belong here.
 
 ## Offers / services / products

@@ -22,7 +22,15 @@ packet, dashboard choice, or submitted draft is evidence/proposal only.
 | Target ID | Family ID | Routes | Approved recommendation IDs | Compatibility | Required adaptations | Exceptions |
 |---|---|---|---|---|---|---|
 | <stable id> | <stable id or n/a> | <all routes> | <stable ids> | compatible | none | none |
+
+- Shortlisted for build-time consideration: <target id → recommendation ids, or none>
+- Provided references: <live_url — exact liked part, or none>
+- Focused research outcomes: <request → resolution, or none>
 ```
+
+These three record lines are optional and additive: they carry the shortlisted candidates,
+provided references, and focused-research outcomes verbatim from the approved submission so the
+human's non-binding-but-real decisions survive into Build Page instead of being lost at lock time.
 
 Compatibility uses only `compatible`, `compatible_with_adaptation`, or `conflicting`.
 

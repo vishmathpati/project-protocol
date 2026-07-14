@@ -137,6 +137,60 @@ class GuidedVisualBuildFlowTests(unittest.TestCase):
         self.assertIn("routing reminder", write)
         self.assertNotIn("hook's 8 steps", write)
 
+    def test_site_direction_lock_carries_human_decisions_verbatim(self):
+        contract = (ROOT / "skills/build-page/references/site-direction-lock.md").read_text()
+
+        self.assertIn("Shortlisted for build-time consideration:", contract)
+        self.assertIn("Provided references:", contract)
+        self.assertIn("Focused research outcomes:", contract)
+        self.assertIn("verbatim from the approved submission", contract)
+
+    def test_build_page_surfaces_human_research_decisions(self):
+        build = (ROOT / "skills/build-page/SKILL.md").read_text()
+
+        self.assertIn("provided_references", build)
+        self.assertIn("focused_research_requests", build)
+        self.assertIn("shortlisted recommendation IDs", build)
+        self.assertIn("never silently ignored", build)
+        self.assertIn("the human's shortlisted candidates for this target", build)
+        self.assertIn("Present shortlisted candidates by name when relevant", build)
+
+    def test_page_asset_request_names_submission_asset_requirements(self):
+        build = (ROOT / "skills/build-page/SKILL.md").read_text()
+
+        self.assertIn("asset_requirements", build)
+        self.assertIn("brain/marketing/MEDIA.md", build)
+
+    def test_build_flow_requires_human_satisfaction_approval(self):
+        build = (ROOT / "skills/build-page/SKILL.md").read_text()
+
+        self.assertIn("Human satisfaction loop", build)
+        self.assertIn("present the rendered result to the human", build)
+        self.assertIn("until the human explicitly approves the page", build)
+        self.assertIn("do not replace the human's satisfaction approval", build)
+        self.assertIn("Record that explicit approval in the chapter's page decision", build)
+
+    def test_build_page_blueprint_finalizes_copy_before_media(self):
+        text = (ROOT / "skills/build-page/SKILL.md").read_text()
+        lower = text.lower()
+
+        self.assertIn("Copy finalization", text)
+        self.assertIn("implementation uses only finalized copy", text)
+        self.assertIn("PAGE-COPY format, human edits win, marketing ownership unchanged", text)
+        self.assertLess(lower.index("copy finalization"), lower.index("media plan"))
+        self.assertLess(lower.index("optional section overrides"), lower.index("copy finalization"))
+
+    def test_site_wide_gate_requires_locked_design_canon(self):
+        build = (ROOT / "skills/build-page/SKILL.md").read_text()
+
+        self.assertIn("locked design canon (Style Lock completed, or an existing DESIGN explicitly reused)", build)
+
+    def test_family_members_reuse_verified_template(self):
+        build = (ROOT / "skills/build-page/SKILL.md").read_text()
+
+        self.assertIn("verified representative page becomes the family template", build)
+        self.assertIn("without reopening the direction", build)
+
     def test_build_page_consumes_state_from_the_active_checkout_only(self):
         text = (ROOT / "skills/build-page/SKILL.md").read_text()
 

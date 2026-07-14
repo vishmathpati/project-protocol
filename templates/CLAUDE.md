@@ -1,5 +1,7 @@
 # [Project Name]
 
+> Format: project-protocol/claude.v1
+
 ## Constitution
 
 1. Read live project sources before answering about project state.

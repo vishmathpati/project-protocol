@@ -57,7 +57,10 @@ def load_recommendations(root: Path) -> dict[str, Any]:
         raise PacketError("missing brain/research/page-recommendations.json") from exc
     except (OSError, json.JSONDecodeError) as exc:
         raise PacketError("page recommendations are unreadable") from exc
-    if packet.get("schema_version") != "project-protocol.page-recommendations.v1":
+    if packet.get("schema_version") not in {
+        "project-protocol.page-recommendations.v1",
+        "project-protocol.page-recommendations.v2",
+    }:
         raise PacketError("page recommendations use an unsupported schema")
     checkout = packet.get("checkout")
     if not isinstance(checkout, dict):

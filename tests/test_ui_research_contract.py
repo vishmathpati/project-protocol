@@ -25,11 +25,18 @@ class UIResearchContractTests(unittest.TestCase):
         contracts = [contract(path) for path in paths]
         self.assertTrue(all(value == contracts[0] for value in contracts[1:]))
         for required in (
-            '"schema_version": "project-protocol.page-recommendations.v1"',
+            '"schema_version": "project-protocol.page-recommendations.v2"',
             '"checkout_root"',
             '"page_families"',
             '"target_id"',
             '"scope": "whole-page | connected-sections | one-section | repeated-page-family | global-shell"',
+            '"job_id": "<target-id>--job-<slug>"',
+            '"copy_excerpt"',
+            '"copy_ref"',
+            '"description": "<what the asset shows, one line>"',
+            '"affected_blocks": ["<supplied job_id>"]',
+            '"serves_jobs": ["<job_id>"]',
+            '"first_impression": true|false',
             '"live_url"',
             '"screenshot_paths"',
             '"video"',
@@ -41,6 +48,8 @@ class UIResearchContractTests(unittest.TestCase):
         ):
             self.assertIn(required, contracts[0])
         self.assertNotIn("human_selection", contracts[0])
+        self.assertNotIn('"content_jobs": ["<job>"]', contracts[0])
+        self.assertNotIn("page-recommendations.v1", contracts[0])
 
     def test_research_readiness_shell_and_approval_ownership_are_unambiguous(self):
         paths = [
@@ -95,7 +104,7 @@ class UIResearchContractTests(unittest.TestCase):
         ):
             self.assertIn(required, mission)
         self.assertRegex(mission, r"Do not reopen the\s+site-wide direction")
-        self.assertIn("Target/block IDs are immutable", aside)
+        self.assertIn("Target and job IDs are immutable", aside)
         self.assertIn("never create a human selection", aside)
         self.assertIn("never create a build lock", aside)
         self.assertIn("focused follow-up", aside)

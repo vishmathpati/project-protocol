@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import threading
 import unittest
@@ -13,6 +15,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVER = ROOT / "skills/project-dashboard/scripts/serve_dashboard.py"
+
+# Load the server module for direct loader tests without writing a __pycache__
+# into the shipped scripts directory (which the plugin validator treats as debris).
+_SERVER_SPEC = importlib.util.spec_from_file_location("serve_dashboard", SERVER)
+serve_dashboard = importlib.util.module_from_spec(_SERVER_SPEC)
+_PREV_DONT_WRITE_BYTECODE = sys.dont_write_bytecode
+sys.dont_write_bytecode = True
+try:
+    _SERVER_SPEC.loader.exec_module(serve_dashboard)
+finally:
+    sys.dont_write_bytecode = _PREV_DONT_WRITE_BYTECODE
 
 
 def request_json(url: str, token: str, payload: dict | None = None, origin: str | None = None) -> tuple[int, dict]:
@@ -131,6 +144,22 @@ def write_recommendations(project: Path, checkout_root: Path | None = None) -> N
 
 
 class DashboardStateTests(unittest.TestCase):
+    def test_packet_loader_accepts_a_v2_schema_packet(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            (project / "brain/research").mkdir(parents=True)
+            write_recommendations(project)
+            path = project / "brain/research/page-recommendations.json"
+            packet = json.loads(path.read_text())
+            packet["schema_version"] = "project-protocol.page-recommendations.v2"
+            packet["input"]["targets"][0]["content_jobs"] = [
+                {"job_id": "arrival", "label": "Arrival", "copy_excerpt": "Welcome.", "copy_ref": "x.md#a"}
+            ]
+            packet["targets"][0]["recommendations"][0]["serves_jobs"] = ["arrival"]
+            path.write_text(json.dumps(packet))
+            loaded = serve_dashboard.load_recommendations(project)
+            self.assertEqual(loaded["schema_version"], "project-protocol.page-recommendations.v2")
+
     def test_submit_accepts_exact_followup_reference_and_asset_relays(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp)

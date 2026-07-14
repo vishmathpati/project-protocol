@@ -25,4 +25,6 @@ Silently derive trust temperature, cultural anchor, category flexibility (`const
 
 Preserve researched content. Write product/niche context, audience, problem, differentiation, emotional transformation, personality/voice, cultural context, trust stakes, archetype, reference tribe, distinctive assets/status, memorability, protected elements, refusals, and dated decisions.
 
+BRAND.md follows the structure of the shipped `templates/BRAND.md`.
+
 Do not write DESIGN, marketing, research, chapters, or code. Recommend the appropriate next doorway without auto-chaining.

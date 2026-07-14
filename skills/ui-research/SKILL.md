@@ -17,8 +17,11 @@ constraint outrank STATUS/ROADMAP next actions. Never redirect homepage research
 Build a **site and page map** before composing the mission. Preserve stable family and target IDs from
 the sitemap; when absent, create deterministic slug IDs without changing routes. Represent every unique
 page or repeated page family once, including special, utility, and legal groups when they require visual
-review. Each target carries its routes, content goal, and content jobs. A single-page project has one
-target. Do not invent missing content strategy; ask only when a missing goal would change the research.
+review. Each target carries its routes, content goal, and content jobs — each job with its immutable job ID (authored
+in Marketing Stage A) and any bounded verbatim copy excerpt quoted from approved canon — plus available media
+with a one-line description of what each asset shows. Keep these as concise canon summaries, not raw file
+dumps: excerpts are bounded quotes, never dumps, and never invented or paraphrased. A single-page project has
+one target. Do not invent missing content strategy; ask only when a missing goal would change the research.
 
 Use the five scope labels exactly: `whole-page`, `connected-sections`, `one-section`,
 `repeated-page-family`, and `global-shell`. A header that depends on a hero is a declared dependency,

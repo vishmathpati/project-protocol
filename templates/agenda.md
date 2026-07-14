@@ -1,5 +1,7 @@
 # Human Agenda
 
+> Format: project-protocol/agenda.v1
+
 ## Next action
 
 - Checkout/worktree:

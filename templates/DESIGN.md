@@ -170,6 +170,7 @@ marketing:                       # optional — applied to landing/marketing sur
 > The brand layer. Specifies WHICH colors, fonts, and sizes this project uses.
 > Universal craft rules (the "how") live in `FUNDAMENTALS.md`.
 > Read both before any UI work.
+> Format: project-protocol/design.v1
 
 ---
 

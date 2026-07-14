@@ -1,6 +1,7 @@
 # TOOLING.md — Node Tooling Convention
 > Project-local. Generated at init time from the project's chosen package manager.
 > Skip this file in Swift / Python / non-Node projects.
+> Format: project-protocol/tooling.v1
 
 **Package manager:** {bun|pnpm|npm|yarn}
 **Lockfile:** {bun.lock|pnpm-lock.yaml|package-lock.json|yarn.lock}

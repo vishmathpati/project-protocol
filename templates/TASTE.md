@@ -22,6 +22,7 @@ suggest_threshold: 0.4    # >= this and < apply -> offer it, let the user confir
 > craft lives in `FUNDAMENTALS.md`; brand tokens live in `DESIGN.md`; this file
 > is the running memory of what *this owner, on this project* keeps steering
 > toward.
+> Format: project-protocol/taste.v1
 
 ---
 

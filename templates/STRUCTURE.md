@@ -1,5 +1,7 @@
 # Project Structure
 
+> Format: project-protocol/structure.v1
+
 Detected map from logical project parts to physical implementation. Existing repository configuration wins; replace examples with observed facts.
 
 ## Project layout

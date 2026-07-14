@@ -1,5 +1,7 @@
 # Marketing Media
 
+> Format: project-protocol/media.v1
+
 | ID | Page/section job | Type | What it must communicate | Role/spec | Source route | Rights/provenance | Current path | Availability / next action | Stage | Replacement gate |
 |---|---|---|---|---|---|---|---|---|---|---|
 

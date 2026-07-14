@@ -65,6 +65,61 @@ def clean_inline(value: str) -> str:
     return re.sub(r"[*_]+", "", value).strip()
 
 
+def normalize_content_jobs(raw: object) -> list[dict[str, str]]:
+    """Normalize content_jobs to one shape for v1 (strings) and v2 (objects).
+
+    Each entry becomes {"job_id": str|"", "label": str, "copy_excerpt": str|"", "copy_ref": str|""}.
+    v1 strings and pseudo-target string jobs carry an empty job_id, copy_excerpt, and copy_ref.
+    """
+    jobs: list[dict[str, str]] = []
+    for entry in raw if isinstance(raw, list) else []:
+        if isinstance(entry, dict):
+            jobs.append({
+                "job_id": str(entry.get("job_id") or ""),
+                "label": str(entry.get("label") or ""),
+                "copy_excerpt": str(entry.get("copy_excerpt") or ""),
+                "copy_ref": str(entry.get("copy_ref") or ""),
+            })
+        else:
+            jobs.append({"job_id": "", "label": str(entry), "copy_excerpt": "", "copy_ref": ""})
+    return jobs
+
+
+def copy_excerpt_state(root: Path, copy_ref: str, excerpt: str) -> str:
+    """Report whether a wireframe excerpt still matches its approved copy section.
+
+    copy_ref is "brain/marketing/copy/<file>.md#<job-id>". Empty copy_ref or excerpt
+    yields "unknown" (render nothing). A missing file or missing section yields "stale".
+    Otherwise "fresh" when the normalized excerpt is a substring of the normalized
+    section text, else "stale".
+    """
+    if not copy_ref or not excerpt:
+        return "unknown"
+    rel, _, job_id = copy_ref.partition("#")
+    rel, job_id = rel.strip(), job_id.strip()
+    if not rel or not job_id:
+        return "stale"
+    candidate = root / rel
+    try:
+        resolved = candidate.resolve()
+        if not resolved.is_relative_to(root.resolve()) or not resolved.is_file():
+            return "stale"
+    except OSError:
+        return "stale"
+    text = resolved.read_text(errors="replace")
+    section = re.search(rf"^##[ \t]+{re.escape(job_id)}(?![\w-])[\s\S]*?(?=^##[ \t]|\Z)", text, re.M)
+    if not section:
+        return "stale"
+
+    def normalize(value: str) -> str:
+        joined = " ".join(clean_inline(line) for line in value.splitlines())
+        return re.sub(r"\s+", " ", joined).strip().casefold()
+
+    section_norm = normalize(section.group(0))
+    excerpt_norm = normalize(excerpt)
+    return "fresh" if excerpt_norm and excerpt_norm in section_norm else "stale"
+
+
 def source_summary(root: Path, path: Path) -> str:
     """Render a bounded digest, never a raw Markdown mirror."""
     text = path.read_text(errors="replace")
@@ -224,7 +279,10 @@ def load_page_recommendations(root: Path) -> dict[str, object] | None:
         packet = json.loads(path.read_text())
     except (OSError, json.JSONDecodeError):
         return None
-    if packet.get("schema_version") != "project-protocol.page-recommendations.v1":
+    if packet.get("schema_version") not in {
+        "project-protocol.page-recommendations.v1",
+        "project-protocol.page-recommendations.v2",
+    }:
         return None
     return packet
 
@@ -240,6 +298,7 @@ def scope_label(scope: str) -> str:
 
 
 def recommendation_evidence_html(root: Path, output: Path, evidence: list[dict[str, object]], portable: bool) -> str:
+    evidence = sorted(evidence, key=lambda item: not (isinstance(item, dict) and item.get("first_impression")))
     slides: list[str] = []
     for item in evidence:
         name = html.escape(str(item.get("site") or "Reference"))
@@ -294,12 +353,12 @@ def decision_actions(
     allow_deferred_component: bool = True,
 ) -> str:
     actions = (
-        ("recommended", "Recommended"),
-        ("selected", "Accept"),
-        ("shortlisted", "Shortlist"),
-        ("not_using", "Not using"),
+        ("recommended", "Recommended", "Go with what the research recommends"),
+        ("selected", "Accept", "Yes — use this for the site"),
+        ("shortlisted", "Shortlist", "Keep as a maybe"),
+        ("not_using", "Not using", "Rule this out"),
     )
-    buttons = "".join(f'<button class="decision-action" data-status="{status}">{label}</button>' for status, label in actions)
+    buttons = "".join(f'<button class="decision-action" data-status="{status}" title="{tip}">{label}</button>' for status, label, tip in actions)
     part_buttons = "".join(f'<button class="part-choice" type="button" data-part="{html.escape(part)}" aria-pressed="false">{html.escape(part)}</button>' for part in (parts or []))
     optional_parts = f'<details class="optional-parts"><summary>Optional: keep or change specific parts</summary><div class="part-list">{part_buttons}</div></details>' if part_buttons else ""
     component_action = '<button class="request-action" type="button" data-request="component">I’ll bring my own component later</button>' if allow_deferred_component else ""
@@ -315,6 +374,7 @@ def recommendation_card(
     portable: bool,
     active: bool,
     allow_deferred_component: bool = True,
+    copy_outline: str = "",
 ) -> str:
     rid = str(recommendation.get("recommendation_id") or "")
     target_id = str(target.get("target_id") or "")
@@ -324,20 +384,101 @@ def recommendation_card(
     dependency_note = '<p class="dependency-note">Header remains pending. This option may propose a linked header treatment, but never selects it automatically.</p>' if dependencies else ""
     affected_blocks = [str(value) for value in recommendation.get("affected_blocks", [])]
     affected = ", ".join(affected_blocks) or "whole target"
+    affected_pretty = ", ".join(block.replace("-", " ").replace("_", " ") for block in affected_blocks) or "whole target"
     alternatives = ", ".join(str(value) for value in recommendation.get("alternatives", [])) or "none recorded"
     evidence = recommendation.get("evidence") if isinstance(recommendation.get("evidence"), list) else []
     requirements = recommendation.get("asset_requirements") if isinstance(recommendation.get("asset_requirements"), list) else []
-    jobs = [str(value) for value in target.get("content_jobs", [])]
-    wireframe = "".join(f'<div class="wire-row"><strong>{html.escape(job)}</strong><small>{"Lead" if index == 0 else "Required"}</small></div>' for index, job in enumerate(jobs)) or '<div class="wire-row"><strong>No content job recorded</strong><small>Open</small></div>'
+    normalized_jobs = normalize_content_jobs(target.get("content_jobs"))
+    wire_rows: list[str] = []
+    for index, job in enumerate(normalized_jobs):
+        label = html.escape(job["label"] or "Untitled content job")
+        excerpt = f'<em>{html.escape(job["copy_excerpt"])}</em>' if job["copy_excerpt"] else ""
+        stale = '<span class="stale-copy">copy changed since research</span>' if copy_excerpt_state(root, job["copy_ref"], job["copy_excerpt"]) == "stale" else ""
+        tag = "Lead" if index == 0 else "Required"
+        wire_rows.append(f'<div class="wire-row"><strong>{label}</strong>{excerpt}{stale}<small>{tag}</small></div>')
+    wireframe = "".join(wire_rows) or '<div class="wire-row"><strong>No content job recorded</strong><small>Open</small></div>'
+    serves_jobs = [str(value) for value in recommendation.get("serves_jobs", []) if str(value)]
+    if serves_jobs:
+        label_by_id = {job["job_id"]: job["label"] for job in normalized_jobs if job["job_id"]}
+        covers_pretty = ", ".join(
+            label_by_id.get(job_id) or job_id.replace("-", " ").replace("_", " ") for job_id in serves_jobs
+        ) or "whole target"
+    else:
+        covers_pretty = affected_pretty
     if scope in {"whole-page", "repeated-page-family"}:
         level = "Choose this first · Whole-page direction" if scope == "whole-page" else "Choose this first · Repeated page family"
     elif scope == "connected-sections":
         level = "Connected sequence"
+    elif scope == "global-shell":
+        level = "Shared across the site"
     else:
         level = "Optional section refinement"
     connection = f'<div class="connection-note"><strong>Keep this together:</strong> This recommendation affects {html.escape(affected)} as one connected composition.</div>' if scope == "connected-sections" else ""
     confidence = str((recommendation.get("confidence") or {}).get("level", "unknown") if isinstance(recommendation.get("confidence"), dict) else "unknown")
-    return f'''<article class="decision-block recommendation-card {"connected " if scope == "connected-sections" else ""}{"page-wide " if scope in {"whole-page", "repeated-page-family"} else ""}{"active" if active else ""}" data-recommendation-panel="{html.escape(rid)}"><div class="brief"><div class="block-number">{html.escape(level)} · {html.escape(str(recommendation.get("title") or rid))}</div><h3>{html.escape(str(target.get("content_goal") or recommendation.get("description") or ""))}</h3><p class="goal">This is what the page needs to communicate. The visual pattern on the right is judged against this—not chosen only because it looks attractive.</p><div class="content-label">Existing content, shown as a rough structure</div><div class="wireframe">{wireframe}</div>{connection}</div><div class="recommendation"><div class="recommendation-visual"><span class="scope-badge">{html.escape(scope_label(scope))}</span>{recommendation_evidence_html(root, output, evidence, portable)}</div><div class="recommendation-body"><div class="recommendation-heading"><div><p class="eyebrow">Recommended reference pattern</p><h4>{html.escape(str(recommendation.get("title") or rid))}</h4><p>{html.escape(str(recommendation.get("description") or ""))}</p></div><span class="confidence">{html.escape(confidence)} confidence</span></div><div class="fit-grid"><div><b>Why it may fit</b><p>{html.escape(str(recommendation.get("fit") or ""))}</p></div><div><b>What Claude or Codex receives</b><p>{html.escape(str(compatibility.get("notes") or "The complete combination still needs an agent compatibility check."))}</p><small>Alternatives: {html.escape(alternatives)}</small></div></div>{dependency_note}<section><h5>What this option needs</h5>{assets_html(requirements)}</section>{decision_actions(rid, scope, target_id, affected_blocks, allow_deferred_component)}</div></div></article>'''
+    title_text = str(recommendation.get("title") or rid)
+    description_html = f'<p>{html.escape(str(recommendation.get("description")))}</p>' if recommendation.get("description") and str(recommendation.get("description")) != title_text else ""
+    scope_plain = {
+        "whole-page": "changes this entire page",
+        "connected-sections": "a linked group of sections",
+        "one-section": "just one section — optional",
+        "repeated-page-family": "a layout reused by similar pages",
+        "global-shell": "shared navigation & footer",
+    }.get(scope, "")
+    scope_plain_html = f'<i> · {html.escape(scope_plain)}</i>' if scope_plain else ""
+    return f'''<article class="decision-block recommendation-card {"connected " if scope == "connected-sections" else ""}{"page-wide " if scope in {"whole-page", "repeated-page-family"} else ""}{"active" if active else ""}" data-recommendation-panel="{html.escape(rid)}"><div class="brief"><div class="block-number">{html.escape(level)} · {html.escape(title_text)}</div><p class="side-label">Your content</p><h3>{html.escape(str(target.get("content_goal") or recommendation.get("description") or ""))}</h3><p class="goal">This is what the page needs to communicate. The visual pattern on the right is judged against this—not chosen only because it looks attractive.</p><div class="content-label">Existing content, shown as a rough structure</div><div class="wireframe">{wireframe}</div>{connection}{copy_outline}</div><div class="recommendation"><div class="recommendation-heading"><div><p class="eyebrow">Recommended reference pattern</p><h4>{html.escape(title_text)}</h4>{description_html}</div><span class="confidence">{html.escape(confidence)} confidence</span></div><div class="mapping-line"><span class="scope-badge">{html.escape(scope_label(scope))}{scope_plain_html}</span><span class="mapping-covers">Covers: {html.escape(covers_pretty)}</span></div><div class="recommendation-visual">{recommendation_evidence_html(root, output, evidence, portable)}</div><div class="recommendation-body"><div class="fit-grid"><div><b>Why it may fit</b><p>{html.escape(str(recommendation.get("fit") or ""))}</p></div><div><b>What Claude or Codex receives</b><p>{html.escape(str(compatibility.get("notes") or "The complete combination still needs an agent compatibility check."))}</p><small>Alternatives: {html.escape(alternatives)}</small></div></div>{dependency_note}<section><h5>What this option needs</h5>{assets_html(requirements)}</section>{decision_actions(rid, scope, target_id, affected_blocks, allow_deferred_component)}</div></div></article>'''
+
+
+def page_copy_outline(root: Path, routes: list[str], label: str) -> str:
+    """Show only approved marketing copy that already exists on disk; never invent content."""
+    copy_dir = root / "brain/marketing/copy"
+    if not copy_dir.is_dir() or not routes:
+        return ""
+    groups: list[tuple[str, str, list[tuple[str, list[str], str]]]] = []
+    for path in sorted(copy_dir.glob("*.md")):
+        text = path.read_text(errors="replace")
+        first_line = text.splitlines()[0] if text else ""
+        match = re.match(r"^#\s+(.+?)\s*\(`([^`]+)`\)", first_line)
+        if not match:
+            continue
+        file_label, file_route = clean_inline(match.group(1)), match.group(2).strip()
+        if file_route not in routes:
+            continue
+        sections: list[tuple[str, list[str], str]] = []
+        for section in re.finditer(r"^##\s+(?:\d+[.)]?\s*)?(.+)$([\s\S]*?)(?=^##\s|\Z)", text, re.M):
+            name = clean_inline(section.group(1))
+            if name.lower().startswith("copy notes"):
+                continue
+            headlines: list[str] = []
+            blurb = ""
+            for element, value in re.findall(r"^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|", section.group(2), re.M):
+                key = element.strip().lower()
+                cleaned = clean_inline(value)
+                if key == "element" or not cleaned or set(cleaned) <= {"-"}:
+                    continue
+                if len(headlines) < 3 and any(k in key for k in ("wordmark", "h1", "headline", "title", "proper name", "name")):
+                    headlines.append(cleaned)
+                elif not blurb and any(k in key for k in ("tagline", "subtitle", "blurb", "body", "description", "intro")):
+                    blurb = cleaned
+            sections.append((name, headlines, blurb))
+            if len(sections) == 8:
+                break
+        if sections:
+            groups.append((file_label, file_route, sections))
+        if len(groups) == 3:
+            break
+    if not groups:
+        return ""
+    parts = ['<div class="copy-outline"><div class="content-label">Approved copy on file</div>']
+    show_file_names = len(groups) > 1
+    for file_label, file_route, sections in groups:
+        if show_file_names:
+            parts.append(f'<p class="copy-file">{html.escape(file_label)} · {html.escape(file_route)}</p>')
+        for number, (name, headlines, blurb) in enumerate(sections, 1):
+            headline_html = f'<b>{html.escape(" · ".join(headlines))}</b>' if headlines else '<b class="copy-missing">No headline copy yet</b>'
+            blurb_html = f"<small>{html.escape(blurb)}</small>" if blurb else ""
+            parts.append(f'<div class="copy-slot"><span>{number}</span><div><i>{html.escape(name)}</i>{headline_html}{blurb_html}</div></div>')
+    parts.append("</div>")
+    return "".join(parts)
 
 
 def page_decisions_html(root: Path, output: Path, packet: dict[str, object] | None, portable: bool) -> str:
@@ -362,13 +503,14 @@ def page_decisions_html(root: Path, output: Path, packet: dict[str, object] | No
         family = families.get(str(target.get("family_id") or ""), {})
         kind = str(family.get("kind") or "unique")
         routes = ", ".join(str(value) for value in family.get("routes", []))
+        outline = page_copy_outline(root, [str(value) for value in family.get("routes", [])], label)
         nav.append(f'<button class="page-review-tab {"active" if index == 0 else ""}" data-review-page="review-page-{index}">{html.escape(label)}</button>')
-        jobs = [str(value) for value in target.get("content_jobs", [])]
-        page_map = "".join(f'<li><span>{number + 1}</span><b>{html.escape(job)}</b></li>' for number, job in enumerate(jobs)) or '<li><b>No content jobs recorded.</b></li>'
+        jobs = normalize_content_jobs(target.get("content_jobs"))
+        page_map = "".join(f'<li><span>{number + 1}</span><b>{html.escape(job["label"] or "Untitled content job")}</b></li>' for number, job in enumerate(jobs)) or '<li><b>No content jobs recorded.</b></li>'
         recommendations = [item for item in result_targets.get(target_id, {}).get("recommendations", []) if isinstance(item, dict)]
         priority = {"whole-page": 0, "repeated-page-family": 0, "connected-sections": 1, "one-section": 2}
         recommendations.sort(key=lambda item: priority.get(str(item.get("scope") or "one-section"), 3))
-        cards = "".join(recommendation_card(root, output, item, target, portable, card_index == 0) for card_index, item in enumerate(recommendations))
+        cards = "".join(recommendation_card(root, output, item, target, portable, card_index == 0, copy_outline=outline) for card_index, item in enumerate(recommendations))
         controls = '<div class="recommendation-nav"><button class="previous-recommendation">← Previous</button><span>Review one recommendation at a time</span><button class="next-recommendation">Next →</button></div>' if len(recommendations) > 1 else ""
         panels.append(f'''<section id="review-page-{index}" class="page-review-panel {"active" if index == 0 else ""}"><header class="page-review-header"><div><p class="eyebrow">{html.escape(kind)} · {html.escape(routes)}</p><h4>{html.escape(label)}</h4><p>{html.escape(str(target.get("content_goal") or ""))}</p></div><div class="page-map"><b>What this page must cover</b><ol>{page_map}</ol></div></header><div class="recommendation-stack">{cards or '<div class="empty">No recommendation for this target.</div>'}</div>{controls}</section>''')
 
@@ -392,7 +534,7 @@ def page_decisions_html(root: Path, output: Path, packet: dict[str, object] | No
     direction_card = recommendation_card(root, output, direction_pseudo, direction_target, portable, True, False).replace("Choose this first · Whole-page direction", "Choose this first · Site-wide direction", 1)
     shell = packet.get("global_shell") if isinstance(packet.get("global_shell"), dict) else {"target_id": "global-shell", "state": "not_needed", "recommendations": []}
     shell_recommendations = shell.get("recommendations") if isinstance(shell.get("recommendations"), list) else []
-    shell_target = {"target_id": "global-shell", "content_goal": "Choose navigation, footer, and any page-dependent header treatment without separating them from the selected page direction.", "content_jobs": ["Navigation", "Footer", "Dependent header treatment"]}
+    shell_target = {"target_id": "global-shell", "content_goal": "Pick the shared pieces every page uses: the top navigation, the footer, and any header style that depends on the page design you chose.", "content_jobs": ["Navigation", "Footer", "Dependent header treatment"]}
     shell_items: list[str] = []
     for item in shell_recommendations:
         if not isinstance(item, dict):
@@ -470,59 +612,157 @@ def render(root: Path, output: Path, paths: list[Path], portable: bool) -> str:
     title = html.escape(root.name)
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title} · Project Dashboard</title><style>
 :root{{--bg:#f4f1ea;--panel:#fffdf8;--ink:#1d1b18;--muted:#706b63;--line:#d9d2c7;--accent:#174c3c;--warn:#9a5b10}}*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,sans-serif}}body>header{{padding:14px clamp(20px,4vw,56px);border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:16px}}body>header p{{margin:0}}h1{{margin:0;font:700 clamp(24px,3vw,34px)/1.05 ui-serif,Georgia,serif}}h2{{font-size:clamp(26px,3vw,40px)}}h3{{line-height:1.15}}p,.muted,small{{color:var(--muted)}}nav{{display:flex;gap:8px;overflow:auto;padding:10px clamp(20px,4vw,56px);position:sticky;top:0;background:rgba(244,241,234,.96);backdrop-filter:blur(12px);z-index:6}}button{{border:1px solid var(--line);background:var(--panel);padding:9px 13px;border-radius:999px;cursor:pointer;font:inherit}}button:disabled{{opacity:.45;cursor:not-allowed}}nav button{{white-space:nowrap}}button.active,button[aria-pressed="true"]{{background:var(--ink);color:white}}main{{padding:8px clamp(20px,4vw,56px) 90px}}.panel,.concept-panel,.site-panel,.page-review-panel,.recommendation-card{{display:none}}.panel.active,.concept-panel.active,.site-panel.active,.page-review-panel.active,.recommendation-card.active{{display:block}}.summary-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}}.summary-card,.design-preview,.concept-panel,.site-panel,.selection-status,.site-direction-option,.shell-review,.page-review-panel{{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 8px 30px rgba(50,40,25,.05)}}.summary-card ul{{padding-left:20px}}.source,.eyebrow{{text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-size:11px}}.design-preview h3,.concept-panel h3,.site-panel h3{{font-size:clamp(32px,5vw,70px);margin:10px 0 22px}}.swatches{{display:flex;flex-wrap:wrap;gap:10px}}.swatches span{{display:grid;gap:5px;font-size:11px}}.swatches i{{width:78px;height:58px;border-radius:10px;background:var(--swatch);border:1px solid var(--line)}}.empty{{padding:32px;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}}.research-section{{margin:24px 0 64px}}.page-decision-section{{margin-top:8px}}.research-section>h3{{font-size:clamp(24px,3vw,40px)}}.selection-status{{display:flex;justify-content:space-between;gap:16px;margin-bottom:16px}}.selection-status.pending{{border-color:#d5a562;background:#fff8e8}}.selection-status span{{color:var(--muted)}}.concept-layout,.site-layout{{display:grid;grid-template-columns:minmax(190px,260px) minmax(0,1fr);gap:18px}}aside{{display:flex;flex-direction:column;gap:8px;align-self:start;position:sticky;top:68px}}aside button{{text-align:left;border-radius:12px}}dl>div{{display:grid;grid-template-columns:150px 1fr;gap:18px;border-top:1px solid var(--line);padding:13px 0}}dt{{font-weight:700}}dd{{margin:0}}.live-links,.site-panel header,.decision-evidence header{{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}}a.live,.live-links a{{display:inline-flex;padding:9px 13px;background:var(--ink);color:white;border-radius:999px;text-decoration:none}}.review{{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}}.review span{{font-weight:700}}textarea{{width:100%;min-height:72px;margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit}}.evidence-stack{{display:grid;gap:24px;margin-top:18px}}figure{{margin:0;background:#111;border-radius:15px;overflow:hidden}}figure img,figure video{{display:block;width:100%;height:auto;max-height:78vh;object-fit:contain;background:#111}}figcaption{{padding:10px;background:var(--panel);color:var(--muted);font-size:12px}}.badge,.scope-badge,.confidence{{display:inline-block;padding:5px 9px;border-radius:999px;margin-right:8px;font-size:11px;font-weight:700}}.badge.ok{{background:#e7f3e8;color:#255c2a}}.badge.warn,.dependency-note{{background:#fff0d4;color:#80500b}}.badge.bad{{background:#f9dddd;color:#8b2525}}.scope-badge{{background:#e4eee9;color:var(--accent)}}.confidence{{background:#ece8df;color:#4f4a43}}.decision-intro{{display:flex;justify-content:space-between;gap:24px;align-items:end;padding:10px 0 18px}}.decision-intro h3{{font-size:clamp(26px,4vw,48px);max-width:900px;margin:4px 0}}.readiness{{display:grid;text-align:right;white-space:nowrap}}.readiness b{{font-size:20px}}.site-direction-option,.shell-review{{margin-bottom:14px}}.site-direction-option h4,.shell-review h4,.page-review-header h4{{font:700 clamp(24px,3vw,38px)/1.1 ui-serif,Georgia,serif;margin:8px 0}}.shell-option{{border-top:1px solid var(--line);padding:18px 0}}.dependency-note{{padding:10px 12px;border-radius:10px}}.page-review-tabs{{display:flex;gap:8px;overflow:auto;padding:12px 0;position:sticky;top:53px;background:var(--bg);z-index:5}}.page-review-tabs button{{white-space:nowrap}}.page-review-header{{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.75fr);gap:28px;border-bottom:1px solid var(--line);padding-bottom:18px}}.page-map ol{{display:flex;flex-wrap:wrap;gap:7px;padding:0;list-style:none}}.page-map li{{display:flex;gap:7px;align-items:center;border:1px solid var(--line);padding:7px 10px;border-radius:999px}}.page-map li span{{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px}}.recommendation-card{{padding-top:22px}}.recommendation-heading,.fit-grid{{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.6fr);gap:24px}}.recommendation-heading h4{{font:700 clamp(30px,5vw,64px)/1.02 ui-serif,Georgia,serif;margin:8px 0}}.recommendation-description{{font-size:18px;max-width:900px}}.fit-grid>div{{border-top:1px solid var(--line);padding-top:12px}}.recommendation-card h5{{font-size:18px;margin:24px 0 10px}}.decision-evidence{{margin:14px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden}}.decision-evidence header,.decision-evidence>p,.decision-evidence>.badge{{margin:12px 16px}}.decision-media{{background:#111;display:grid;place-items:center}}.decision-media img{{display:block;width:100%;max-height:78vh;object-fit:contain}}.evidence-missing{{padding:60px 24px;color:#fff}}.asset-list{{display:grid;gap:8px;padding:0;list-style:none}}.asset-list li{{display:grid;gap:3px;border-top:1px solid var(--line);padding:10px 0}}.decision-actions{{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:20px;padding-top:18px}}.decision-actions textarea,.decision-actions .choice-state{{flex-basis:100%}}.choice-state{{margin:0;color:var(--accent)}}.recommendation-nav{{display:flex;justify-content:space-between;align-items:center;margin-top:18px}}.decision-submit-bar{{position:sticky;bottom:10px;background:#1d1b18;color:#fff;padding:12px 14px;border-radius:14px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 12px 40px rgba(0,0,0,.22);z-index:8}}.decision-submit-bar>div{{display:flex;gap:8px;align-items:center;flex-wrap:wrap}}.decision-submit-bar span{{color:#d4cec5;font-size:12px}}.decision-submit-bar button{{background:#fff}}.decision-submit-bar #submit-decisions,.decision-submit-bar #update-decisions{{background:#2a6a55;color:#fff;border-color:#2a6a55}}@media(max-width:760px){{body>header{{display:block}}.concept-layout,.site-layout,.page-review-header,.recommendation-heading,.fit-grid{{grid-template-columns:1fr}}aside{{position:static;display:flex;flex-direction:row;overflow:auto}}aside button{{white-space:nowrap}}dl>div{{grid-template-columns:1fr;gap:3px}}.selection-status,.decision-intro,.decision-submit-bar{{display:grid}}.readiness{{text-align:left}}.decision-submit-bar{{bottom:4px}}}}
-.decision-workspace{{max-width:1800px;margin:0 auto}}.decision-workspace .decision-intro{{padding:4px 0 10px}}.decision-workspace .decision-intro h3{{font-size:clamp(22px,3vw,38px)}}.decision-workspace .site-direction-option,.decision-workspace .shell-review,.decision-workspace .page-review-panel{{padding:0;background:transparent;border:0;box-shadow:none}}.decision-block{{grid-template-columns:minmax(280px,.72fr) minmax(0,1.28fr);gap:clamp(22px,4vw,64px);padding:clamp(28px,5vw,72px) 0;border-top:1px solid var(--line)}}.decision-block.active{{display:grid}}.decision-block.connected{{margin:18px 0;padding:clamp(24px,4vw,54px);border:1px solid #c9d9d2;border-radius:18px;background:#edf4f0}}.decision-block.page-wide{{border-top:3px solid var(--ink)}}.brief{{position:sticky;top:68px;align-self:start}}.block-number,.content-label{{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}}.brief h3{{font:500 clamp(25px,3vw,42px)/1.14 ui-serif,Georgia,serif;margin:12px 0}}.brief .goal{{font-size:16px}}.wireframe{{display:grid;gap:8px;margin-top:16px;padding:14px;border:1px dashed #bbb3a8;border-radius:14px;background:rgba(255,255,255,.55)}}.wire-row{{min-height:44px;padding:10px 12px;border-radius:9px;background:#fff;display:flex;justify-content:space-between;gap:12px;align-items:center}}.wire-row small{{font-size:10px;text-transform:uppercase;letter-spacing:.08em}}.connection-note{{margin-top:14px;padding:13px;border-left:3px solid var(--accent);background:var(--accent-soft)}}.recommendation{{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 18px 55px rgba(47,39,28,.09)}}.recommendation-visual{{position:relative;padding:12px;background:#222}}.recommendation-visual>.scope-badge{{position:absolute;z-index:2;top:22px;left:22px}}.recommendation-visual .decision-evidence{{margin:0;border:0}}.recommendation-visual .decision-media img{{max-height:64vh}}.recommendation-body{{padding:clamp(20px,3vw,34px)}}.recommendation-heading{{align-items:start}}.recommendation-heading h4{{font:500 clamp(25px,3vw,42px)/1.12 ui-serif,Georgia,serif;margin:6px 0}}.optional-parts{{margin:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}}.optional-parts summary{{padding:13px 0;cursor:pointer;color:var(--muted)}}.part-list{{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:14px}}.part-choice[aria-pressed="true"]{{background:var(--accent);color:#fff;border-color:var(--accent)}}.request-action{{border-radius:10px}}.decision-actions .decision-action{{border-radius:10px}}dialog{{width:min(680px,calc(100% - 28px));border:0;border-radius:20px;padding:0;box-shadow:0 32px 100px rgba(0,0,0,.28)}}dialog::backdrop{{background:rgba(14,14,12,.62);backdrop-filter:blur(4px)}}#decision-request-form{{padding:28px}}#decision-request-form h3{{font:500 30px/1.15 ui-serif,Georgia,serif}}#decision-request-fields label{{display:grid;gap:7px;margin:16px 0}}#decision-request-fields input,#decision-request-fields textarea{{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}}.dialog-actions{{display:flex;justify-content:flex-end;gap:10px}}body>header{{padding:8px clamp(16px,2vw,32px)}}body>header h1{{font-size:20px}}body>header p{{font-size:11px}}body>nav{{padding:7px clamp(16px,2vw,32px)}}main{{padding-inline:clamp(16px,2vw,32px)}}.review-header{{position:sticky;top:0;z-index:7;justify-content:space-between;background:rgba(244,241,234,.96);backdrop-filter:blur(12px)}}.review-header span{{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}}.review-mode main{{padding-top:0}}.review-mode .page-review-tabs{{top:40px}}@media(max-width:900px){{.decision-block.active{{display:grid;grid-template-columns:1fr}}.brief{{position:static}}}}
+.decision-workspace{{max-width:1800px;margin:0 auto}}.decision-workspace .decision-intro{{padding:4px 0 10px}}.decision-workspace .decision-intro h3{{font-size:clamp(22px,3vw,38px)}}.decision-workspace .site-direction-option,.decision-workspace .shell-review,.decision-workspace .page-review-panel{{padding:0;background:transparent;border:0;box-shadow:none}}.decision-block{{grid-template-columns:minmax(280px,.72fr) minmax(0,1.28fr);gap:clamp(22px,4vw,64px);padding:clamp(28px,5vw,72px) 0;border-top:1px solid var(--line)}}.decision-block.active{{display:grid}}.decision-block.connected{{margin:18px 0;padding:clamp(24px,4vw,54px);border:1px solid #c9d9d2;border-radius:18px;background:#edf4f0}}.decision-block.page-wide{{border-top:3px solid var(--ink)}}.brief{{position:sticky;top:68px;align-self:start}}.block-number,.content-label{{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}}.brief h3{{font:500 clamp(25px,3vw,42px)/1.14 ui-serif,Georgia,serif;margin:12px 0}}.brief .goal{{font-size:16px}}.wireframe{{display:grid;gap:8px;margin-top:16px;padding:14px;border:1px dashed #bbb3a8;border-radius:14px;background:rgba(255,255,255,.55)}}.wire-row{{min-height:44px;padding:10px 12px;border-radius:9px;background:#fff;display:flex;justify-content:space-between;gap:12px;align-items:center}}.wire-row small{{font-size:10px;text-transform:uppercase;letter-spacing:.08em}}.connection-note{{margin-top:14px;padding:13px;border-left:3px solid var(--accent);background:var(--accent-soft)}}.recommendation{{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 18px 55px rgba(47,39,28,.09)}}.recommendation-visual{{position:relative;padding:12px;background:#222}}.recommendation-visual>.scope-badge{{position:absolute;z-index:2;top:22px;left:22px}}.recommendation-visual .decision-evidence{{margin:0;border:0}}.recommendation-visual .decision-media img{{max-height:64vh}}.recommendation-body{{padding:clamp(20px,3vw,34px)}}.recommendation-heading{{align-items:start}}.recommendation-heading h4{{font:500 clamp(25px,3vw,42px)/1.12 ui-serif,Georgia,serif;margin:6px 0}}.optional-parts{{margin:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}}.optional-parts summary{{padding:13px 0;cursor:pointer;color:var(--muted)}}.part-list{{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:14px}}.part-choice[aria-pressed="true"]{{background:var(--accent);color:#fff;border-color:var(--accent)}}.request-action{{border-radius:10px}}.decision-actions .decision-action{{border-radius:10px}}dialog{{width:min(680px,calc(100% - 28px));border:0;border-radius:20px;padding:0;box-shadow:0 32px 100px rgba(0,0,0,.28)}}dialog::backdrop{{background:rgba(14,14,12,.62);backdrop-filter:blur(4px)}}#decision-request-form{{padding:28px}}#decision-request-form h3{{font:500 30px/1.15 ui-serif,Georgia,serif}}#decision-request-fields label{{display:grid;gap:7px;margin:16px 0}}#decision-request-fields input,#decision-request-fields textarea{{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}}.dialog-actions{{display:flex;justify-content:flex-end;gap:10px}}body>header{{padding:8px clamp(16px,2vw,32px)}}body>header h1{{font-size:20px}}body>header p{{font-size:11px}}body>nav{{padding:7px clamp(16px,2vw,32px)}}main{{padding-inline:clamp(16px,2vw,32px)}}.review-header{{position:sticky;top:0;z-index:7;justify-content:space-between;background:rgba(244,241,234,.96);backdrop-filter:blur(12px)}}.review-header span{{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}}.review-mode main{{padding-top:0}}@media(max-width:900px){{.decision-block.active{{display:grid;grid-template-columns:1fr}}.brief{{position:static}}}}
 /* The review app is one reusable product surface. Project data changes; this interface does not. */
-.review-mode{{--bg:#fafafa;--panel:#fff;--ink:#18181b;--muted:#71717a;--line:#e4e4e7;--accent:#18181b;--accent-soft:#f4f4f5;--warn:#52525b;background:var(--bg);font:14px/1.45 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
-.review-mode .review-header{{position:sticky;top:0;z-index:20;height:44px;padding:0 20px;background:rgba(255,255,255,.96);color:#18181b;border:0;border-bottom:1px solid var(--line);align-items:center;backdrop-filter:blur(10px)}}
-.review-mode .review-header h1{{font:650 14px/1 Inter,ui-sans-serif,sans-serif;letter-spacing:-.01em}}
-.review-mode .review-header span{{color:#71717a;font-size:10px}}
-.review-mode main{{padding:0 20px 40px}}.review-mode .page-decision-section{{margin:0}}
+.review-mode{{--bg:#faf8f3;--panel:#fffefb;--ink:#22211d;--body-c:#55534b;--muted:#8b8779;--line:#e8e4d8;--accent:#1e5c45;--accent-soft:#e9f1ec;--clay:#a2593a;--clay-soft:#f7ede6;--amber:#8a5a12;--amber-soft:#f7edd8;--warn:#8a5a12;--ok:#1e5c45;--side:236px;--side-bg:#f4f1e9;--font-display:"New York","Iowan Old Style",Palatino,ui-serif,Georgia,serif;--font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,sans-serif;background:var(--bg);color:var(--ink);font:14px/1.55 var(--font-body);-webkit-font-smoothing:antialiased}}
+.review-mode .review-header{{position:fixed;top:0;left:0;width:var(--side);height:56px;z-index:32;margin:0;padding:0 18px;background:var(--side-bg);border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:flex-start;backdrop-filter:none}}
+.review-mode .review-header h1{{font-family:var(--font-display);font-size:16px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+.review-mode .review-header span{{display:none}}
+.review-mode main{{padding:0 0 0 var(--side)}}
+.review-mode main::before{{content:"";position:fixed;left:0;top:0;bottom:0;width:var(--side);background:var(--side-bg);border-right:1px solid var(--line);z-index:20}}
+.review-mode .page-decision-section{{margin:0}}
 .decision-workspace{{width:100%;max-width:none;margin:0 auto}}
-.decision-toolbar{{min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line);background:var(--bg)}}
-.review-stage-tabs,.publish-actions{{display:flex;align-items:center;gap:6px;overflow:auto}}
-.review-stage-tabs button,.publish-actions button,.page-review-tabs button{{white-space:nowrap;border:0;background:transparent;border-radius:8px;padding:8px 11px;color:var(--muted);font-size:13px;font-weight:600}}
-.review-stage-tabs button.active,.page-review-tabs button.active{{background:#15171a;color:#fff}}
-.publish-actions button{{border:1px solid var(--line);background:#fff;color:var(--ink)}}
-.publish-actions #submit-decisions,.publish-actions #update-decisions{{background:#18181b;border-color:#18181b;color:#fff}}
-.review-status{{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0 14px;color:var(--muted);font-size:12px}}
-.review-status>div{{display:flex;gap:10px;align-items:center;min-width:0}}.review-status b{{color:var(--ink);white-space:nowrap}}
-.review-status #decision-message{{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-.review-status .readiness{{display:block;padding:5px 9px;background:#f4f4f5;color:#52525b;border:1px solid #e4e4e7;border-radius:999px;text-transform:capitalize}}
-.review-stage{{display:none}}.review-stage.active{{display:block}}
-.stage-heading{{display:flex;justify-content:space-between;align-items:end;gap:24px;padding:18px 0 12px}}
-.stage-heading h3{{margin:2px 0 0;font-size:20px;line-height:1.2;letter-spacing:-.02em}}.stage-heading>p{{margin:0;max-width:620px;text-align:right}}
+.decision-toolbar{{position:fixed;left:0;top:56px;width:var(--side);z-index:33;display:block;padding:10px;border:0;background:transparent;min-height:0}}
+.review-stage-tabs{{display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:0;background:transparent;border-radius:0;overflow:visible}}
+.review-stage-tabs button{{position:relative;text-align:left;border:0;background:transparent;border-radius:9px;padding:8px 10px 8px 30px;color:#6b675a;font-size:13px;font-weight:600;white-space:normal}}
+.review-stage-tabs button::before{{content:"";position:absolute;left:11px;top:14px;width:8px;height:8px;border-radius:50%;background:#cfc9ba}}
+.review-stage-tabs button.decided::before{{background:var(--ok)}}
+.review-stage-tabs button.active{{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(60,50,30,.1)}}
+.review-stage-tabs button::after{{display:block;font-size:10.5px;font-weight:500;color:#9a9484;margin-top:1px}}
+.review-stage-tabs button:nth-of-type(1)::after{{content:"The whole site's shared look"}}
+.review-stage-tabs button:nth-of-type(2)::after{{content:"Navigation & footer"}}
+.review-stage-tabs button:nth-of-type(3)::after{{content:"Each page, one at a time"}}
+.page-review-tabs{{position:fixed;left:0;top:226px;bottom:300px;width:var(--side);z-index:33;display:flex;flex-direction:column;align-items:stretch;gap:1px;overflow-y:auto;margin:0;padding:8px 10px;background:transparent;border-radius:0;border-top:1px solid var(--line)}}
+.page-review-tabs button{{position:relative;text-align:left;border:0;background:transparent;border-radius:8px;padding:7px 8px 7px 30px;color:#6b675a;font-size:12.5px;font-weight:550;white-space:normal}}
+.page-review-tabs button::before{{content:"";position:absolute;left:11px;top:12px;width:7px;height:7px;border-radius:50%;background:#cfc9ba}}
+.page-review-tabs button.decided::before{{background:var(--ok)}}
+.page-review-tabs button.active{{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(60,50,30,.1)}}
+.page-review-tabs::-webkit-scrollbar{{width:6px}}
+.page-review-tabs::-webkit-scrollbar-thumb{{background:#ddd6c6;border-radius:6px}}
+.publish-actions{{position:fixed;left:0;bottom:0;width:var(--side);z-index:34;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 12px 14px;background:var(--side-bg);border-top:1px solid var(--line);border-right:1px solid var(--line)}}
+.publish-actions::before{{content:"Decide every item — then submit everything at once from here.";grid-column:1/-1;font-size:10.5px;color:var(--muted);line-height:1.5;padding:0 2px}}
+.publish-actions button{{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:8px 10px;font-size:12.5px;font-weight:600;white-space:nowrap}}
+.publish-actions #review-decisions,.publish-actions #export-decisions,.publish-actions #copy-decisions{{grid-column:auto;background:transparent;border:0;color:var(--muted);font-size:11.5px;font-weight:550;padding:5px 4px}}
+.publish-actions #review-decisions:hover,.publish-actions #export-decisions:hover,.publish-actions #copy-decisions:hover{{color:var(--ink);text-decoration:underline}}
+.publish-actions #update-decisions{{grid-column:1/-1}}
+.publish-actions #submit-decisions{{grid-column:1/-1;padding:11px;font-size:13px}}
+.publish-actions #submit-decisions,.publish-actions #update-decisions{{background:var(--accent);border-color:var(--accent);color:#fff}}
+.publish-actions #submit-decisions:disabled,.publish-actions #update-decisions:disabled{{display:none}}
+.review-status{{position:fixed;left:0;bottom:150px;width:var(--side);z-index:33;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px 16px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);background:var(--side-bg)}}
+.review-status>div{{display:flex;flex-direction:column;gap:2px;align-items:flex-start;min-width:0}}
+.review-status b{{color:var(--ink);font-weight:650;white-space:normal}}
+.review-status #decision-message{{position:static;max-width:none;background:transparent;color:var(--muted);padding:0;box-shadow:none;white-space:normal;overflow:visible;font-size:11.5px;line-height:1.5}}
+.review-status .readiness{{display:block;padding:4px 10px;background:#fff;color:var(--muted);border:1px solid var(--line);border-radius:12px;font-size:11px;font-weight:600;text-transform:capitalize;white-space:normal;text-align:left;line-height:1.4;max-width:100%}}
+.review-stage{{display:none}}
+.review-stage.active{{display:block}}
+.stage-heading{{display:none}}
 .decision-workspace .site-direction-option,.decision-workspace .shell-review,.decision-workspace .page-review-panel{{padding:0;background:transparent;border:0;box-shadow:none}}
-.page-review-tabs{{position:static;display:flex;gap:6px;padding:10px;background:#e7eaee;border-radius:12px;margin-bottom:12px}}
-.page-review-header{{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}}
-.page-review-header h4{{font:650 18px/1.2 Inter,ui-sans-serif,sans-serif;margin:3px 0}}.page-review-header p{{margin:4px 0}}
-.page-map{{max-width:55%}}.page-map>b{{font-size:11px;color:var(--muted)}}.page-map ol{{margin:7px 0 0;justify-content:flex-end}}
-.page-map li{{background:#f5f6f8;border:0;border-radius:7px;padding:6px 8px;font-size:12px}}.page-map li span{{width:18px;height:18px;background:#dfe3e8;color:#4c535d}}
-.decision-block{{grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:12px;padding:0;border:0}}
-.decision-block.connected{{margin:0;padding:0;border:0;background:transparent}}.decision-block.page-wide{{border:0}}
-.brief{{position:static;align-self:start;padding:18px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:14px;min-height:0}}
-.brief .block-number,.brief .content-label{{color:var(--muted);font-size:10px}}
-.brief h3{{font:650 20px/1.25 Inter,ui-sans-serif,sans-serif;margin:12px 0;color:var(--ink);letter-spacing:-.025em}}.brief .goal{{color:var(--muted);font-size:13px}}
-.wireframe{{border:0;border-radius:10px;background:#f4f4f5;padding:8px}}.wire-row{{min-height:38px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:8px 9px}}.wire-row small{{color:var(--muted)}}
-.connection-note{{background:#f4f4f5;color:#3f3f46;border-left-color:#a1a1aa;border-radius:7px}}
-.recommendation{{border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(18,24,32,.08)}}
-.recommendation-visual{{padding:36px 0 0;background:#101114}}.recommendation-visual>.scope-badge{{top:8px;left:10px;background:#f4f4f5;color:#3f3f46;box-shadow:none}}
-.evidence-slide{{display:none;position:relative;border-radius:0;overflow:hidden}}.evidence-slide.active{{display:block}}.evidence-slide header{{min-height:48px;margin:0;padding:9px 12px;background:#101114;color:#fff;display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}}
-.evidence-slide header p{{margin:1px 0;color:#aeb4bc;font-size:11px}}.evidence-slide>.badge{{display:block;width:max-content;margin:8px 12px 0;background:#f4f4f5;color:#52525b}}
-.recommendation-visual .decision-media{{height:320px;background:#090a0b}}.recommendation-visual .decision-media img,.recommendation-visual .decision-media video{{width:100%;height:320px;max-height:none;object-fit:cover}}
-.recommendation-visual .evidence-missing{{height:320px;display:grid;place-items:center}}.evidence-notes{{display:flex;gap:16px;padding:8px 12px;background:#18181b}}.evidence-notes p{{margin:0;color:#a1a1aa;font-size:11px}}.evidence-notes b{{color:#e4e4e7}}.evidence-controls{{height:42px;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:6px 10px;background:#101114;color:#d4d4d8;font-size:12px}}.evidence-controls button{{width:30px;height:30px;padding:0;border-radius:7px;background:#27272a;color:#fff;border-color:#3f3f46}}a.live{{padding:7px 10px;background:#fff;color:#15171a;border-radius:7px;font-size:12px;font-weight:650}}
-.recommendation-body{{padding:18px 20px 20px}}.recommendation-heading{{display:flex;justify-content:space-between;gap:16px}}
-.recommendation-heading h4{{font:650 21px/1.2 Inter,ui-sans-serif,sans-serif;margin:3px 0;letter-spacing:-.02em}}.recommendation-heading p{{margin:5px 0}}.confidence{{flex:none;background:#eef1f4;color:#515963}}
-.fit-grid{{grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}}.fit-grid>div{{padding:12px;background:#f6f7f9;border:0;border-radius:9px}}.fit-grid p{{margin:5px 0}}
-.recommendation-card h5{{font-size:13px;margin:16px 0 8px}}.asset-list{{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:7px}}.asset-list li{{padding:9px 10px;border:1px solid var(--line);border-radius:8px}}
-.optional-parts{{margin:14px 0 0}}.optional-parts summary{{padding:10px 0;font-size:12px}}.part-choice{{border-radius:7px}}
-.decision-actions{{gap:6px;margin-top:12px;padding-top:12px}}.decision-actions .decision-action,.request-action{{border-radius:7px;padding:8px 10px;font-size:12px}}
-.decision-actions .decision-action[aria-pressed="true"]{{background:#15171a;color:#fff}}.request-action[data-request="component"]{{border-style:dashed}}
-.decision-actions textarea{{min-height:50px;margin-top:4px;background:#f7f8f9}}.choice-state{{font-size:12px}}
-.recommendation-nav{{margin:10px 0 0;padding:9px 12px;background:#e7eaee;border-radius:10px}}.recommendation-nav button{{border-radius:7px}}
-dialog{{border-radius:14px}}#decision-request-form{{padding:22px}}#decision-request-form h3{{font:650 22px/1.2 Inter,ui-sans-serif,sans-serif}}.dependency-note{{background:#f4f4f5;color:#52525b;border:1px solid var(--line)}}
-.review-mode :where(button,a,summary,input,textarea):focus-visible{{outline:2px solid #18181b;outline-offset:2px}}
-@media(max-width:980px){{.decision-toolbar,.stage-heading,.review-status{{align-items:flex-start;flex-direction:column}}.publish-actions{{width:100%}}.stage-heading>p{{text-align:left}}.decision-block.active{{grid-template-columns:1fr}}.brief{{min-height:0}}.page-review-header{{display:block}}.page-map{{max-width:none}}.page-map ol{{justify-content:flex-start}}}}
-@media(max-width:640px){{.review-mode main{{padding-inline:10px}}.review-mode .review-header{{padding-inline:12px}}.decision-toolbar{{padding:8px 0}}.review-stage-tabs,.publish-actions{{width:100%}}.publish-actions button{{flex:0 0 auto}}.recommendation-visual .decision-media,.recommendation-visual .decision-media img,.recommendation-visual .decision-media video{{height:230px}}.fit-grid{{grid-template-columns:1fr}}}}
+#direction-stage,#shell-stage,#pages-stage{{padding:16px 22px 28px}}
+.page-review-header{{display:block;padding:4px 2px 14px;background:transparent;border:0;border-radius:0;margin-bottom:4px;box-shadow:none}}
+.page-review-header .eyebrow{{font-size:10px;letter-spacing:.1em;color:var(--muted)}}
+.page-review-header h4{{font-family:var(--font-display);font-size:27px;font-weight:600;letter-spacing:0;margin:4px 0 2px}}
+.page-review-header p{{margin:2px 0 0;color:var(--body-c);font-size:13px;max-width:760px}}
+.page-map{{display:none}}
+.decision-block{{grid-template-columns:minmax(300px,410px) minmax(0,1fr);gap:18px;padding:0;border:0}}
+.decision-block.connected{{margin:0;padding:0;border:0;background:transparent}}
+.decision-block.page-wide{{border:0}}
+.brief{{position:static;align-self:start;padding:18px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-left:3px solid var(--clay);border-radius:14px;min-height:0;box-shadow:0 1px 2px rgba(60,50,30,.05)}}
+.brief .block-number{{color:var(--muted);font-size:9px;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.brief .side-label{{margin:10px 0 0;color:var(--clay);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}}
+.brief h3{{font-family:var(--font-display);font-size:20px;line-height:1.35;font-weight:600;letter-spacing:0;margin:6px 0 4px;color:var(--ink)}}
+.brief .goal{{color:var(--muted);font-size:12px;margin:4px 0 0}}
+.brief .content-label{{margin-top:14px;color:var(--clay);font-size:9.5px;font-weight:700;letter-spacing:.08em}}
+.wireframe{{border:0;border-radius:0;background:transparent;padding:0;margin-top:8px;display:grid;gap:7px}}
+.wire-row{{min-height:0;background:#fff;color:var(--ink);border:1.5px dashed #d8c7b8;border-radius:9px;padding:9px 11px;font-size:12.5px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center}}
+.wire-row:first-child{{border-style:solid;border-color:var(--clay);background:var(--clay-soft)}}
+.wire-row small{{color:#b39b83;font-size:8.5px;font-weight:700;letter-spacing:.1em}}
+.wire-row em{{font-style:normal;display:block;width:100%;font-size:11px;color:var(--body-c);margin-top:3px;line-height:1.45}}
+.stale-copy{{display:block;width:max-content;margin-top:4px;padding:2px 8px;border-radius:999px;background:var(--amber-soft);color:var(--amber);font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}}
+.connection-note{{margin-top:12px;padding:9px 12px;background:var(--accent-soft);color:#1c4a39;border-left:3px solid var(--accent);border-radius:8px;font-size:12px}}
+.copy-outline{{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}}
+.copy-file{{margin:8px 0 2px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}}
+.copy-slot{{display:flex;gap:9px;padding:8px 10px;background:#faf7f0;border-radius:8px;margin-top:6px;align-items:flex-start}}
+.copy-slot>span{{flex:none;width:18px;height:18px;border-radius:50%;background:#e9dfd0;color:#7a5c42;font-size:10px;font-weight:700;display:grid;place-items:center;margin-top:1px}}
+.copy-slot i{{display:block;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}}
+.copy-slot b{{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-top:2px;line-height:1.35}}
+.copy-slot b.copy-missing{{color:#b08968;font-weight:550}}
+.copy-slot small{{margin-top:2px;font-size:11.5px;color:var(--body-c);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.recommendation{{border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:14px;background:var(--panel);box-shadow:0 1px 2px rgba(60,50,30,.05),0 12px 30px rgba(60,50,30,.06);overflow:hidden}}
+.recommendation-heading{{padding:16px 18px 8px;display:flex;justify-content:space-between;gap:16px;align-items:start}}
+.recommendation-heading .eyebrow{{color:var(--accent);font-size:10px;font-weight:700;letter-spacing:.1em}}
+.recommendation-heading h4{{font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:0;margin:4px 0 0;line-height:1.22}}
+.recommendation-heading p{{margin:5px 0 0;color:var(--body-c);font-size:13px}}
+.confidence{{flex:none;background:var(--accent-soft);color:var(--accent);padding:5px 10px;border-radius:999px;font-size:11px;font-weight:650;margin:0}}
+.mapping-line{{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 18px 12px}}
+.mapping-line .scope-badge{{position:static;background:var(--accent-soft);color:var(--accent);margin:0}}
+.scope-badge i{{font-style:normal;font-weight:500;color:#4f7a68}}
+.mapping-covers{{font-size:11.5px;color:var(--muted)}}
+.recommendation-visual{{position:relative;padding:0 18px;background:transparent}}
+.recommendation-visual>.scope-badge{{display:none}}
+.evidence-slide{{display:none;position:relative;border-radius:0;overflow:visible}}
+.evidence-slide.active{{display:flex;flex-direction:column}}
+.evidence-slide header{{order:2;min-height:40px;margin:0;padding:8px 2px 0;background:transparent;color:var(--ink);display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}}
+.evidence-slide header b{{font-size:12.5px;font-weight:650;color:var(--ink)}}
+.evidence-slide header p{{margin:1px 0 0;color:var(--muted);font-size:10.5px}}
+.evidence-slide>.badge{{position:absolute;top:12px;left:14px;z-index:3;display:block;width:max-content;margin:0;background:var(--amber-soft);color:var(--amber);border:1px solid #e7d3ac}}
+.recommendation-visual .decision-media{{order:1;height:320px;max-height:none;min-height:0;overflow:hidden;display:block;background:#efece3;border:1px solid var(--line);border-radius:10px}}
+.recommendation-visual .decision-media img,.recommendation-visual .decision-media video{{width:100%;height:100%;max-height:none;object-fit:cover;object-position:top;display:block}}
+.recommendation-visual .evidence-missing{{height:320px;display:grid;place-items:center;color:var(--muted);background:#efece3;border:1px solid var(--line);border-radius:10px}}
+.evidence-notes{{order:3;display:flex;gap:16px;padding:2px 2px 6px;background:transparent;border:0}}
+.evidence-notes p{{margin:0;color:var(--muted);font-size:11px;line-height:1.5}}
+.evidence-notes b{{color:var(--body-c);font-weight:650}}
+.evidence-controls{{position:static;height:0;padding:0;background:transparent;display:block}}
+.evidence-controls span{{position:absolute;top:14px;right:30px;z-index:4;background:rgba(34,33,29,.75);color:#fff;padding:4px 10px;border-radius:999px;font-size:11px}}
+.evidence-controls .previous-evidence,.evidence-controls .next-evidence{{position:absolute;top:150px;width:38px;height:38px;padding:0;border-radius:50%;background:rgba(255,255,255,.95);color:var(--ink);border:1px solid var(--line);font-size:15px;z-index:4;box-shadow:0 2px 10px rgba(40,30,10,.18);cursor:pointer}}
+.evidence-controls .previous-evidence{{left:28px}}
+.evidence-controls .next-evidence{{right:28px}}
+.evidence-controls .previous-evidence:hover,.evidence-controls .next-evidence:hover{{background:#fff;border-color:#c8c2b2}}
+a.live{{padding:6px 11px;background:var(--ink);color:#fff;border-radius:8px;font-size:11.5px;font-weight:650;text-decoration:none}}
+.recommendation-body{{padding:6px 18px 16px}}
+.fit-grid{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}}
+.fit-grid>div{{padding:12px;background:#f6f3ea;border:0;border-radius:10px}}
+.fit-grid b{{font-size:12px}}
+.fit-grid p{{margin:5px 0 0;font-size:12.5px;color:var(--body-c)}}
+.fit-grid small{{display:block;margin-top:6px;color:var(--muted)}}
+.recommendation-card h5{{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 6px}}
+.asset-list{{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px}}
+.asset-list li{{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff}}
+.asset-list b{{font-size:12px}}
+.asset-list span{{font-size:11.5px;color:var(--body-c)}}
+.asset-list small{{color:var(--muted);font-size:10.5px}}
+.optional-parts{{margin:12px 0 0;border-top:1px solid var(--line);border-bottom:0}}
+.optional-parts summary{{padding:10px 0 6px;font-size:12px;font-weight:550;color:var(--muted);cursor:pointer}}
+.part-list{{padding-bottom:8px}}
+.part-choice{{border-radius:7px;font-size:11.5px;padding:6px 10px;background:#fff;border:1px solid var(--line)}}
+.part-choice[aria-pressed="true"]{{background:var(--ink);color:#fff;border-color:var(--ink)}}
+.decision-actions{{position:sticky;bottom:10px;z-index:8;gap:6px;margin-top:12px;padding:10px;background:rgba(255,254,251,.97);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px rgba(60,50,30,.16);backdrop-filter:blur(8px);align-items:center}}
+.decision-actions .decision-action{{border-radius:8px;padding:8px 13px;font-size:12.5px;font-weight:600;background:#fff;border:1px solid var(--line)}}
+.decision-actions .decision-action:hover{{border-color:#c8c2b2}}
+.decision-actions .decision-action[aria-pressed="true"]{{background:var(--ink);border-color:var(--ink);color:#fff}}
+.decision-actions .decision-action[data-status="selected"][aria-pressed="true"]{{background:var(--ok);border-color:var(--ok)}}
+.decision-actions .decision-action[data-status="shortlisted"][aria-pressed="true"]{{background:#996c15;border-color:#996c15}}
+.decision-actions .decision-action[data-status="not_using"][aria-pressed="true"]{{background:#757164;border-color:#757164}}
+.request-action{{border-radius:8px;padding:7px 11px;font-size:11.5px;font-weight:550;background:#f3efe4;border:1px solid transparent;color:var(--body-c)}}
+.request-action:hover{{background:#ece7d8}}
+.request-action[data-request="component"]{{border:1px dashed #c8c2b2;background:#fff}}
+.decision-actions textarea{{min-height:40px;margin-top:2px;background:#fff;border:1px solid var(--line);border-radius:9px;font-size:12.5px}}
+.choice-state{{font-size:12px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:7px}}
+.choice-state::before{{content:"";width:8px;height:8px;border-radius:50%;background:#cfc9ba;flex:none}}
+.decision-actions:has(.decision-action[aria-pressed="true"]) .choice-state{{color:var(--ok)}}
+.decision-actions:has(.decision-action[aria-pressed="true"]) .choice-state::before{{background:var(--ok)}}
+.recommendation-nav{{margin:12px 0 0;padding:8px 12px;background:#efebe0;border-radius:10px;font-size:12px;color:var(--muted)}}
+.recommendation-nav button{{border-radius:8px;background:#fff;border:1px solid var(--line);padding:7px 12px;font-size:12px;font-weight:600}}
+dialog{{border-radius:16px}}
+#decision-request-form{{padding:24px}}
+#decision-request-form h3{{font-family:var(--font-display);font-size:20px;font-weight:600;margin:0 0 6px}}
+#decision-request-form p{{color:var(--muted);font-size:13px}}
+#decision-request-fields label span{{font-size:12px;font-weight:600}}
+#decision-request-fields input,#decision-request-fields textarea{{border-radius:10px}}
+.dialog-actions button{{border-radius:9px;padding:8px 14px;font-weight:600}}
+.dialog-actions #decision-request-save{{background:var(--accent);color:#fff;border-color:var(--accent)}}
+.dependency-note{{background:#f4f4f5;color:#52525b;border:1px solid var(--line);border-radius:10px;font-size:12px;margin-top:10px}}
+.review-mode :where(button,a,summary,input,textarea):focus-visible{{outline:2px solid var(--accent);outline-offset:2px}}
+@media(max-width:1020px){{.review-mode main{{padding-left:0}}.review-mode main::before{{display:none}}.review-mode .review-header{{position:sticky;width:auto;right:0;border-right:0}}.decision-toolbar{{position:static;width:auto;display:flex;flex-direction:column;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}}.review-stage-tabs{{flex-direction:row;overflow:auto}}.review-stage-tabs button{{white-space:nowrap}}.review-stage-tabs button::after{{display:none}}.review-stage-tabs button::before{{display:none}}.page-review-tabs{{position:static;width:auto;flex-direction:row;overflow-x:auto;border-top:0}}.page-review-tabs button{{white-space:nowrap}}.page-review-tabs button::before{{display:none}}.publish-actions{{position:static;width:auto;display:flex;flex-wrap:wrap;border-right:0}}.review-status{{position:static;width:auto;flex-direction:row;align-items:center;border-top:0}}.decision-block.active{{grid-template-columns:1fr}}.recommendation-visual .decision-media{{height:240px}}.fit-grid{{grid-template-columns:1fr}}}}
 </style></head><body class="{body_class}">{HASH_PREFIX}{marker} -->{header}{f'<nav class="dashboard-tabs">{nav}</nav>' if nav else ''}<main>{panels}</main><script>
 function swap(selector,panel,id){{document.querySelectorAll(selector).forEach(x=>x.classList.remove('active'));document.querySelectorAll(panel).forEach(x=>x.classList.remove('active'));const b=document.querySelector(`[data-${{selector.includes('concept')?'concept':'site'}}="${{id}}"]`);if(b)b.classList.add('active');const p=document.getElementById(id);if(p)p.classList.add('active')}}
 document.querySelectorAll('nav button[data-tab]').forEach(b=>b.addEventListener('click',()=>{{document.querySelectorAll('nav button,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active')}}));
@@ -539,7 +779,8 @@ if(recommendationNode){{
  const packetPath='brain/research/ui-decision-draft.json';const source=JSON.parse(recommendationNode.textContent);const checkoutIdentity=source.checkout?.checkout_root||'unknown-checkout',reviewKey='project-dashboard-page-decisions:'+checkoutIdentity+':'+source.mission_id,requestKey=reviewKey+':requests';let review={{}},requests=[];try{{review=JSON.parse(localStorage.getItem(reviewKey)||'{{}}')}}catch(e){{review={{}}}}try{{requests=JSON.parse(localStorage.getItem(requestKey)||'[]')}}catch(e){{requests=[]}}
  const message=document.getElementById('decision-message'),count=document.getElementById('decision-count'),submitButton=document.getElementById('submit-decisions'),updateButton=document.getElementById('update-decisions');let submitted=false;
  const saveLocal=()=>{{localStorage.setItem(reviewKey,JSON.stringify(review));localStorage.setItem(requestKey,JSON.stringify(requests))}};
- const refresh=()=>{{document.querySelectorAll('.decision-actions').forEach(group=>{{const saved=review[group.dataset.recommendationId]||{{}};group.querySelectorAll('.decision-action').forEach(button=>button.setAttribute('aria-pressed',String(saved.status===button.dataset.status)));group.closest('.recommendation-body')?.querySelectorAll('.part-choice').forEach(button=>button.setAttribute('aria-pressed',String((saved.selected_parts||[]).includes(button.dataset.part))));group.querySelector('textarea').value=saved.note||'';group.querySelector('.choice-state').textContent=saved.status?`Choice: ${{saved.status.replaceAll('_',' ')}}`:'No choice recorded.'}});count.textContent=`${{Object.keys(review).length}} choices · ${{requests.length}} requests saved in this browser`}};
+ const updateNav=()=>{{const navDirectionId=source.site_direction?.recommendation_id;const shellIds=(source.global_shell?.recommendations||[]).map(item=>item.recommendation_id);document.querySelectorAll('.page-review-tab').forEach(tab=>{{const panel=document.getElementById(tab.dataset.reviewPage);if(!panel)return;const ids=[...panel.querySelectorAll('.decision-actions')].map(group=>group.dataset.recommendationId);tab.classList.toggle('decided',ids.some(id=>review[id]?.status))}});const pagesDone=[...document.querySelectorAll('.page-review-panel')].every(panel=>[...panel.querySelectorAll('.decision-actions')].some(group=>review[group.dataset.recommendationId]?.status));document.querySelectorAll('.review-stage-tab').forEach(tab=>{{const stage=tab.dataset.reviewStage;const done=stage==='direction-stage'?Boolean(review[navDirectionId]?.status):stage==='shell-stage'?(shellIds.length===0||shellIds.every(id=>review[id]?.status)):pagesDone;tab.classList.toggle('decided',done)}})}};
+ const refresh=()=>{{document.querySelectorAll('.decision-actions').forEach(group=>{{const saved=review[group.dataset.recommendationId]||{{}};group.querySelectorAll('.decision-action').forEach(button=>button.setAttribute('aria-pressed',String(saved.status===button.dataset.status)));group.closest('.recommendation-body')?.querySelectorAll('.part-choice').forEach(button=>button.setAttribute('aria-pressed',String((saved.selected_parts||[]).includes(button.dataset.part))));group.querySelector('textarea').value=saved.note||'';group.querySelector('.choice-state').textContent=saved.status?`Choice: ${{saved.status.replaceAll('_',' ')}}`:'No choice recorded.'}});count.textContent=`${{Object.keys(review).length}} choices · ${{requests.length}} requests saved in this browser`;updateNav()}};
  document.querySelectorAll('.decision-actions').forEach(group=>{{group.querySelectorAll('.decision-action').forEach(button=>button.addEventListener('click',()=>{{const previous=review[group.dataset.recommendationId]||{{}};review[group.dataset.recommendationId]={{...previous,status:button.dataset.status,candidate_ids:[group.dataset.recommendationId],scope:group.dataset.scope,target_id:group.dataset.targetId,note:group.querySelector('textarea').value||''}};saveLocal();refresh()}}));group.querySelector('textarea').addEventListener('input',event=>{{if(!review[group.dataset.recommendationId])return;review[group.dataset.recommendationId].note=event.target.value;saveLocal()}});group.closest('.recommendation-body')?.querySelectorAll('.part-choice').forEach(button=>button.addEventListener('click',()=>{{const saved=review[group.dataset.recommendationId]||{{status:'shortlisted',candidate_ids:[group.dataset.recommendationId],scope:group.dataset.scope,target_id:group.dataset.targetId,note:''}},parts=new Set(saved.selected_parts||[]);parts.has(button.dataset.part)?parts.delete(button.dataset.part):parts.add(button.dataset.part);saved.selected_parts=[...parts];review[group.dataset.recommendationId]=saved;saveLocal();refresh()}}))}});
  const normalizeScope=value=>({{'whole-page':'whole_page','connected-sections':'connected_sections','one-section':'section','repeated-page-family':'page_family','global-shell':'global_shell'}}[value]||value);
  const buildPacket=()=>{{const targetResults=new Map((source.targets||[]).map(target=>[target.target_id,target]));const pages=(source.input.targets||[]).map(target=>{{const recs=(targetResults.get(target.target_id)||{{recommendations:[]}}).recommendations||[];return{{id:target.target_id,family_id:target.family_id,label:target.label,decisions:recs.filter(rec=>review[rec.recommendation_id]).map(rec=>({{...review[rec.recommendation_id],id:rec.recommendation_id,scope:normalizeScope(rec.scope),affected_blocks:(review[rec.recommendation_id].selected_parts?.length?review[rec.recommendation_id].selected_parts:rec.affected_blocks)||[]}}))}}}});const directionId=source.site_direction?.recommendation_id;const shellSource=source.global_shell||{{target_id:'global-shell',state:'not_needed',recommendations:[]}},shellRecommendations=shellSource.recommendations||[],shell=shellRecommendations.filter(item=>review[item.recommendation_id]).map(item=>({{...review[item.recommendation_id],recommendation_id:item.recommendation_id,scope:'global_shell'}}));const assets=[],assetKeys=new Set();(source.targets||[]).forEach(target=>(target.recommendations||[]).forEach(rec=>{{const choice=review[rec.recommendation_id];if(choice?.status==='selected')(rec.asset_requirements||[]).forEach(asset=>{{const key=`${{target.target_id}}:${{rec.recommendation_id}}:${{asset.asset_id}}`;if(!assetKeys.has(key)){{assetKeys.add(key);assets.push({{...asset,target_id:target.target_id,recommendation_id:rec.recommendation_id}})}}}})}}));const focused=requests.filter(item=>item.kind==='research'),provided=[...(source.input.reference_scope?.urls||[]).map(url=>({{live_url:url,source:'initial-research-scope'}})),...requests.filter(item=>item.kind==='reference')],deferred=requests.filter(item=>item.kind==='component').map(item=>({{...item,kind:'bring_own_component',status:'awaiting_active_page'}}));return{{schema_version:1,project:{{name:source.project}},research:{{mission_id:source.mission_id,mode:source.entry_mode,evidence_readiness:source.evidence_readiness,derived_path:source.derived_path,documented_gaps:source.unresolved_gaps||[]}},site_direction:{{recommendation_id:directionId,...(review[directionId]||{{}})}},global_shell:{{target_id:'global-shell',state:shellSource.state||'not_needed',recommendations:shellRecommendations,decisions:shell}},page_families:source.input.page_families||[],pages,asset_requirements:assets,focused_research_requests:focused,provided_references:provided,deferred_component_intents:deferred}}}};
@@ -552,6 +793,7 @@ if(recommendationNode){{
  const persist=async action=>{{const packet=buildPacket(),problem=incomplete(packet);if(problem){{message.textContent=problem;return}}const config=window.__PROJECT_DASHBOARD_SERVER__;if(!config){{message.textContent='Static HTML cannot write project files. Use Export JSON or Copy relay.';return}}try{{const response=await fetch(`${{config.url}}/api/${{action}}`,{{method:'POST',headers:{{'Content-Type':'application/json','X-Project-Dashboard-Token':config.token}},body:JSON.stringify(packet)}}),result=await response.json();if(!response.ok)throw new Error(result.error||'Request failed');submitted=true;submitButton.disabled=true;updateButton.disabled=false;message.textContent=`Revision ${{result.submission.revision}} submitted for agent review. Build remains locked.`}}catch(error){{message.textContent=error.message}}}};
  document.getElementById('review-decisions').addEventListener('click',()=>{{const packet=buildPacket(),problem=incomplete(packet),selected=packet.pages.flatMap(page=>page.decisions.map(decision=>`${{page.label||page.id}} · ${{decision.status}} · ${{decision.id}}`));message.textContent=problem||`Ready to submit: ${{selected.length}} page choices, ${{packet.focused_research_requests.length}} focused requests, ${{packet.provided_references.length}} references, ${{packet.deferred_component_intents.length}} components to provide later.`}});document.getElementById('export-decisions').addEventListener('click',exportPacket);document.getElementById('copy-decisions').addEventListener('click',copyPacket);submitButton.addEventListener('click',()=>persist('submit'));updateButton.addEventListener('click',()=>persist('update'));
  const config=window.__PROJECT_DASHBOARD_SERVER__;if(config)fetch(`${{config.url}}/api/state`,{{headers:{{'X-Project-Dashboard-Token':config.token}}}}).then(response=>response.json()).then(state=>{{if(!state.packet)return;submitted=true;submitButton.disabled=true;updateButton.disabled=false;const packet=state.packet;const decisions=[packet.site_direction,...(packet.global_shell?.decisions||[]),...(packet.pages||[]).flatMap(page=>page.decisions||[])];decisions.filter(Boolean).forEach(item=>{{const id=item.id||item.recommendation_id||(item.candidate_ids||[])[0];if(id)review[id]={{status:item.status,candidate_ids:item.candidate_ids||[id],scope:item.scope,target_id:item.target_id,note:item.note||''}}}});requests=[...(packet.focused_research_requests||[]).map(item=>({{...item,kind:'research'}})),...(packet.provided_references||[]).filter(item=>item.source!=='initial-research-scope').map(item=>({{...item,kind:'reference'}})),...(packet.deferred_component_intents||[]).map(item=>({{...item,kind:'component'}}))];localStorage.setItem(reviewKey,JSON.stringify(review));localStorage.setItem(requestKey,JSON.stringify(requests));refresh();message.textContent=`Loaded submitted revision ${{packet.submission.revision}}. Build remains locked pending agent review.`}}).catch(()=>{{message.textContent='Could not load server state. Browser choices remain local.'}});
+ document.addEventListener('keydown',event=>{{if(event.target.closest('textarea,input,dialog'))return;if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;const stage=document.querySelector('.review-stage.active');if(!stage)return;const scopeNode=stage.querySelector('.page-review-panel.active')||stage;const card=scopeNode.querySelector('.recommendation-card.active')||scopeNode;const carousel=card.querySelector('[data-evidence-carousel]');carousel?.querySelector(event.key==='ArrowLeft'?'.previous-evidence':'.next-evidence')?.click()}});
  refresh();
 }}
 </script></body></html>'''

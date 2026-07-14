@@ -1,6 +1,7 @@
 # Project Status
 
 > Last updated: [date] · [author]
+> Format: project-protocol/status.v1
 
 ## Current state
 

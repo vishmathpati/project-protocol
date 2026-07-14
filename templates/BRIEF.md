@@ -1,5 +1,7 @@
 # Project Brief
 
+> Format: project-protocol/brief.v1
+
 ## Project
 
 - Name:

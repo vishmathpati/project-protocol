@@ -1,5 +1,7 @@
 # Marketing Sitemap
 
+> Format: project-protocol/sitemap.v1
+
 | Page/family ID | Scope | Paths/members | Parent | Representative page | Shared pattern | Exceptions | Audience | Intent | Primary conversion | Supporting CTA | Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 

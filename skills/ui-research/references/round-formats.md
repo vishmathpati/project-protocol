@@ -18,7 +18,7 @@ contains evidence-backed recommendations only and never human selections or buil
 <!-- PAGE_RECOMMENDATIONS_V1_START -->
 ```json
 {
-  "schema_version": "project-protocol.page-recommendations.v1",
+  "schema_version": "project-protocol.page-recommendations.v2",
   "mission_id": "<stable mission id>",
   "project": "<project name>",
   "generated_at": "<ISO-8601 timestamp>",
@@ -33,8 +33,8 @@ contains evidence-backed recommendations only and never human selections or buil
   "input": {
     "site_goal": "<plain-language site goal>",
     "page_families": [{"family_id": "<stable id>", "label": "<label>", "routes": ["<route>"], "kind": "unique | repeated-family | special | utility | legal"}],
-    "targets": [{"target_id": "<stable id>", "family_id": "<stable id>", "label": "<label>", "content_goal": "<goal>", "content_jobs": ["<job>"]}],
-    "available_media": [{"asset_id": "<stable id>", "kind": "image | video | icon | illustration | logo-mark | other", "status": "owned | client-provided | licensed | generated | temporary | missing"}],
+    "targets": [{"target_id": "<stable id>", "family_id": "<stable id>", "label": "<label>", "content_goal": "<goal>", "content_jobs": [{"job_id": "<target-id>--job-<slug>", "label": "<job>", "copy_excerpt": "<verbatim approved copy for this job, max ~200 chars, empty string when none exists>", "copy_ref": "<brain/marketing/copy/<file>#<job-id> or empty>"}]}],
+    "available_media": [{"asset_id": "<stable id>", "kind": "image | video | icon | illustration | logo-mark | other", "status": "owned | client-provided | licensed | generated | temporary | missing", "description": "<what the asset shows, one line>"}],
     "reference_scope": {"mode": "open | pinned", "urls": ["<exact URL>"]}
   },
   "site_direction": {"recommendation_id": "<stable id>", "summary": "<plain-language recommendation>", "fit": "<why it serves the site>", "alternatives": ["<alternative>"], "evidence_refs": ["<evidence id>"], "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]}},
@@ -44,13 +44,14 @@ contains evidence-backed recommendations only and never human selections or buil
     "recommendations": [{
       "recommendation_id": "<target id>--<stable recommendation slug>",
       "scope": "whole-page | connected-sections | one-section | repeated-page-family | global-shell",
-      "affected_blocks": ["<stable page-map block id>"],
+      "affected_blocks": ["<supplied job_id>"],
+      "serves_jobs": ["<job_id>"],
       "title": "<plain-language name>",
       "description": "<what the human will see and experience>",
       "fit": "<how the project content and goal map to this option>",
       "alternatives": ["<recommendation id>"],
       "compatibility_notes": {"dependencies": ["<recommendation id>"], "notes": "<research evidence that may affect combination review; no verdict>"},
-      "evidence": [{"evidence_id": "<stable id>", "site": "<site>", "page": "<page/region>", "live_url": "<exact URL>", "screenshot_paths": ["<worktree-local path>"], "capture_status": "live-complete | live-partial | media-fallback-only | no-visual", "viewport": "<size>", "video": {"role": "<role or none>", "provider_or_page_url": "<URL or none>", "delivery": "<type or unknown>", "playback": "<flags or unknown>", "reduced_motion_fallback": "<observed, absent, or unknown>", "official_embed": "<yes, no, or unknown>"}, "motion": {"behavior": "<plain behavior>", "implementation_evidence": "<observed stack/triggers or unknown>"}, "teardown_path": "<path or none>", "evidence": "<direct observation>", "inference": "<labeled inference or none>"}],
+      "evidence": [{"evidence_id": "<stable id>", "site": "<site>", "page": "<page/region>", "live_url": "<exact URL>", "screenshot_paths": ["<worktree-local path>"], "capture_status": "live-complete | live-partial | media-fallback-only | no-visual", "first_impression": true|false, "viewport": "<size>", "video": {"role": "<role or none>", "provider_or_page_url": "<URL or none>", "delivery": "<type or unknown>", "playback": "<flags or unknown>", "reduced_motion_fallback": "<observed, absent, or unknown>", "official_embed": "<yes, no, or unknown>"}, "motion": {"behavior": "<plain behavior>", "implementation_evidence": "<observed stack/triggers or unknown>"}, "teardown_path": "<path or none>", "evidence": "<direct observation>", "inference": "<labeled inference or none>"}],
       "asset_requirements": [{"asset_id": "<stable slot id>", "kind": "image | video | bespoke-icon | illustration | logo-mark | other", "purpose": "<slot job>", "quantity": "<actual required quantity>", "orientation_or_dimensions": "<need>", "responsive_need": "<desktop/mobile need>", "poster_or_fallback": "<need or none>", "safe_source_routes": ["existing", "client", "licensed", "generated", "commissioned", "temporary"], "replacement_or_rights_state": "<state>"}],
       "confidence": {"level": "high | medium | low", "reason": "<reason>", "material_gaps": ["<gap>"]},
       "focused_followup": {"eligible": true, "question": "<narrow page/block question or none>"}
@@ -69,7 +70,11 @@ agent combination verdict. Claude or Codex owns the exact review statuses `compa
 `compatible_with_adaptation`, and `conflicting`. Canonical research evidence is not an approved design
 selection. Final human approval must produce and validate the `## Approved Site Direction` Markdown
 record defined by `source/skills/build-page/references/site-direction-lock.md`; until that complete record
-is locked, no selected teardown or build is authorized.
+is locked, no selected teardown or build is authorized. Job IDs are authored upstream in Marketing Stage A and are
+immutable; copy excerpts are verbatim quotes from existing canon — Aside and the mission renderer never
+invent or paraphrase them. `affected_blocks` and `serves_jobs` may reference ONLY supplied job IDs — never a
+block ID that was not supplied. At most one `evidence` item per recommendation may set `first_impression` to
+true; it must be the capture that best represents the site's felt look.
 
 ---
 
@@ -79,11 +84,12 @@ is locked, no selected teardown or build is authorized.
   count, not a concept count, not a teardown count. Every `<count>` / `<N>` / `<k>` slot is the
   number the field *actually* produced, saturation-driven. A `<count>` is a report of what happened,
   never a goal that was aimed at. The depth dial (quick / standard / deep) tunes appetite, not counts.
-- **Paste blocks must be self-sufficient (Spec §7, fallback C).** Disk writes are an optimization;
-  the paste SUMMARY BLOCK is the guaranteed channel. Aside prints the block **every round, even when
-  the disk writes succeed.** If Aside cannot reach the `brain/` paths in some environment, the paste
-  block is the ONLY channel and the receiving agent must be able to write canon from it alone — so it carries the
-  full findings, not a pointer to a file.
+- **Paste blocks must be self-sufficient (Spec §7, fallback C).** Disk writes are an optimization; the
+  guaranteed channel is the **pair** — the paste SUMMARY BLOCK plus the complete PAGE_RECOMMENDATIONS
+  packet JSON. Aside prints the summary block **every round, even when the disk writes succeed**, and when
+  the disk write failed it also pastes the complete packet JSON as a second block. If Aside cannot reach the
+  `brain/` paths in some environment, that pair is the ONLY channel and the receiving agent must be able to
+  write canon from it alone — so together they carry the full findings, not a pointer to a file.
 
 ---
 
@@ -137,6 +143,7 @@ SATURATION: stopped at <N>, last <M> added nothing new.
 AGENCY FINDS: <agency → k works> | none
 FILES WRITTEN: brain/research/concepts.md · brain/moodboard/<k> shots
 QUESTIONS FOR YOU: <any blockers Aside hit, or "none">
+IF DISK WRITE FAILED: paste the COMPLETE PAGE_RECOMMENDATIONS packet JSON as a second block below this summary.
 ═══ END ROUND-1 ═══
 ```
 

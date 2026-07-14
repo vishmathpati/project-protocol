@@ -206,5 +206,146 @@ class DashboardTests(unittest.TestCase):
             self.assertIn(':where(button,a,summary,input,textarea):focus-visible', html)
 
 
+    def test_v2_packet_renders_copy_excerpt_serves_jobs_and_first_impression_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp); research = project / "brain/research"; moodboard = project / "brain/moodboard"
+            research.mkdir(parents=True); moodboard.mkdir(parents=True)
+            (moodboard / "cafe-hero.png").write_bytes(b"hero")
+            (moodboard / "cafe-mid.png").write_bytes(b"mid")
+            packet = {
+                "schema_version": "project-protocol.page-recommendations.v2",
+                "mission_id": "sample-cafe-mission",
+                "project": "Sample Cafe",
+                "generated_at": "2026-07-14T00:00:00Z",
+                "entry_mode": "provided-reference-discovery",
+                "derived_path": "brain/research/page-recommendations.json",
+                "checkout": {"checkout_root": str(project), "brain_root": str(project / "brain"), "branch": "test", "head": "abc"},
+                "input": {
+                    "site_goal": "Introduce a neighborhood cafe.",
+                    "page_families": [{"family_id": "home", "label": "Home", "routes": ["/"], "kind": "unique"}],
+                    "targets": [{
+                        "target_id": "home", "family_id": "home", "label": "Home",
+                        "content_goal": "Welcome guests and set the mood.",
+                        "content_jobs": [
+                            {"job_id": "welcome", "label": "Warm welcome", "copy_excerpt": "Fresh coffee and slow mornings.", "copy_ref": "brain/marketing/copy/home.md#welcome"},
+                            {"job_id": "hours", "label": "Hours and location", "copy_excerpt": "Open daily 7am to 4pm.", "copy_ref": "brain/marketing/copy/home.md#hours"},
+                        ],
+                    }],
+                    "available_media": [{"asset_id": "cafe-hero", "kind": "image", "description": "Placeholder storefront photo."}],
+                    "reference_scope": {"mode": "pinned", "urls": ["https://example.com/cafe"]},
+                },
+                "site_direction": {"recommendation_id": "site-warm", "summary": "A warm photographic welcome", "fit": "Cozy", "alternatives": [], "evidence_refs": ["cafe-home"], "confidence": {"level": "high", "reason": "Repeated", "material_gaps": []}},
+                "global_shell": {"target_id": "global-shell", "state": "not_needed", "recommendations": []},
+                "targets": [{
+                    "target_id": "home",
+                    "recommendations": [{
+                        "recommendation_id": "home--warm-welcome",
+                        "scope": "whole-page",
+                        "affected_blocks": ["welcome", "hours"],
+                        "serves_jobs": ["welcome", "hours"],
+                        "title": "Warm photographic welcome",
+                        "description": "A photo-led hero that carries both jobs.",
+                        "fit": "Carries the supplied copy without fragmenting it.",
+                        "alternatives": [],
+                        "compatibility_notes": {"dependencies": [], "notes": "Header proposed, never auto-selected."},
+                        "evidence": [
+                            {"evidence_id": "cafe-detail", "site": "Sample Reference A", "page": "Home", "live_url": "https://example.com/a", "screenshot_paths": ["brain/moodboard/cafe-mid.png"], "capture_status": "live-complete", "viewport": "1440x900", "first_impression": False, "motion": {"behavior": "gentle fade"}, "evidence": "direct"},
+                            {"evidence_id": "cafe-home", "site": "Sample Reference B", "page": "Home", "live_url": "https://example.com/b", "screenshot_paths": ["brain/moodboard/cafe-hero.png"], "capture_status": "live-complete", "viewport": "1440x900", "first_impression": True, "motion": {"behavior": "hero parallax"}, "evidence": "direct"},
+                        ],
+                        "asset_requirements": [{"asset_id": "cafe-hero", "kind": "image", "purpose": "Welcome", "quantity": "1", "orientation_or_dimensions": "landscape", "responsive_need": "desktop/mobile", "poster_or_fallback": "none", "safe_source_routes": ["client"]}],
+                        "confidence": {"level": "high", "reason": "direct", "material_gaps": []},
+                    }],
+                }],
+                "unresolved_gaps": [],
+                "saturation": "stable",
+                "evidence_readiness": "ready",
+            }
+            (research / "page-recommendations.json").write_text(json.dumps(packet))
+            output = project / "brain/project-dashboard.html"
+            result = subprocess.run(["python3", str(GENERATOR), str(project)], text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            html = output.read_text()
+
+            wire_rows = re.findall(r'<div class="wire-row">.*?</div>', html, re.S)
+            self.assertTrue(any('<em>Fresh coffee and slow mornings.</em>' in row for row in wire_rows))
+
+            self.assertIn("Covers: Warm welcome, Hours and location", html)
+
+            first_active = html.split('class="evidence-slide active"', 1)[1].split('class="evidence-slide', 1)[0]
+            self.assertIn("Sample Reference B", first_active)
+            self.assertNotIn("Sample Reference A", first_active)
+
+    def test_v2_copy_staleness_flags_only_drifted_wire_rows(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            research = project / "brain/research"
+            copy_dir = project / "brain/marketing/copy"
+            research.mkdir(parents=True)
+            copy_dir.mkdir(parents=True)
+            (copy_dir / "home.md").write_text(
+                "# Home (`/`) — Final Copy\n\n"
+                "## welcome\n\nFresh coffee and slow mornings on Maple Street. Stay a while.\n\n"
+                "## hours\n\nWe have moved to a new seasonal schedule; check the board out front.\n"
+            )
+            packet = {
+                "schema_version": "project-protocol.page-recommendations.v2",
+                "mission_id": "sample-cafe-mission",
+                "project": "Sample Cafe",
+                "generated_at": "2026-07-14T00:00:00Z",
+                "entry_mode": "provided-reference-discovery",
+                "derived_path": "brain/research/page-recommendations.json",
+                "checkout": {"checkout_root": str(project), "brain_root": str(project / "brain"), "branch": "test", "head": "abc"},
+                "input": {
+                    "site_goal": "Introduce a neighborhood cafe.",
+                    "page_families": [{"family_id": "home", "label": "Home", "routes": ["/"], "kind": "unique"}],
+                    "targets": [{
+                        "target_id": "home", "family_id": "home", "label": "Home",
+                        "content_goal": "Welcome guests and set the mood.",
+                        "content_jobs": [
+                            {"job_id": "welcome", "label": "Warm welcome", "copy_excerpt": "Fresh coffee and slow mornings on Maple Street.", "copy_ref": "brain/marketing/copy/home.md#welcome"},
+                            {"job_id": "hours", "label": "Hours and location", "copy_excerpt": "Open daily 7am to 4pm, corner of Maple and Third.", "copy_ref": "brain/marketing/copy/home.md#hours"},
+                        ],
+                    }],
+                    "available_media": [],
+                    "reference_scope": {"mode": "pinned", "urls": ["https://example.com/cafe"]},
+                },
+                "site_direction": {"recommendation_id": "site-warm", "summary": "A warm photographic welcome", "fit": "Cozy", "alternatives": [], "evidence_refs": [], "confidence": {"level": "high", "reason": "Repeated", "material_gaps": []}},
+                "global_shell": {"target_id": "global-shell", "state": "not_needed", "recommendations": []},
+                "targets": [{
+                    "target_id": "home",
+                    "recommendations": [{
+                        "recommendation_id": "home--warm-welcome",
+                        "scope": "whole-page",
+                        "affected_blocks": ["welcome", "hours"],
+                        "serves_jobs": ["welcome", "hours"],
+                        "title": "Warm photographic welcome",
+                        "description": "A photo-led hero that carries both jobs.",
+                        "fit": "Carries the supplied copy without fragmenting it.",
+                        "alternatives": [],
+                        "compatibility_notes": {"dependencies": [], "notes": "Header proposed, never auto-selected."},
+                        "evidence": [],
+                        "asset_requirements": [],
+                        "confidence": {"level": "high", "reason": "direct", "material_gaps": []},
+                    }],
+                }],
+                "unresolved_gaps": [],
+                "saturation": "stable",
+                "evidence_readiness": "ready",
+            }
+            (research / "page-recommendations.json").write_text(json.dumps(packet))
+            output = project / "brain/project-dashboard.html"
+            result = subprocess.run(["python3", str(GENERATOR), str(project)], text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            html = output.read_text()
+
+            wire_rows = re.findall(r'<div class="wire-row">.*?</div>', html, re.S)
+            welcome_row = next(row for row in wire_rows if "Warm welcome" in row)
+            hours_row = next(row for row in wire_rows if "Hours and location" in row)
+            # Matching excerpt: no staleness badge.
+            self.assertNotIn("stale-copy", welcome_row)
+            # Drifted excerpt: staleness badge present.
+            self.assertIn('<span class="stale-copy">copy changed since research</span>', hours_row)
+
+
 if __name__ == "__main__":
     unittest.main()

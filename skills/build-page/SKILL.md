@@ -24,7 +24,7 @@ UI Research remains optional. When `brain/research/page-recommendations.json` ex
 
 ### Site-wide decision gate
 
-For a research-led marketing website, read the exact `## Approved Site Direction` block defined in `references/site-direction-lock.md`. A dashboard submission is a proposal: **submitted is not locked**. Before the first page build, require human-approved site direction, reviewed global-shell decisions (including an explicit `not_needed` where applicable), and a reviewed direction for every unique page and page family in the sitemap. Missing, submitted, reopened, partial, or `conflicting` decisions stop before implementation and route to the site-wide review. This gate does not apply to ordinary product/dashboard work that did not enter the research-led marketing workflow.
+For a research-led marketing website, read the exact `## Approved Site Direction` block defined in `references/site-direction-lock.md`. A dashboard submission is a proposal: **submitted is not locked**. Before the first page build, require human-approved site direction, reviewed global-shell decisions (including an explicit `not_needed` where applicable), a reviewed direction for every unique page and page family in the sitemap, and locked design canon (Style Lock completed, or an existing DESIGN explicitly reused) for research-led marketing pages. Missing, submitted, reopened, partial, or `conflicting` decisions stop before implementation and route to the site-wide review. This gate does not apply to ordinary product/dashboard work that did not enter the research-led marketing workflow.
 
 ### Activate one page
 
@@ -36,9 +36,11 @@ Activate only the page or representative family page named by the chapter. Load 
 
 For the homepage chapter, follow FUNDAMENTALS: implement and verify the **shell slice first** (navigation structure, footer, page skeleton, and base primitives), then compose homepage sections. A page-coupled header may be reviewed with its hero, but it must still honor the locked navigation architecture and other-page behavior.
 
+Also read, from the approved submission and locked site-direction record, the validated `provided_references`, the `focused_research_requests` outcomes, and the shortlisted recommendation IDs. Treat each as a human decision that must be surfaced during the page conversation and honored or explicitly discussed — never silently ignored.
+
 Read any validated `deferred_component_intents` in the approved submission. A deferred component intent is not a component choice and never bypasses the site-wide gate. Ask the human to provide it **only when its exact page or representative family becomes active** and the named affected block is reached. Then compare it with the locked site direction, global shell, approved homepage and prior pages, page-family siblings, design system, active content job, responsiveness, accessibility, and media needs. Reuse or adapt it when compatible; use Inspect Component when exact mechanics are unclear; use Build Component only when the project genuinely lacks the required component. Record the outcome in the active page's execution decisions.
 
-For a page family, build and verify the representative page/template first, check its shared pattern against every member and recorded exception, then apply the approved family to the remaining members without reopening the direction. A member whose exception changes the composition becomes its own active page decision.
+For a page family, build and verify the representative page/template first, check its shared pattern against every member and recorded exception, then apply the approved family to the remaining members without reopening the direction. The verified representative page becomes the family template; each remaining member is produced by injecting that member's own content jobs, copy, and media into the approved template without reopening the direction. Record per-member deviations as exceptions. A member whose exception changes the composition becomes its own active page decision.
 
 ## Lock page intent
 
@@ -52,8 +54,9 @@ Do not begin by asking the user to pick components, and do not make a generic wi
 2. **Section jobs and narrative order** — propose the smallest coherent sequence based on meaning. No card/carousel/layout choice yet.
 3. **Whole-page direction** — apply the approved site/page-family direction to the page's hierarchy, rhythm, navigation, imagery, type, and motion.
 4. **Connected-section sequences** — identify sections whose shared background, transition, scroll behavior, or narrative depends on staying together. Approve each connected-section sequence as one composition before discussing its parts.
-5. **Pattern choice — optional section overrides** — only where a section genuinely needs a different expression, offer at most three options grounded in selected research and existing project components. Explain the trade-off in plain language and let the human choose; never mechanically slice a coherent page into unrelated components.
-6. **Media plan** — convert the approved composition into implementation-ready media slots before promising visual completeness.
+5. **Pattern choice — optional section overrides** — only where a section genuinely needs a different expression, offer at most three options grounded in selected research, the human's shortlisted candidates for this target, and existing project components. Present shortlisted candidates by name when relevant. Explain the trade-off in plain language and let the human choose; never mechanically slice a coherent page into unrelated components.
+6. **Copy finalization** — present this page's draft copy in the context of the chosen composition; the human finalizes it (PAGE-COPY format, human edits win, marketing ownership unchanged); implementation uses only finalized copy.
+7. **Media plan** — convert the approved composition into implementation-ready media slots before promising visual completeness.
 
 For each whole page, connected sequence, and optional section override, record its scope, job, content source, approved presentation pattern, visual anchor, selected research evidence, reuse/build decision, media slots, and responsive/motion behavior. A reference may propose a coupled **hero/header** treatment; present that dependency to the human and global-shell review, but never silently select it or change global navigation on the hero's behalf. The Page Blueprint is a decision conversation, not a separate source-of-truth file.
 
@@ -65,7 +68,7 @@ Safe prototypes may use owned/licensed media, approved AI generations, or neutra
 
 ### Page Asset Request
 
-Before implementation, present one consolidated human-readable request grouped into available, required, provisional, and blocked assets. Include all page **images**, **videos**, video **posters**, **illustrations**, **logos**, **bespoke marks**, and any **other load-bearing assets** such as 3D, audio, maps, embeds, or documents. For every slot state the quantity, page/section purpose, required dimensions/behavior, existing path, source route and rights, availability / next action, responsive variant, and replacement gate. Routine icons are automatic from the locked icon family and must not become user questions.
+Before implementation, present one consolidated human-readable request grouped into available, required, provisional, and blocked assets. Draw its inputs from both the approved submission's `asset_requirements` array and `brain/marketing/MEDIA.md`. Include all page **images**, **videos**, video **posters**, **illustrations**, **logos**, **bespoke marks**, and any **other load-bearing assets** such as 3D, audio, maps, embeds, or documents. For every slot state the quantity, page/section purpose, required dimensions/behavior, existing path, source route and rights, availability / next action, responsive variant, and replacement gate. Routine icons are automatic from the locked icon family and must not become user questions.
 
 Record approved page-specific choices in the chapter under `## Page Execution Decisions`: locked site-direction revision, active page/family, global-shell and prior-page context, compatibility verdict/adaptations, content inventory, whole-page/connected/override scopes, media-slot IDs and replacement gates, component paths, and meaningful deviations. Do not create a competing page-state file or append page plans to BRIEF.
 
@@ -73,4 +76,10 @@ Record approved page-specific choices in the chapter under `## Page Execution De
 
 Reuse existing components first. For configured shadcn product/dashboard systems, use existing project components, then shadcn primitives, then compose an accessible project-system component only when neither exists. Brand-expressive marketing sections may be bespoke over accessible primitives.
 
-Render at relevant viewports, self-critique rhythm/hierarchy/content fit, run Design Check postflight, run applicable tests, and then Completion Check against the chapter. Report evidence and untouched regions.
+Render at relevant viewports, self-critique rhythm/hierarchy/content fit, and run Design Check postflight.
+
+### Human satisfaction loop
+
+After implementation and before completion, run a mandatory satisfaction loop: render the page at relevant viewports, **present the rendered result to the human**, collect feedback, revise, and repeat until the human explicitly approves the page. Record that explicit approval in the chapter's page decision. Design Check and Completion Check verify compliance and contract — they do not replace the human's satisfaction approval. For research-led marketing pages this loop is unmistakably mandatory and cannot be skipped.
+
+Only after the human's explicit page approval, run applicable tests and then Completion Check against the chapter. Report evidence and untouched regions.

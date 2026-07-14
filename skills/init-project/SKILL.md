@@ -29,7 +29,7 @@ Do not ask brand positioning, marketing strategy, visual taste, colors, fonts, r
 
 ## 3. Create universal canon
 
-Always ensure these exist, preserving customized content:
+Always ensure these exist, preserving customized content. Create each file from its shipped template in the plugin's `templates/` directory:
 
 - root `CLAUDE.md`
 - `brain/.plugin-version`
@@ -46,6 +46,8 @@ Always ensure these exist, preserving customized content:
 Conditional owners create ROADMAP, TOOLING, docs/INDEX, BRAND, DESIGN, FUNDAMENTALS, TASTE, DISCOVERIES, marketing, research, moodboard, and dashboard artifacts. Foundation may create a conditional file only when applicability is established and real information is available.
 
 Never create a real chapter, fake roadmap, fake history, invented brand/design direction, or research artifact.
+
+Created and updated files keep their template's `> Format:` stamp line so a future plugin version can detect the format generation.
 
 ## 4. File ownership
 

@@ -1,5 +1,7 @@
 # Page Brief — [Page]
 
+> Format: project-protocol/page-brief.v1
+
 ## Placement
 
 - Page/family ID:
@@ -21,9 +23,14 @@
 | Content ID/source | Purpose | Proof/status |
 |---|---|---|
 
-## Section intent
+## Content jobs
 
-List communication jobs and required content, not visual layout or component composition.
+| Job ID | Communication job | Required content IDs | Copy status |
+|---|---|---|---|
+
+- Job IDs use the form `<page-id>--job-<slug>`.
+- A Job ID is stable once consumed downstream (copy, research, or Build Page) and is renamed only through an intentional migration, mirroring the stable-ID rule in `CONTENT.md`.
+- Record communication jobs, not visual layout or component composition.
 
 ## Media requirements
 
